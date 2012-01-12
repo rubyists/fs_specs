@@ -21,7 +21,7 @@ This is the starting point for all addition features and specs. This feature wil
 show that your testing infrastructure is working correctly! If this fails, nothing
 else matters!
 
-The starting point is named features/00_phone_infrastructure.feature
+The starting point is named features/000_phone_infrastructure.feature
 
 NOTE: Please bear in mind the '00' portion of the filename. You should order the remainder
 of any addition setup you need, or specific action sets done first before you hit the real
@@ -58,12 +58,12 @@ you can simply check ``rvm info`` to make sure you are in ruby-1.9.3-p0@fs_specs
 
 Now is the time to check that you have connectivity between your machines you'll be using for testing.
 
-Now edit features/00_phone_infrastructure.feature and change the (blackbird|falcon).rubyists.com
+Now edit features/000_phone_infrastructure.feature and change the (blackbird|falcon).rubyists.com
 to the names of your own servers.
 NOTE: This *will* be made into a configuration file, most likely YAML based. Its a TODO.
 
 You're done! Now you can run the following command. If your connection check earlier was working correctly,
-then this command should pass. Run: ``cucumber features/00_phone_infrastructure.feature``
+then this command should pass. Run: ``cucumber features/000_phone_infrastructure.feature``
 You should see all Green if your machines are properly configured.
 
 == What Does What?
