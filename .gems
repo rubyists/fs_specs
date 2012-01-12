@@ -1,0 +1,20 @@
+# .gems generated gem export file. Note that any env variable settings will be missing. Append these after using a ';' field separator
+bacon -v1.1.0
+builder -v3.0.0
+cucumber -v1.1.4
+diff-lcs -v1.1.3
+eventmachine -v0.12.10
+freeswitcher -v0.6.18
+gherkin -v2.7.3
+gist -v2.0.4
+json -v1.6.4
+log4r -v1.1.10
+nokogiri -v1.5.0
+rack -v1.4.0
+rack-test -v0.6.1
+rspec -v2.8.0
+rspec-core -v2.8.0
+rspec-expectations -v2.8.0
+rspec-mocks -v2.8.0
+term-ansicolor -v1.0.7
+webrat -v0.7.3
