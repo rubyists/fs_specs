@@ -19,7 +19,7 @@ Given /^I have 2 servers named ([\w.]+) and ([\w.]+)$/ do |server1, server2|
   @sock = FSR::CommandSocket.new(server: @server1, port: 8021)
 end
 
-Then /^I should be able to terminate it$/ do
+Then /^I should be able to terminate the call$/ do
   @sock.calls.run.each do |call|
     @sock.say("api uuid_kill #{call.uuid}")
   end
