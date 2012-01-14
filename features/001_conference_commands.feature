@@ -16,6 +16,7 @@ Feature: Test all available commands for conferences
 
     Examples:
     | Command       | Command_Help_Text |
+    | help          | help_text         |
     | list          | help_text         |
     | st            | help_text         |
     | xml_list      | help_text         |
