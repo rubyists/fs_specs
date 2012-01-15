@@ -33,3 +33,7 @@ Then /^I should be able to terminate the call$/ do
   end
   @sock.calls.run.size.should == 0
 end
+
+Given /^I have registered to FreeSWITCH$/ do
+  pending
+end
