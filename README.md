@@ -71,3 +71,12 @@ You should see all Green if your machines are properly configured.
 The feature files kick off all the specs under features/step_definitions/ and this is where to find everything.
 All the guts of the Testing Glory reside here. The human interface remains with Cucumber.
 
+== Donations
+
+  I'm proud to work on Open Source software for various Projects out there. If you feel I’ve done something 
+    worthy of it, please feel free to donate some cash! It will be used to pay bills, feed my dog and I, and make 
+    it easier for me to spend more time working on more Open Source projects!
+    Let me say right up front! Thank you! All your donations are deeply appreciated! 
+    I hope to continue to write and work on stuff people need and want!
+
+<a href='http://www.pledgie.com/campaigns/16587'><img alt='Click here to lend your support to: Donations and make a donation at www.pledgie.com !' src='http://www.pledgie.com/campaigns/16587.png?skin_name=chrome' border='0' /></a>
