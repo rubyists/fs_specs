@@ -9,8 +9,8 @@ Feature: Test all available commands for conferences
       And I have registered to FreeSWITCH
 
     Scenario Outline: Check command availability
-      Given I issue command <Command>
-      Then I should recieve the help text <Command_Help_Text>
+      When I issue command "<Command>"
+      Then I should recieve the help text "<Command_Help_Text>"
       But I should not see an error status
 
     Examples:
