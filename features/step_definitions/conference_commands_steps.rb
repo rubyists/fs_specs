@@ -22,11 +22,11 @@ Given /^I have a conference object$/ do
   #pending # express the regexp above with the code you wish you had
 end
 
-When /^I issue command "([^"]*)"$/ do |arg1|
+When /^I issue command "([^"]*)"$/ do |cmd|
     pending # express the regexp above with the code you wish you had
 end
 
-Then /^I should recieve the help text "([^"]*)"$/ do |arg1|
+Then /^I should recieve the help text "([^"]*)"$/ do |help_text|
     pending # express the regexp above with the code you wish you had
 end
 
