@@ -23,7 +23,7 @@ Then /^I should be able to terminate the call$/ do
   @sock.calls.run.each do |call|
     @sock.say("api uuid_kill #{call.uuid}")
   end
-  
+
   # Due to asynchronous nature of the entire method chain
   # which involves network stack, call plans, etc..
   # We wait until all call deletions have caught up to us.
@@ -35,5 +35,8 @@ Then /^I should be able to terminate the call$/ do
 end
 
 Given /^I have registered to FreeSWITCH$/ do
-  pending
+  steps %{
+    When I make a phone call
+    Then I should be able to terminate the call
+  }
 end

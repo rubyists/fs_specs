@@ -5,9 +5,8 @@ Feature: Test all available commands for conferences
   tests those commands specific to the 'conference' command.
 
     Background:
-      Given I have 2 servers named 127.0.0.1 and falcon.rubyists.com
-      And I make a phone call
-      And I have a conference object
+      Given I have 2 servers named localhost and falcon.rubyists.com
+      And I have registered to FreeSWITCH
 
     Scenario Outline: Check command availability
       Given I issue command <Command>
