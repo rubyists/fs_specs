@@ -1,5 +1,5 @@
 When /^I make a phone call$/ do
-  orig = @sock.originate(target: "sofia/external/3000@#{@server2}:5080", endpoint: '&transfer(3000)')
+  orig = @sock.originate(target: "sofia/external/3000@#{@server2}:5080", endpoint: '&transfer(9664)')
   uuid = orig.run(:api)['body'].split[1]
 
   # Due to asyncronous nature of the entire method chain
@@ -37,6 +37,44 @@ end
 Given /^I have registered to FreeSWITCH$/ do
   steps %{
     When I make a phone call
-    Then I should be able to terminate the call
   }
 end
+
+Given /^I have a conference object$/ do
+  confs = @sock.conference(:list).run
+  p confs
+  #pending # express the regexp above with the code you wish you had
+end
+
+When /^I issue command "([^"]*)"$/ do |cmd|
+    pending # express the regexp above with the code you wish you had
+end
+
+Then /^I should recieve the help text "([^"]*)"$/ do |help_text|
+    pending # express the regexp above with the code you wish you had
+end
+
+Then /^I should not see an error status$/ do
+  pending # express the regexp above with the code you wish you had
+end
+
+When /^I dial registered extension (\d+)$/ do |regged_extension|
+  pending # express the regexp above with the code you wish you had
+end
+
+Then /^I should be connected to that extension$/ do
+  pending # express the regexp above with the code you wish you had
+end
+
+When /^I dial unregistered extension (\d+)$/ do | unregged_extension|
+  pending # express the regexp above with the code you wish you had
+end
+
+Then /^I should be notified the call failed$/ do
+  pending # express the regexp above with the code you wish you had
+end
+
+Then /^I should recieve call failure type (\w+)$/ do |failure_type|
+  pending # express the regexp above with the code you wish you had
+end
+

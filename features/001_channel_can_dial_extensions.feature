@@ -7,6 +7,7 @@ Feature: A channel can dial an extension
   the fact of the failure, and the type of the failure. (NoAnswer, UnRegisteredExtension)
 
   Background: 
+    Given I have 2 servers named localhost and falcon.rubyists.com
     Given I have registered to FreeSWITCH
 
     Scenario:
