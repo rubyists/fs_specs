@@ -10,12 +10,35 @@ Feature: A channel can dial an extension
     Given I have 2 servers named localhost and falcon.rubyists.com
     Given I have registered to FreeSWITCH
 
-    Scenario:
-      When I dial registered extension 1000
+    Scenario Outline:
+      When I dial registered extension "<regged_extension>"
       Then I should be connected to that extension
 
+    Examples:
+      | regged_extension |
+      | 1000             |
+      | 1001             |
+      | 1002             |
+      | 1003             |
+      | 1004             |
+      | 1005             |
+      | 1006             |
+      | 1007             |
+      | 1008             |
+      | 1009             |
+      | 1010             |
+      | 1011             |
+      | 1012             |
+      | 1013             |
+      | 1014             |
+      | 1015             |
+      | 1016             |
+      | 1017             |
+      | 1018             |
+      | 1019             |
+
     Scenario:
-      When I dial unregistered extension 1000
+      When I dial unregistered extension 1020
       Then I should be notified the call failed
       And I should recieve call failure type FailureType
 
