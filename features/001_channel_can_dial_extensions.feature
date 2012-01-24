@@ -1,14 +1,14 @@
 Feature: A channel can dial an extension
 
   Once a UserAgent (X-Lite, PolyCom, another FS) can successfully connect to freeswitch,
-  that UserAgent should be able to place a call to any registered extension, and connect.
+  that UserAgent should be able to place a call to any known extension, and connect.
 
   If that extension can not be connected to, then the UserAgent should be notified of both 
-  the fact of the failure, and the type of the failure. (NoAnswer, UnRegisteredExtension)
+  the fact of the failure, and the type of the failure. (NoAnswer, UnknownExtension)
 
   Background: 
     Given I have 2 servers named localhost and falcon.rubyists.com
-    Given I have registered to FreeSWITCH
+    Given I have known to FreeSWITCH
 
     Scenario Outline:
       When I dial extension "<regged_extension>"
