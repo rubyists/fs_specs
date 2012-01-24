@@ -34,7 +34,7 @@ Then /^I should be able to terminate the call$/ do
   @sock.calls.run.size.should == 0
 end
 
-Given /^I have registered to FreeSWITCH$/ do
+Given /^I am known to FreeSWITCH$/ do
   steps %{
     When I make a phone call
   }

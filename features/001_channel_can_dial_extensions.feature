@@ -8,7 +8,7 @@ Feature: A channel can dial an extension
 
   Background: 
     Given I have 2 servers named localhost and falcon.rubyists.com
-    Given I have known to FreeSWITCH
+    Given I am known to FreeSWITCH
 
     Scenario Outline:
       When I dial extension "<regged_extension>"
