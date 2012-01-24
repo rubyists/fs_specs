@@ -97,3 +97,7 @@ end
 Then /^I should be prompted to try again$/ do
   pending # express the regexp above with the code you wish you had
 end
+
+Given /^I dial shortcut "([^"]*)"$/ do |dialed_shortcut|
+  pending # express the regexp above with the code you wish you had
+end

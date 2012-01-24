@@ -6,12 +6,24 @@ Feature: Channel can interact with voicemail
 	Background:
 		Given I have 2 servers named localhost and falcon.rubyists.com
 		And I am known to FreeSWITCH
-    And I dial extension "4000"
 		
-  Scenario: Successfully log into voicemail
+  Scenario: Successfully log into voicemail using extension
+  	And I dial extension "4000"
     And I supply my extension and password
 		Then I should be logged into voicemail
 
-	Scenario: Fail to log into voicemail
+	Scenario: Fail to log into voicemail using extension
+		And I dial extension "4000"
 		And I supply an incorrect extension and password
 	  Then I should be prompted to try again
+		
+	  Scenario: Successfully log into voicemail using shortcut
+	  	And I dial shortcut "*98"
+	    And I supply my extension and password
+			Then I should be logged into voicemail
+
+		Scenario: Fail to log into voicemail using extension
+			And I dial shortcut "*98"
+			And I supply an incorrect extension and password
+		  Then I should be prompted to try again
+	
