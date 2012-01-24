@@ -11,12 +11,12 @@ Feature: A channel can dial an extension
     And I am known to FreeSWITCH
 
     Scenario Outline:
-      When I dial extension "<regged_extension>"
+      When I dial extension "<known_extension>"
       Then I should be connected to that extension
       And I should be able to terminate the call
 
     Examples:
-      | regged_extension |
+      | known_extension |
       | 1000             |
       | 1001             |
       | 1002             |
