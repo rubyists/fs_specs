@@ -78,3 +78,22 @@ Then /^I should recieve call failure type (\w+)$/ do |failure_type|
   pending # express the regexp above with the code you wish you had
 end
 
+When /^I am prompted for my extension and password$/ do
+  pending # express the regexp above with the code you wish you had
+end
+
+When /^I supply my extension and password$/ do
+  pending # express the regexp above with the code you wish you had
+end
+
+Then /^I should be logged into voicemail$/ do
+  pending # express the regexp above with the code you wish you had
+end
+
+Given /^I supply an incorrect extension and password$/ do
+  pending # express the regexp above with the code you wish you had
+end
+
+Then /^I should be prompted to try again$/ do
+  pending # express the regexp above with the code you wish you had
+end
