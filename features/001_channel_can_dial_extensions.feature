@@ -9,10 +9,10 @@ Feature: A channel can dial an extension
 
   Background: 
     Given I have 2 servers named localhost and falcon.rubyists.com
-    And I am known to FreeSWITCH
+    And localhost is accessible via the Event Socket
 
     Scenario Outline:
-      When I dial extension "<known_extension>"
+      When I dial extension "<known_extension>" on falcon.rubyists.com
       Then I should be connected to that extension
       And I should be able to terminate the call
 

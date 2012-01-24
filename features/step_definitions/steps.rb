@@ -20,6 +20,17 @@ Given /^I have 2 servers named ([\w.]+) and ([\w.]+)$/ do |server1, server2|
 end
 
 Then /^I should be able to terminate the call$/ do
+  @uuid.should.not.be.nil
+  resp = @sock.kill(@uuid).run(:api)
+  resp["body"].should.match /^+OK/
+  30.times do
+    sleep 0.1
+    break unless @sock.calls.run.detect { |c| c.uuid == @uuid }
+  end
+  @sock.calls.run.detect { |c| c.uuid == @uuid }.should.be.nil
+end
+
+Then /^I should be able to terminate all calls$/ do
   @sock.calls.run.each do |call|
     @sock.say("api uuid_kill #{call.uuid}")
   end
@@ -29,9 +40,14 @@ Then /^I should be able to terminate the call$/ do
   # We wait until all call deletions have caught up to us.
   30.times do
     sleep 0.1
-    break if @sock.calls.run.empty?
+    break unless @sock.calls.run.size > 0
   end
   @sock.calls.run.size.should == 0
+end
+
+Given /^localhost is accessible via the Event Socket$/ do
+  @sock = FSR::CommandSocket.new(server: @server1)
+  @sock.should.not.be.nil
 end
 
 Given /^I am known to FreeSWITCH$/ do
@@ -41,7 +57,7 @@ Given /^I am known to FreeSWITCH$/ do
 end
 
 Given /^I have a conference object$/ do
-  confs = @sock.conference(:list).run
+  @confs = @sock.conference(:list).run
   p confs
   #pending # express the regexp above with the code you wish you had
 end
@@ -58,24 +74,37 @@ Then /^I should not see an error status$/ do
   pending # express the regexp above with the code you wish you had
 end
 
-When /^I dial extension "([^"]*)"$/ do |known_extension|
-  pending # express the regexp above with the code you wish you had
+When /^I dial extension "([^"]*)" on falcon.rubyists.com$/ do |known_extension|
+  orig = @sock.originate(target: 'sofia/external/%s@%s' % [known_extension, @server2],
+                         endpoint: "&transfer('3000 XML default')")
+  @resp = orig.run(:api)
+  @resp["body"].should.match /^+OK \w{8}-(?:\w{4}-){3}\w{12}$/
 end
 
 Then /^I should be connected to that extension$/ do
-  pending # express the regexp above with the code you wish you had
+  # we need code here that establishes (by checking the FSR sock?) that we have connected.
+  # some sort of return code, some variable only set if the connection succeeded.
+  # Is there something on @conf that we can check value-wise that shows us we are
+  # connected to the extension that was just dialed? I made conf into @conf so it
+  # survives between steps.
+  message, @uuid = @resp["body"].split(" ")
+  message.should == '+OK'
 end
 
 When /^I dial unknown extension (\d+)$/ do | unknown_extension|
-  pending # express the regexp above with the code you wish you had
+  orig = @sock.originate(target: 'sofia/external/%s@%s' % [unknown_extension, @server2],
+                         endpoint: "&transfer('3000 XML default')")
+  @resp = orig.run(:api)
+  @resp["body"].should.match /^-ERR/
 end
 
 Then /^I should be notified the call failed$/ do
-  pending # express the regexp above with the code you wish you had
+  status, @message = @resp["body"].split(" ")
+  status.should == '-ERR'
 end
 
 Then /^I should recieve call failure type (\w+)$/ do |failure_type|
-  pending # express the regexp above with the code you wish you had
+  @message.should == 'NO_USER_RESPONSE'
 end
 
 When /^I am prompted for my extension and password$/ do
