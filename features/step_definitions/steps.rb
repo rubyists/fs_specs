@@ -1,6 +1,6 @@
 When /^I make a phone call$/ do
-  orig = @sock.originate(target: "sofia/external/3000@#{@server2}:5080", endpoint: '&transfer(9664)')
-  uuid = orig.run(:api)['body'].split[1]
+  orig = @sock.originate(target: "sofia/external/3000@#{@server2}", endpoint: '&transfer(9664)')
+  @uuid = orig.run(:api)['body'].split[1]
 
   # Due to asyncronous nature of the entire method chain
   # which involves network stack, call plans, etc..
@@ -9,9 +9,10 @@ When /^I make a phone call$/ do
   # and include additional checks oside the sleep to limit wait time further.
   30.times do
     sleep 0.1
-    break if @sock.calls.run.any?{|call| call.uuid == uuid }
+    break if @sock.calls.run.any?{|call| call.uuid == @uuid }
   end
-  @sock.calls.run.size.should == 1
+  our_call = @sock.calls.run.detect { |call| call.uuid == @uuid }
+  fail "No Call Exists!" unless our_call and our_call.uuid == @uuid
 end
 
 Given /^I have 2 servers named ([\w.]+) and ([\w.]+)$/ do |server1, server2|
@@ -20,14 +21,15 @@ Given /^I have 2 servers named ([\w.]+) and ([\w.]+)$/ do |server1, server2|
 end
 
 Then /^I should be able to terminate the call$/ do
-  @uuid.should.not.be.nil
+  fail "I Have no UUID!" if @uuid.nil?
   resp = @sock.kill(@uuid).run(:api)
-  resp["body"].should.match /^+OK/
+  fail "Response #{resp} was not OK" unless resp["body"].match /^\+OK/
   30.times do
     sleep 0.1
     break unless @sock.calls.run.detect { |c| c.uuid == @uuid }
   end
-  @sock.calls.run.detect { |c| c.uuid == @uuid }.should.be.nil
+  # This is failing for phone_infrastructure
+  fail "Call not terminated!" unless @sock.calls.run.detect { |c| c.uuid == @uuid } == nil
 end
 
 Then /^I should be able to terminate all calls$/ do
@@ -42,12 +44,12 @@ Then /^I should be able to terminate all calls$/ do
     sleep 0.1
     break unless @sock.calls.run.size > 0
   end
-  @sock.calls.run.size.should == 0
+  fail unless @sock.calls.run.size == 0
 end
 
 Given /^localhost is accessible via the Event Socket$/ do
   @sock = FSR::CommandSocket.new(server: @server1)
-  @sock.should.not.be.nil
+  fail if @sock.nil?
 end
 
 Given /^I am known to FreeSWITCH$/ do
@@ -58,8 +60,6 @@ end
 
 Given /^I have a conference object$/ do
   @confs = @sock.conference(:list).run
-  p confs
-  #pending # express the regexp above with the code you wish you had
 end
 
 When /^I issue command "([^"]*)"$/ do |cmd|
@@ -75,36 +75,42 @@ Then /^I should not see an error status$/ do
 end
 
 When /^I dial extension "([^"]*)" on falcon.rubyists.com$/ do |known_extension|
-  orig = @sock.originate(target: 'sofia/external/%s@%s' % [known_extension, @server2],
+  fail "No endpoint created" unless orig = @sock.originate(target: 'sofia/external/%s@%s' % [known_extension, @server2],
                          endpoint: "&transfer('3000 XML default')")
   @resp = orig.run(:api)
-  @resp["body"].should.match /^+OK \w{8}-(?:\w{4}-){3}\w{12}$/
+  fail "Response does not contain OK" unless (@resp["body"].match /^\+OK \w{8}-(?:\w{4}-){3}\w{12}$/)
+end
+
+And /^I dial into voicemail using extension "([^"]*)"$/ do |vm_extension|
+  # Create connection to extension 4000 OR '*98' for voicemail access
+  fail "No endpoint created" unless orig = @sock.originate(target: 'sofia/external/%s@%s' % [vm_extension, @server2],
+                  endpoint: "&transfer('4000 XML default')")
+  # Store the response
+  @resp = orig.run(:api)
+
+  # Now check if we at least got INTO the voicemail extension
+  fail "Unable to connect to voicemail" unless valid_code_here
 end
 
 Then /^I should be connected to that extension$/ do
-  # we need code here that establishes (by checking the FSR sock?) that we have connected.
-  # some sort of return code, some variable only set if the connection succeeded.
-  # Is there something on @conf that we can check value-wise that shows us we are
-  # connected to the extension that was just dialed? I made conf into @conf so it
-  # survives between steps.
   message, @uuid = @resp["body"].split(" ")
-  message.should == '+OK'
+  fail "No UUID found" unless message == '+OK'
 end
 
 When /^I dial unknown extension (\d+)$/ do | unknown_extension|
   orig = @sock.originate(target: 'sofia/external/%s@%s' % [unknown_extension, @server2],
                          endpoint: "&transfer('3000 XML default')")
   @resp = orig.run(:api)
-  @resp["body"].should.match /^-ERR/
+  fail "Previous command did not generate an error" unless @resp["body"].match /^-ERR/
 end
 
 Then /^I should be notified the call failed$/ do
   status, @message = @resp["body"].split(" ")
-  status.should == '-ERR'
+  fail unless status == '-ERR'
 end
 
 Then /^I should recieve call failure type (\w+)$/ do |failure_type|
-  @message.should == 'NO_USER_RESPONSE'
+  fail unless @message == 'NO_USER_RESPONSE'
 end
 
 When /^I am prompted for my extension and password$/ do
