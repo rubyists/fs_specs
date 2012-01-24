@@ -11,8 +11,9 @@ Feature: A channel can dial an extension
     Given I have registered to FreeSWITCH
 
     Scenario Outline:
-      When I dial registered extension "<regged_extension>"
+      When I dial extension "<regged_extension>"
       Then I should be connected to that extension
+      And I should be able to terminate the call
 
     Examples:
       | regged_extension |
@@ -38,7 +39,7 @@ Feature: A channel can dial an extension
       | 1019             |
 
     Scenario:
-      When I dial unregistered extension 1020
+      When I dial unknown extension 1020
       Then I should be notified the call failed
       And I should recieve call failure type FailureType
 
