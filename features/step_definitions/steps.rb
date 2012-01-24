@@ -58,7 +58,7 @@ Then /^I should not see an error status$/ do
   pending # express the regexp above with the code you wish you had
 end
 
-When /^I dial registered extension "([^"]*)"$/ do |regged_extension|
+When /^I dial extension "([^"]*)"$/ do |known_extension|
   pending # express the regexp above with the code you wish you had
 end
 
@@ -66,7 +66,7 @@ Then /^I should be connected to that extension$/ do
   pending # express the regexp above with the code you wish you had
 end
 
-When /^I dial unregistered extension "([^"]*)"$/ do | unregged_extension|
+When /^I dial unknown extension (\d+)$/ do | unknown_extension|
   pending # express the regexp above with the code you wish you had
 end
 
