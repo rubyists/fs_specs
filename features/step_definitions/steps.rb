@@ -78,6 +78,7 @@ When /^I dial extension "([^"]*)" on falcon.rubyists.com$/ do |known_extension|
   fail "No endpoint created" unless orig = @sock.originate(target: 'sofia/external/%s@%s' % [known_extension, @server2],
                          endpoint: "&transfer('3000 XML default')")
   @resp = orig.run(:api)
+  p @resp
   fail "Response does not contain OK" unless (@resp["body"].match /^\+OK \w{8}-(?:\w{4}-){3}\w{12}$/)
 end
 
@@ -136,3 +137,20 @@ end
 Given /^I dial shortcut "([^"]*)"$/ do |dialed_shortcut|
   pending # express the regexp above with the code you wish you had
 end
+
+When /^I dial extension "([^"]*)"$/ do |extension|
+    pending # express the regexp above with the code you wish you had
+end
+
+Then /^I should hear the IVR welcome message$/ do
+    pending # express the regexp above with the code you wish you had
+end
+
+When /^I press "([^"]*)"$/ do |key_sequence|
+    pending # express the regexp above with the code you wish you had
+end
+
+Then /^I should hear "([^"]*)"$/ do |sound_byte|
+    pending # express the regexp above with the code you wish you had
+end
+
