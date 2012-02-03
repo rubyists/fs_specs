@@ -74,7 +74,7 @@ Then /^I should not see an error status$/ do
   pending # express the regexp above with the code you wish you had
 end
 
-When /^I dial extension "([^"]*)" on falcon.rubyists.com$/ do |known_extension|
+When /^I dial extension "([^"]*)" on tigershark.rubyists.com$/ do |known_extension|
   fail "No endpoint created" unless orig = @sock.originate(target: 'sofia/external/%s@%s' % [known_extension, @server2],
                          endpoint: "&transfer('3000 XML default')")
   @resp = orig.run(:api)
@@ -90,7 +90,7 @@ And /^I dial into voicemail using extension "([^"]*)"$/ do |vm_extension|
   @resp = orig.run(:api)
 
   # Now check if we at least got INTO the voicemail extension
-  fail "Unable to connect to voicemail" unless valid_code_here
+  fail "Unable to connect to voicemail" if (@resp["body"].match /^-ERR NO_USER_RESPONSE$/)
 end
 
 Then /^I should be connected to that extension$/ do

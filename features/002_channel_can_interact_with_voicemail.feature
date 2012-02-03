@@ -4,7 +4,7 @@ Feature: Channel can interact with voicemail
   I want to be able to log into, and use, the voicemail system
 
   Background: 
-    Given I have 2 servers named localhost and falcon.rubyists.com
+    Given I have 2 servers named localhost and tigershark.rubyists.com
     And localhost is accessible via the Event Socket
 
     Scenario: Successfully log into voicemail using extension
