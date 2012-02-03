@@ -84,12 +84,12 @@ end
 And /^I dial into voicemail using extension "([^"]*)"$/ do |vm_extension|
   # Create connection to extension 4000 OR '*98' for voicemail access
   fail "No endpoint created" unless orig = @sock.originate(target: 'sofia/external/%s@%s' % [vm_extension, @server2],
-                  endpoint: "&transfer('4000 XML default')")
+                  endpoint: "&transfer('#{vm_extension} XML default')")
   # Store the response
-  @resp = orig.run(:api)
-
-  # Now check if we at least got INTO the voicemail extension
-  fail "Unable to connect to voicemail" if (@resp["body"].match /^-ERR NO_USER_RESPONSE$/)
+  resp = orig.run(:api)
+  fail "Unable to connect to voicemail" unless (resp["body"].match /^\+OK /)
+  @uuid = resp["body"].split[1] # This should have the uuid It's what I was trying to see.
+  # We use @uuid in further steps
 end
 
 Then /^I should be connected to that extension$/ do
@@ -114,11 +114,58 @@ Then /^I should recieve call failure type (\w+)$/ do |failure_type|
 end
 
 When /^I am prompted for my extension and password$/ do
-  pending # express the regexp above with the code you wish you had
+  # Here we do the em run, we can do one per step for now
+  # TODO: Make a listener class for this
+  $stdout.sync = true # always flush after
+
+  EM.run do
+    # Wait two seconds for a voicemail prompt
+    EM.add_timer(2) { |e| fail "Timed out waiting to get voicemail prompt"; EM.stop }
+    listener = Class.new(FSL::Inbound){
+      def before_session
+        # subscribe to events
+        add_event(:ALL){|event| on_event(event) }
+      end
+
+      def on_event(event)
+        # are you not seeing these?
+        if event.content[:event_name] == "PLAYBACK_START"
+          playback_file = event.content[:playback_file_path]
+          fail "Wrong file played: #{playback_file}" unless event.content[:playback_file_path] == "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-enter_id.wav"
+          EM.stop
+        end
+      end
+    }
+    EM.connect(@server2, 8021, listener)
+  end
 end
 
 When /^I supply my extension and password$/ do
-  pending # express the regexp above with the code you wish you had
+  # we made it to here!
+  vm_extension = "1000"
+  EM.run do
+    # Wait four seconds for response to dtmf input
+    EM.add_timer(4) { |e| fail "Timed out waiting to get voicemail prompt"; EM.stop }
+    listener = Class.new(FSL::Inbound){
+      def before_session
+        # subscribe to events
+        add_event(:ALL){|event| on_event(event) }
+      end
+
+      def on_event(event)
+        # are you not seeing these?
+        if event.content[:event_name] == "PLAYBACK_START"
+          playback_file = event.content[:playback_file_path]
+          # This should fail, we don't know the filename yet
+          p playback_file
+          fail "Wrong file played: #{playback_file}" unless event.content[:playback_file_path] == "file_string://ascii/35.wav"
+          EM.stop
+        end
+      end
+    }
+    @sock.uuid_send_dtmf(uuid: @uuid, dtmf: vm_extension)
+    EM.connect(@server2, 8021, listener)
+  end
 end
 
 Then /^I should be logged into voicemail$/ do
