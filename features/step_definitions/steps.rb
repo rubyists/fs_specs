@@ -78,7 +78,6 @@ When /^I dial extension "([^"]*)" on tigershark.rubyists.com$/ do |known_extensi
   fail "No endpoint created" unless orig = @sock.originate(target: 'sofia/external/%s@%s' % [known_extension, @server2],
                          endpoint: "&transfer('3000 XML default')")
   @resp = orig.run(:api)
-  p @resp
   fail "Response does not contain OK" unless (@resp["body"].match /^\+OK \w{8}-(?:\w{4}-){3}\w{12}$/)
 end
 
