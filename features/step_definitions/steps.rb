@@ -47,7 +47,7 @@ Then /^I should be able to terminate all calls$/ do
   fail unless @sock.calls.run.size == 0
 end
 
-Given /^(\w+) is accessible via the Event Socket$/ do |es_server|
+Given /^([\w.]+) is accessible via the Event Socket$/ do |es_server|
   @sock = FSR::CommandSocket.new(server: @server1)
   fail if @sock.nil?
 end
