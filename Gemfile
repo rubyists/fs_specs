@@ -1,4 +1,4 @@
-source: rubyforge
+source "http://rubygems.org"
 
 group :development, :test do
   gem 'bacon'
