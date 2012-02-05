@@ -1,5 +1,4 @@
 language: ruby
 rvm:
-  - 1.9.3 # We use 1.9.3-p0 for testing.
-  # Ensure cucumber is called from bundle
-  script: bundle exec cucumber features
+  - 1.9.3
+script "bundle exec cucumber features"
