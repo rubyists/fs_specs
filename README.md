@@ -28,6 +28,15 @@ of any addition setup you need, or specific action sets done first before you hi
 meat of most of your feature sets, with this pattern in mind. This helps to ensure proper
 flow of the feature sets themselves.
 
+Development has no guarantee to work. It is what it is, which is a work in progress.
+
+We curently hook into Travis-CI: http://travis-ci.org/#!/rubyists/fs_specs
+You can watch how the tree progresses from there.
+
+
+Enjoy!
+
+
 OK, now on to how to get the blasted thing on your machine. :-)
 
 
