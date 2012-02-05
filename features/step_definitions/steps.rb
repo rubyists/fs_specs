@@ -74,7 +74,7 @@ Then /^I should not see an error status$/ do
   pending # express the regexp above with the code you wish you had
 end
 
-When /^I dial extension "([^"]*)" on ([\w.]+)$/ do |known_extension|
+When /^I dial extension "([^"]*)" on ([\w.]+)$/ do |known_extension, server|
   fail "No endpoint created" unless orig = @sock.originate(target: 'sofia/external/%s@%s' % [known_extension, @server2],
                          endpoint: "&transfer('3000 XML default')")
   @resp = orig.run(:api)
