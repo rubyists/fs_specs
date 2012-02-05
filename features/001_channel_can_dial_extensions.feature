@@ -8,8 +8,8 @@ Feature: A channel can dial an extension
   UserAgent should be notified of both the fact of the failure, and the type of the failure.
 
   Background: 
-    Given I have 2 servers named localhost and tigershark.rubyists.com
-    And localhost is accessible via the Event Socket
+    Given I have 2 servers named blackbird.rubyists.com and tigershark.rubyists.com
+    And blackbird.rubyists.com is accessible via the Event Socket
 
     Scenario Outline:
       When I dial extension "<known_extension>" on tigershark.rubyists.com

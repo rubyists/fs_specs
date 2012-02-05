@@ -4,8 +4,8 @@ Feature: Channel can interact with voicemail
   I want to be able to log into, and use, the voicemail system
 
   Background: 
-    Given I have 2 servers named localhost and tigershark.rubyists.com
-    And localhost is accessible via the Event Socket
+    Given I have 2 servers named blackbird.rubyists.com and tigershark.rubyists.com
+    And blackbird.rubyists.com is accessible via the Event Socket
 
     Scenario: Successfully log into voicemail using extension
       And I dial into voicemail using extension "4000"

@@ -5,8 +5,8 @@ Feature: Establish that a channel can interact with the IVR system
   and then properly terminate that connection.
 
   Background: 
-    Given I have 2 servers named localhost and tigershark.rubyists.com
-    And localhost is accessible via the Event Socket
+    Given I have 2 servers named blackbird.rubyists.com and tigershark.rubyists.com
+    And blackbird.rubyists.com is accessible via the Event Socket
 
 
   Scenario: be able to connect to the IVR system
