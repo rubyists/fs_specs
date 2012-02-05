@@ -156,8 +156,7 @@ When /^I supply my extension and password$/ do
         # are you not seeing these?
         if event.content[:event_name] == "PLAYBACK_START"
           playback_file = event.content[:playback_file_path]
-          # This should fail, we don't know the filename yet
-          p playback_file
+          pp playback_file
           fail "Wrong file played: #{playback_file}" unless event.content[:playback_file_path] == "file_string://ascii/35.wav"
           EM.stop
         end
@@ -165,6 +164,29 @@ When /^I supply my extension and password$/ do
     }
     @sock.uuid_send_dtmf(uuid: @uuid, dtmf: vm_extension)
     EM.connect(@server2, 8021, listener)
+  end
+  vm_password = "1000"
+  EM.run do
+    # Wait four seconds for response to dtmf input
+    EM.add_timer(4) { |e| fail "Timed out waiting on password confirmation"; EM.stop }
+    listener2 = Class.new(FSL::Inbound){
+      def before_session
+        # subscribe to events
+        add_event(:ALL){|event| on_event(event) }
+      end
+
+      def on_event(event)
+        # are you not seeing these?
+        if event.content[:event_name] == "PLAYBACK_START"
+          playback_file = event.content[:playback_file_path]
+          pp playback_file
+          fail "Wrong file played: #{playback_file}" unless event.content[:playback_file_path] == "file_string://ascii/35.wav"
+          EM.stop
+        end
+      end
+    }
+    @sock.uuid_send_dtmf(uuid: @uuid, dtmf: vm_password)
+    EM.connect(@server2, 8021, listener2)
   end
 end
 

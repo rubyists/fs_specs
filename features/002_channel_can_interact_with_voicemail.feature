@@ -14,8 +14,7 @@ Feature: Channel can interact with voicemail
       Then I should be logged into voicemail
       And I should be able to terminate all calls
 
-	  Scenario: Fail to log into voicemail using extension
-      And I dial into voicemail using extension "4000"
+    Scenario: Fail to log into voicemail using extension
       And I dial into voicemail using extension "4000"
       And I am prompted for my extension and password
       And I supply an incorrect extension and password
