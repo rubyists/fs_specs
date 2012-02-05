@@ -47,7 +47,7 @@ Then /^I should be able to terminate all calls$/ do
   fail unless @sock.calls.run.size == 0
 end
 
-Given /^localhost is accessible via the Event Socket$/ do
+Given /^blackbird.rubyists.com is accessible via the Event Socket$/ do
   @sock = FSR::CommandSocket.new(server: @server1)
   fail if @sock.nil?
 end
