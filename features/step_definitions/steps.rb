@@ -47,7 +47,7 @@ Then /^I should be able to terminate all calls$/ do
   fail unless @sock.calls.run.size == 0
 end
 
-Given /^blackbird.rubyists.com is accessible via the Event Socket$/ do
+Given /^([\w.]+) is accessible via the Event Socket$/ do
   @sock = FSR::CommandSocket.new(server: @server1)
   fail if @sock.nil?
 end
@@ -74,7 +74,7 @@ Then /^I should not see an error status$/ do
   pending # express the regexp above with the code you wish you had
 end
 
-When /^I dial extension "([^"]*)" on tigershark.rubyists.com$/ do |known_extension|
+When /^I dial extension "([^"]*)" on ([\w.]+)$/ do |known_extension|
   fail "No endpoint created" unless orig = @sock.originate(target: 'sofia/external/%s@%s' % [known_extension, @server2],
                          endpoint: "&transfer('3000 XML default')")
   @resp = orig.run(:api)
