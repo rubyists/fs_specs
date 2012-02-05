@@ -1,4 +1,4 @@
-### Welcome
+== Welcome
 
 Welcome to FSSpecs!
 
@@ -28,10 +28,19 @@ of any addition setup you need, or specific action sets done first before you hi
 meat of most of your feature sets, with this pattern in mind. This helps to ensure proper
 flow of the feature sets themselves.
 
+Development has no guarantee to work. It is what it is, which is a work in progress.
+
+We curently hook into Travis-CI: http://travis-ci.org/#!/rubyists/fs_specs
+You can watch how the tree progresses from there.
+
+
+Enjoy!
+
+
 OK, now on to how to get the blasted thing on your machine. :-)
 
 
-### Install
+== Install
 
 First, make sure you have git on your box, along with ruby, rubygems, etc.
 
@@ -54,7 +63,7 @@ When the .rvmrc file is finished being evaluated, you'll have all the tools we u
 you can simply check ``rvm info`` to make sure you are in ruby-1.9.3-p0@fs_specs
 
 
-### What Next
+== What Next
 
 Now is the time to check that you have connectivity between your machines you'll be using for testing.
 
@@ -66,19 +75,17 @@ You're done! Now you can run the following command. If your connection check ear
 then this command should pass. Run: ``cucumber features/000_phone_infrastructure.feature``
 You should see all Green if your machines are properly configured.
 
-### What Does What?
+== What Does What?
 
 The feature files kick off all the specs under features/step_definitions/ and this is where to find everything.
 All the guts of the Testing Glory reside here. The human interface remains with Cucumber.
 
-### Donations
+== Donations
 
   I'm proud to work on Open Source software for various Projects out there. If you feel I’ve done something 
-  worthy of it, please feel free to donate some cash! It will be used to pay bills, feed my dog and I, and make 
-  it easier for me to spend more time working on more Open Source projects!
-
-
-  Let me say right up front! Thank you! All your donations are deeply appreciated! 
-  I hope to continue to write and work on stuff people need and want!
+    worthy of it, please feel free to donate some cash! It will be used to pay bills, feed my dog and I, and make 
+    it easier for me to spend more time working on more Open Source projects!
+    Let me say right up front! Thank you! All your donations are deeply appreciated! 
+    I hope to continue to write and work on stuff people need and want!
 
 <a href='http://www.pledgie.com/campaigns/16587'><img alt='Click here to lend your support to: Donations and make a donation at www.pledgie.com !' src='http://www.pledgie.com/campaigns/16587.png?skin_name=chrome' border='0' /></a>
