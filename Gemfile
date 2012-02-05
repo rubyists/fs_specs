@@ -1,6 +1,7 @@
 source "http://rubygems.org"
 
 group :development, :test do
+  gem 'rake'
   gem 'bacon'
   gem 'builder'
   gem 'cucumber'
