@@ -2,3 +2,8 @@ language: ruby
 rvm:
   - 1.9.3
 script: 'bundle exec cucumber features'
+
+notifications:
+  irc:
+    channels:
+      - "irc.freenode.org#fs_specs"
