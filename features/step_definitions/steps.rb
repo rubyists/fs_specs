@@ -169,6 +169,9 @@ When /^I supply my extension and password$/ do
         end
       end
     }
+    # BROKEN: We're just being prompted over and over for the extension
+    # even after the test fails. So we need to check for a response to uuid_send_dtf
+    # and that FS has actually processed it!
     @sock.uuid_send_dtmf(uuid: @uuid, dtmf: vm_extension)
     EM.connect(@server2, 8021, listener)
   end
@@ -192,12 +195,17 @@ When /^I supply my extension and password$/ do
         end
       end
     }
+    # BROKEN: Not currently seeing /var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-enter_pass.wav
+    # requested. I don't think we're successfully completing passing the extension in order to get 'here'
+    # to even be offered vm-enter_pass.wav
     @sock.uuid_send_dtmf(uuid: @uuid, dtmf: vm_password)
     EM.connect(@server2, 8021, listener2)
   end
 end
 
 Then /^I should be logged into voicemail$/ do
+  # BROKEN: Need a way here to *verify* that we have, in fact, had our ext. and pass. accepted,
+  # and we get something like /var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-no_more_messages.wav
   pending # express the regexp above with the code you wish you had
 end
 
