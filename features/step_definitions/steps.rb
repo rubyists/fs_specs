@@ -129,6 +129,13 @@ When /^I am prompted for my extension and password$/ do
 
       def on_event(event)
         # are you not seeing these?
+        #
+        # It looks like in both checks on the playback_file we get either of these 2.
+        #   /var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-enter_id.wav
+        #  file_string://ascii/35.wav
+        #
+        #  What seems to be happening is the wav files are cycling play status within the timeframe of the checks. (Reprompt cycling)
+        #  This is making this pass *and* fail. If we catch the order right, we pass. we don't, we fail.
         if event.content[:event_name] == "PLAYBACK_START"
           playback_file = event.content[:playback_file_path]
           fail "Wrong file played: #{playback_file}" unless event.content[:playback_file_path] == "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-enter_id.wav"
@@ -180,7 +187,6 @@ When /^I supply my extension and password$/ do
         if event.content[:event_name] == "PLAYBACK_START"
           playback_file = event.content[:playback_file_path]
           pp playback_file
-          pp event
           fail "Wrong file played: #{playback_file}" unless event.content[:playback_file_path] == "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-enter_id.wav"
           EM.stop
         end
