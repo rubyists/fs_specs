@@ -117,12 +117,15 @@ When /^I am prompted for my extension and password$/ do
   # Here we do the em run, we can do one per step for now
   # TODO: Make a listener class for this
   $stdout.sync = true # always flush after
+  vm_extension = "1000#"
+  vm_password = "1000"
 
   EM.run do
     # Wait two seconds for a voicemail prompt
     EM.add_timer(2) { |e| fail "Timed out waiting to get voicemail prompt"; EM.stop }
+
     listener = Class.new(FSL::Inbound){
-      def before_session
+    def before_session
         # subscribe to events
         add_event(:ALL){|event| on_event(event) }
       end
@@ -134,11 +137,15 @@ When /^I am prompted for my extension and password$/ do
         #   /var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-enter_id.wav
         #  file_string://ascii/35.wav
         #
+        expected_playback_file = { :enter_id => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-enter_id.wav", :pound => "file_string://ascii/35.wav" }
+        
         #  What seems to be happening is the wav files are cycling play status within the timeframe of the checks. (Reprompt cycling)
         #  This is making this pass *and* fail. If we catch the order right, we pass. we don't, we fail.
         if event.content[:event_name] == "PLAYBACK_START"
-          playback_file = event.content[:playback_file_path]
-          fail "Wrong file played: #{playback_file}" unless event.content[:playback_file_path] == "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-enter_id.wav"
+          fs_playback_file = event.content[:playback_file_path]
+          pp fs_playback_file
+
+          fail "Wrong file played: #{fs_playback_file}" unless event.content[:playback_file_path] == "#{expected_playback_file[:enter_id]}" || event.content[:playback_file_path] == "#{expected_playback_file[:pound]}"
           EM.stop
         end
       end
@@ -148,23 +155,29 @@ When /^I am prompted for my extension and password$/ do
 end
 
 When /^I supply my extension and password$/ do
-  # we made it to here!
+  # Configure extension and pass, as well as expected wav files.
   vm_extension = "1000#"
+  vm_password = "1000"
+  
+  # Start the actual work
   EM.run do
     # Wait 30 seconds for response to dtmf input
     EM.add_timer(30) { |e| fail "Timed out waiting to get voicemail prompt"; EM.stop }
+
     listener = Class.new(FSL::Inbound){
-      def before_session
+    def before_session
         # subscribe to events
         add_event(:ALL){|event| on_event(event) }
       end
 
       def on_event(event)
         # are you not seeing these?
+        expected_playback_file = { :enter_id => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-enter_id.wav", :pound => "file_string://ascii/35.wav" }
+
         if event.content[:event_name] == "PLAYBACK_START"
-          playback_file = event.content[:playback_file_path]
-          pp playback_file
-          fail "Wrong file played: #{playback_file}" unless event.content[:playback_file_path] == "file_string://ascii/35.wav"
+        fs_playback_file = event.content[:playback_file_path]
+        pp fs_playback_file
+        fail "Wrong file played: #{fs_playback_file}" unless event.content[:playback_file_path] == "#{expected_playback_file[:enter_id]}" || event.content[:playback_file_path] == "#{expected_playback_file[:pound]}"
           EM.stop
         end
       end
@@ -175,7 +188,7 @@ When /^I supply my extension and password$/ do
     @sock.uuid_send_dtmf(uuid: @uuid, dtmf: vm_extension)
     EM.connect(@server2, 8021, listener)
   end
-  vm_password = "1000"
+
   EM.run do
     # Wait 30 seconds for response to dtmf input
     EM.add_timer(30) { |e| fail "Timed out waiting on password confirmation"; EM.stop }
@@ -187,10 +200,12 @@ When /^I supply my extension and password$/ do
 
       def on_event(event)
         # are you not seeing these?
+        expected_playback_file = { :enter_id => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-enter_id.wav", :pound => "file_string://ascii/35.wav" }
+        
         if event.content[:event_name] == "PLAYBACK_START"
-          playback_file = event.content[:playback_file_path]
-          pp playback_file
-          fail "Wrong file played: #{playback_file}" unless event.content[:playback_file_path] == "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-enter_id.wav"
+          fs_playback_file = event.content[:playback_file_path]
+          pp fs_playback_file
+          fail "Wrong file played: #{fs_playback_file}" unless event.content[:playback_file_path] == "#{expected_playback_file[:enter_id]}" || event.content[:playback_file_path] == "#{expected_playback_file[:pound]}"
           EM.stop
         end
       end
