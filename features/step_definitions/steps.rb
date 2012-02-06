@@ -144,8 +144,8 @@ When /^I supply my extension and password$/ do
   # we made it to here!
   vm_extension = "1000"
   EM.run do
-    # Wait four seconds for response to dtmf input
-    EM.add_timer(4) { |e| fail "Timed out waiting to get voicemail prompt"; EM.stop }
+    # Wait 30 seconds for response to dtmf input
+    EM.add_timer(30) { |e| fail "Timed out waiting to get voicemail prompt"; EM.stop }
     listener = Class.new(FSL::Inbound){
       def before_session
         # subscribe to events
@@ -167,8 +167,8 @@ When /^I supply my extension and password$/ do
   end
   vm_password = "1000"
   EM.run do
-    # Wait four seconds for response to dtmf input
-    EM.add_timer(4) { |e| fail "Timed out waiting on password confirmation"; EM.stop }
+    # Wait 30 seconds for response to dtmf input
+    EM.add_timer(30) { |e| fail "Timed out waiting on password confirmation"; EM.stop }
     listener2 = Class.new(FSL::Inbound){
       def before_session
         # subscribe to events
@@ -180,7 +180,8 @@ When /^I supply my extension and password$/ do
         if event.content[:event_name] == "PLAYBACK_START"
           playback_file = event.content[:playback_file_path]
           pp playback_file
-          fail "Wrong file played: #{playback_file}" unless event.content[:playback_file_path] == "file_string://ascii/35.wav"
+          pp event
+          fail "Wrong file played: #{playback_file}" unless event.content[:playback_file_path] == "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-enter_id.wav"
           EM.stop
         end
       end
