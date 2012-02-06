@@ -149,7 +149,7 @@ end
 
 When /^I supply my extension and password$/ do
   # we made it to here!
-  vm_extension = "1000"
+  vm_extension = "1000#"
   EM.run do
     # Wait 30 seconds for response to dtmf input
     EM.add_timer(30) { |e| fail "Timed out waiting to get voicemail prompt"; EM.stop }
