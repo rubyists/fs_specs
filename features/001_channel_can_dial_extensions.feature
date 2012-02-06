@@ -17,7 +17,7 @@ Feature: A channel can dial an extension
     And I should be able to terminate the call
 
   Scenario: 
-    When I dial unknown extension 1020
+    When I dial unknown extension "1020"
     Then I should be notified the call failed
-    And I should recieve call failure type FailureType
+    And I should recieve call failure type "NO_USER_RESPONSE"
 

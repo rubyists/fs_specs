@@ -97,7 +97,7 @@ Then /^I should be connected to that extension$/ do
   fail "No UUID found" unless message == '+OK'
 end
 
-When /^I dial unknown extension (\d+)$/ do | unknown_extension|
+When /^I dial unknown extension "([^"]*)"$/ do | unknown_extension|
   orig = @sock.originate(target: 'sofia/external/%s@%s' % [unknown_extension, @server2],
                          endpoint: "&transfer('3000 XML default')")
   @resp = orig.run(:api)
@@ -109,8 +109,8 @@ Then /^I should be notified the call failed$/ do
   fail unless status == '-ERR'
 end
 
-Then /^I should recieve call failure type (\w+)$/ do |failure_type|
-  fail unless @message == 'NO_USER_RESPONSE'
+Then /^I should recieve call failure type "([^"]*)"$/ do |failure_type|
+  fail unless @message == "#{failure_type}"
 end
 
 When /^I am prompted for my extension and password$/ do
