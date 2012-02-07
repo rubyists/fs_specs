@@ -117,19 +117,19 @@ When /^I am prompted for my extension and password$/ do
   # Here we do the em run, we can do one per step for now
   # TODO: Make a listener class for this
   $stdout.sync = true # always flush after
-  
+
   EM.run do
     # Inside EM.run block so this is operating full speed and live on the listener sockets we create in here.
     # Wait 10 seconds for a voicemail prompt - This is only due to travis-ci to ensure we have enough time.
     #
     # NOTE: This should make it stop. we don't want that, so I'm removing for now via comment.
     # EM.add_periodic_timer(10) { |e| fail "Timed out waiting to get voicemail prompt"; EM.stop }
-    
-    # Now we process all of the 
+
+    # Now we process all of the
     #EM.add_periodic_timer(30) do
       # Should we be doing all the work that we're doing within the listener itself, via events, here?
     #end
-    
+
     EM.add_timer(30) do
       EM.next_tick do
         # This sends the command from within the reactor to FS.
@@ -172,10 +172,10 @@ When /^I am prompted for my extension and password$/ do
         #  This is making this pass *and* fail. If we catch the order right, we pass. we don't, we fail.
         if event.content[:event_name] == "PLAYBACK_START"
           fs_playback_file = event.content[:playback_file_path]
-          puts "In 1st EM.run 'if' - Prompted for Extension/Password: event.content[:event_name] = #{event.content[:event_name]}"
+          puts "In 1st EM.run 'if' - Prompted for Extension/Password: event.content[:event_name] = #{event.content[:event_name]} - PLAYBACK_FILE: #{fs_playback_file}"
           fail "Wrong file played: #{fs_playback_file}" if event.content[:playback_file_path] == "#{expected_playback_file[:abort]}"
         else
-            puts "In 1st EM.run 'else' - Prompted for Extension/Password: event.content[:event_name] = #{event.content[:event_name]}"
+            puts "In 1st EM.run 'else' - Prompted for Extension/Password: event.content[:event_name] = #{event.content[:event_name]} - PLAYBACK_FILE: #{fs_playback_file}"
             if event.content[:playback_file_path] == expected_playback_file[:pound]
               puts "Got '#' wav file! - Should send the vm_extension here, inside #{Thread.current}"
               puts "EM.stop is called next because we exit the else, but THIS is the physical location where we need to send the tones for the extension"
