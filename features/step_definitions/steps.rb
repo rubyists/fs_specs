@@ -120,7 +120,7 @@ When /^I am prompted for my extension and password$/ do
 
   EM.run do
     # Wait 10 seconds for a voicemail prompt - This is only due to travis-ci to ensure we have enough time.
-    EM.add_timer(10) { |e| fail "Timed out waiting to get voicemail prompt"; EM.stop }
+    EM.add_periodic_timer(10) { |e| fail "Timed out waiting to get voicemail prompt"; EM.stop }
 
     vm_extension = "1000#"
     vm_password = "1000#"
@@ -146,31 +146,36 @@ When /^I am prompted for my extension and password$/ do
 
         expected_playback_file = {
           :enter_id => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-enter_id.wav",
+          :enter_pass => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-enter_pass.wav",
           :pound => "file_string://ascii/35.wav",
           :abort => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-abort.wav",
           :goodbye => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-goodbye.wav",
-          :press => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-press.wav"
+          :press => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-press.wav",
+          :logged_in => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-no_messages.wav"
         }
 
         #  What seems to be happening is the wav files are cycling play status within the timeframe of the checks. (Reprompt cycling)
         #  This is making this pass *and* fail. If we catch the order right, we pass. we don't, we fail.
         if event.content[:event_name] == "PLAYBACK_START"
           fs_playback_file = event.content[:playback_file_path]
-          pp fs_playback_file
-
-          fail "Wrong file played: #{fs_playback_file}" if event.content[:playback_file_path] == "#{expected_playback_file[:abort]}" || event.content[:playback_file_path] == "#{expected_playback_file[:goodbye]}"
+          fail "Wrong file played: #{fs_playback_file}" if event.content[:playback_file_path] == "#{expected_playback_file[:abort]}"
         else
             if event.content[:playback_file_path] == expected_playback_file[:pound]
               puts "Got '#' wav file! - Should send the vm_extension here, inside #{Thread.current}"
               puts "EM.stop is called next because we exit the else, but THIS is the physical location where we need to send the tones for the extension"
               puts "EVENT_NAME: #{event.content[:event_name]} - PLAYBACK_FILE_PATH: #{event.content[:playback_file_path]}"
             end
+            # This fails IN the run because @sock is nilClass, meaning its not being passed in correctly
+            # so the call to vm_extension fails, which means we can't extend the logic to look for vm-enter_pass.wav
+            @sock.uuid_send_dtmf(uuid: @uuid, dtmf: vm_extension)
         end
+
           # We process on pound above because it denotes expectation change. If 
         EM.stop
-        end
+      end
     }
-    @sock.uuid_send_dtmf(uuid: @uuid, dtmf: vm_extension)
+
+    # - This needs to be done IN the listener's thread: @sock.uuid_send_dtmf(uuid: @uuid, dtmf: vm_extension)
     EM.connect(@server2, 8021, listener)
   end
 end
@@ -183,7 +188,7 @@ When /^I supply my extension and password$/ do
   # Start the actual work
   EM.run do
     # Wait 15 seconds for response to dtmf input
-    EM.add_timer(15) { |e| fail "Timed out waiting to get voicemail prompt"; EM.stop }
+    EM.add_periodic_timer(15) { |e| fail "Timed out waiting to get voicemail prompt"; EM.stop }
 
     listener = Class.new(FSL::Inbound){
     def before_session
@@ -212,7 +217,7 @@ When /^I supply my extension and password$/ do
 
   EM.run do
     # Wait 15 seconds for response to dtmf input
-    EM.add_timer(15) { |e| fail "Timed out waiting on password confirmation"; EM.stop }
+    EM.add_periodic_timer(15) { |e| fail "Timed out waiting on password confirmation"; EM.stop }
     listener2 = Class.new(FSL::Inbound){
       def before_session
         # subscribe to events
