@@ -117,10 +117,27 @@ When /^I am prompted for my extension and password$/ do
   # Here we do the em run, we can do one per step for now
   # TODO: Make a listener class for this
   $stdout.sync = true # always flush after
-
+  
   EM.run do
-    # Wait 60 seconds for a voicemail prompt - This is only due to travis-ci to ensure we have enough time.
-    EM.add_periodic_timer(60) { |e| fail "Timed out waiting to get voicemail prompt"; EM.stop }
+    # Inside EM.run block so this is operating full speed and live on the listener sockets we create in here.
+    # Wait 10 seconds for a voicemail prompt - This is only due to travis-ci to ensure we have enough time.
+    #
+    # NOTE: This should make it stop. we don't want that, so I'm removing for now via comment.
+    # EM.add_periodic_timer(10) { |e| fail "Timed out waiting to get voicemail prompt"; EM.stop }
+    
+    # Now we process all of the 
+    EM.add_periodic_timer(30) do
+      # Should we be doing all the work that we're doing within the listener itself, via events, here?
+    end
+    
+    EM.add_timer(5) do
+      EM.next_tick do
+        # This sends the command from within the reactor to FS.
+        # We need @sock from specs level to be available here.
+        @sock.uuid_send_dtmf(uuid: @uuid, dtmf: vm_extension)
+        EM.stop_event_loop
+      end
+    end
 
     listener = Class.new(FSL::Inbound){
 
@@ -164,15 +181,14 @@ When /^I am prompted for my extension and password$/ do
             end
             # This fails IN the run because @sock is nilClass, meaning its not being passed in correctly
             # so the call to vm_extension fails, which means we can't extend the logic to look for vm-enter_pass.wav
-            @sock.uuid_send_dtmf(uuid: @uuid, dtmf: vm_extension)
         end
-
-          # We process on pound above because it denotes expectation change. If
         EM.stop
       end
     }
-
-    # - This needs to be done IN the listener's thread: @sock.uuid_send_dtmf(uuid: @uuid, dtmf: vm_extension)
+    # - All of this is executed on a terminated reactor because its after the EM.stop call. So we're dealing with 'last-state' from here on.
+    # - The EM.connect just spins off the actual payload we built in the EM.run, which for us equates to event.content subscriptions we then cherry pick.
+    #
+    # This needs to be done IN the listener's thread: @sock.uuid_send_dtmf(uuid: @uuid, dtmf: vm_extension)
     EM.connect(@server2, 8021, listener)
   end
 end
