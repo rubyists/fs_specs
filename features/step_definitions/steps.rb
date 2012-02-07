@@ -126,11 +126,11 @@ When /^I am prompted for my extension and password$/ do
     # EM.add_periodic_timer(10) { |e| fail "Timed out waiting to get voicemail prompt"; EM.stop }
     
     # Now we process all of the 
-    EM.add_periodic_timer(30) do
+    #EM.add_periodic_timer(30) do
       # Should we be doing all the work that we're doing within the listener itself, via events, here?
-    end
+    #end
     
-    EM.add_timer(5) do
+    EM.add_timer(30) do
       EM.next_tick do
         # This sends the command from within the reactor to FS.
         # We need @sock from specs level to be available here.
@@ -172,8 +172,10 @@ When /^I am prompted for my extension and password$/ do
         #  This is making this pass *and* fail. If we catch the order right, we pass. we don't, we fail.
         if event.content[:event_name] == "PLAYBACK_START"
           fs_playback_file = event.content[:playback_file_path]
+          puts "In 1st EM.run 'if' - Prompted for Extension/Password: event.content[:event_name] = #{event.content[:event_name]}"
           fail "Wrong file played: #{fs_playback_file}" if event.content[:playback_file_path] == "#{expected_playback_file[:abort]}"
         else
+            puts "In 1st EM.run 'else' - Prompted for Extension/Password: event.content[:event_name] = #{event.content[:event_name]}"
             if event.content[:playback_file_path] == expected_playback_file[:pound]
               puts "Got '#' wav file! - Should send the vm_extension here, inside #{Thread.current}"
               puts "EM.stop is called next because we exit the else, but THIS is the physical location where we need to send the tones for the extension"
@@ -215,7 +217,7 @@ When /^I supply my extension and password$/ do
 
         if event.content[:event_name] == "PLAYBACK_START"
         fs_playback_file = event.content[:playback_file_path]
-        pp fs_playback_file
+        puts "In 1st EM.run 'if' - Supply Extension/Password: EVENT_NAME: #{event.content[:event_name]} - PLAYBACK_FILE: #{fs_playback_file}"
         fail "Wrong file played: #{fs_playback_file}" unless event.content[:playback_file_path] == "#{expected_playback_file[:enter_id]}" || event.content[:playback_file_path] == "#{expected_playback_file[:pound]}"
           EM.stop
         end
@@ -243,7 +245,7 @@ When /^I supply my extension and password$/ do
 
         if event.content[:event_name] == "PLAYBACK_START"
           fs_playback_file = event.content[:playback_file_path]
-          pp fs_playback_file
+          puts "In 2nd EM.run 'if' - Supply Extension/Password: EVENT_NAME: #{event.content[:event_name]} - PLAYBACK_FILE: #{fs_playback_file}"
           fail "Wrong file played: #{fs_playback_file}" unless event.content[:playback_file_path] == "#{expected_playback_file[:enter_id]}" || event.content[:playback_file_path] == "#{expected_playback_file[:pound]}"
           EM.stop
         end
