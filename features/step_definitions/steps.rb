@@ -117,19 +117,19 @@ When /^I am prompted for my extension and password$/ do
   # Here we do the em run, we can do one per step for now
   # TODO: Make a listener class for this
   $stdout.sync = true # always flush after
-
+  
   EM.run do
     # Inside EM.run block so this is operating full speed and live on the listener sockets we create in here.
     # Wait 10 seconds for a voicemail prompt - This is only due to travis-ci to ensure we have enough time.
     #
     # NOTE: This should make it stop. we don't want that, so I'm removing for now via comment.
     # EM.add_periodic_timer(10) { |e| fail "Timed out waiting to get voicemail prompt"; EM.stop }
-
-    # Now we process all of the
+    
+    # Now we process all of the 
     #EM.add_periodic_timer(30) do
       # Should we be doing all the work that we're doing within the listener itself, via events, here?
     #end
-
+    
     EM.add_timer(30) do
       EM.next_tick do
         # This sends the command from within the reactor to FS.
@@ -170,21 +170,29 @@ When /^I am prompted for my extension and password$/ do
 
         #  What seems to be happening is the wav files are cycling play status within the timeframe of the checks. (Reprompt cycling)
         #  This is making this pass *and* fail. If we catch the order right, we pass. we don't, we fail.
-        sleep(2)
-        if event.content[:event_name] == "PLAYBACK_START"
-          fs_playback_file = event.content[:playback_file_path]
-          puts "In 1st EM.run 'if' - Prompted for Extension/Password: event.content[:event_name] = #{event.content[:event_name]}\n\t\t\tevent.content[:playback_file_path] = #{fs_playback_file}"
-          fail "Wrong file played: #{fs_playback_file}" if event.content[:playback_file_path] == "#{expected_playback_file[:abort]}"
-        else
-          fs_playback_file = event.content[:playback_file_path]
-          puts "In 1st EM.run 'else' - Prompted for Extension/Password: event.content[:event_name] = #{event.content[:event_name]}\n\t\t\tevent.content[:playback_file_path] =  #{fs_playback_file}"
-          if event.content[:playback_file_path] == expected_playback_file[:pound]
-            puts "Got '#' wav file! - Should send the vm_extension here, inside #{Thread.current}"
-            puts "EM.stop is called next because we exit the else, but THIS is the physical location where we need to send the tones for the extension"
-            puts "EVENT_NAME: #{event.content[:event_name]} - PLAYBACK_FILE_PATH: #{event.content[:playback_file_path]}"
-          end
-          # This fails IN the run because @sock is nilClass, meaning its not being passed in correctly
-          # so the call to vm_extension fails, which means we can't extend the logic to look for vm-enter_pass.wav
+        sleep(1)
+        
+        case event.content[:event_name]
+        	when "CHANNEL_EXECUTE_COMPLETE", "CHANNEL_EXECUTE", "HEARTBEAT", "RE_SCHEDULE"
+        	  puts "PROMPTED - 1 EM.run - #{Thread.current.to_s} - CHANNEL MANAGEMENT : event.content[:event_name] = #{event.content[:event_name]}"
+
+        	when "PLAYBACK_START"
+        	  fs_playback_file = event.content[:playback_file_path]
+        	  puts "PROMPTED - 1 EM.run - #{Thread.current.to_s} - event.content[:event_name] = #{event.content[:event_name]} fs_playback_file: #{fs_playback_file}"
+
+        	when "PLAYBACK_STOP"
+        	  fs_playback_file = event.content[:playback_file_path]
+        	  puts "PROMPTED - 1 EM.run - #{Thread.current.to_s} - event.content[:event_name] = #{event.content[:event_name]} fs_playback_file: #{fs_playback_file}"
+
+        	when nil
+        	  puts "In 1st EM.run 'case' - event.content[:event_name] is nil"
+        	  return
+
+        	else
+            fail "Wrong file played: #{fs_playback_file}" unless event.content[:playback_file_path] == "#{expected_playback_file[:enter_id]}" || event.content[:playback_file_path] == "#{expected_playback_file[:pound]}"
+        	  fs_playback_file = event.content[:playback_file_path]
+        	  puts "In 1st EM.run 'case' - else hit! - PROMPTED - #{Thread.current.to_s}"
+            puts "In 1st EM.run 'case' - Prompted for Extension/Password: EVENT_NAME: #{event.content[:event_name]} - PLAYBACK_FILE: #{fs_playback_file}"    	  
         end
         EM.stop
       end
@@ -192,7 +200,7 @@ When /^I am prompted for my extension and password$/ do
     # - All of this is executed on a terminated reactor because its after the EM.stop call. So we're dealing with 'last-state' from here on.
     # - The EM.connect just spins off the actual payload we built in the EM.run, which for us equates to event.content subscriptions we then cherry pick.
     #
-    # This needs to be done IN the listener's thread: @sock.uuid_send_dtmf(uuid: @uuid, dtmf: vm_extension)
+    # This needs to be done IN the listener's @sock.uuid_send_dtmf(uuid: @uuid, dtmf: vm_extension)
     EM.connect(@server2, 8021, listener)
   end
 end
@@ -208,21 +216,49 @@ When /^I supply my extension and password$/ do
     EM.add_periodic_timer(60) { |e| fail "Timed out waiting to get voicemail prompt"; EM.stop }
 
     listener = Class.new(FSL::Inbound){
-    def before_session
+      def before_session
         # subscribe to events
         add_event(:ALL){|event| on_event(event) }
       end
 
       def on_event(event)
         # are you not seeing these?
-        expected_playback_file = { :enter_id => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-enter_id.wav", :pound => "file_string://ascii/35.wav" }
+        expected_playback_file = {
+          :enter_id => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-enter_id.wav",
+          :enter_pass => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-enter_pass.wav",
+          :pound => "file_string://ascii/35.wav",
+          :abort => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-abort.wav",
+          :goodbye => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-goodbye.wav",
+          :press => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-press.wav",
+          :logged_in => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-no_messages.wav"
+        }
 
-        if event.content[:event_name] == "PLAYBACK_START"
-        fs_playback_file = event.content[:playback_file_path]
-        puts "In 1st EM.run 'if' - Supply Extension/Password: EVENT_NAME: #{event.content[:event_name]}\n\t\t\tevent.content[:playback_file_path] = #{fs_playback_file}"
-        fail "Wrong file played: #{fs_playback_file}" unless event.content[:playback_file_path] == "#{expected_playback_file[:enter_id]}" || event.content[:playback_file_path] == "#{expected_playback_file[:pound]}"
-          EM.stop
+        sleep(1)
+        
+        case event.content[:event_name]
+        	when "CHANNEL_EXECUTE_COMPLETE", "CHANNEL_EXECUTE", "HEARTBEAT", "RE_SCHEDULE"
+        	  puts "SUPPLY - 1 EM.run - #{Thread.current.to_s} - CHANNEL MANAGEMENT : event.content[:event_name] = #{event.content[:event_name]}"
+
+        	when "PLAYBACK_START"
+        	  fs_playback_file = event.content[:playback_file_path]
+        	  puts "SUPPLY - 1 EM.run - #{Thread.current.to_s} - event.content[:event_name] = #{event.content[:event_name]} fs_playback_file: #{fs_playback_file}"
+
+        	when "PLAYBACK_STOP"
+        	  fs_playback_file = event.content[:playback_file_path]
+        	  puts "SUPPLY - 1 EM.run - #{Thread.current.to_s} - event.content[:event_name] = #{event.content[:event_name]} fs_playback_file: #{fs_playback_file}"
+
+        	when nil
+        	  puts "In 1st EM.run 'case' - event.content[:event_name] is nil"
+        	  return
+
+        	else
+        	  fs_playback_file = event.content[:playback_file_path]
+        	  puts "In 1st EM.run 'case' - else hit! - SUPPLY - #{Thread.current.to_s}"
+            puts "In 1st EM.run 'case' - Supply Extension/Password: EVENT_NAME: #{event.content[:event_name]} - PLAYBACK_FILE: #{fs_playback_file}"    	  
+            fail "Wrong file played: #{fs_playback_file}" unless event.content[:playback_file_path] == "#{expected_playback_file[:enter_id]}" || event.content[:playback_file_path] == "#{expected_playback_file[:pound]}"
         end
+        
+        EM.stop
       end
     }
     # BROKEN: We're just being prompted over and over for the extension
@@ -243,14 +279,40 @@ When /^I supply my extension and password$/ do
 
       def on_event(event)
         # are you not seeing these?
-        expected_playback_file = { :enter_id => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-enter_id.wav", :pound => "file_string://ascii/35.wav" }
+        expected_playback_file = {
+          :enter_id => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-enter_id.wav",
+          :enter_pass => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-enter_pass.wav",
+          :pound => "file_string://ascii/35.wav",
+          :abort => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-abort.wav",
+          :goodbye => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-goodbye.wav",
+          :press => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-press.wav",
+          :logged_in => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-no_messages.wav"
+        }
 
-        if event.content[:event_name] == "PLAYBACK_START"
-          fs_playback_file = event.content[:playback_file_path]
-          puts "In 2nd EM.run 'if' - Supply Extension/Password: EVENT_NAME: #{event.content[:event_name]}\n\t\t\tevent.content[:playback_file_path] = #{fs_playback_file}"
-          fail "Wrong file played: #{fs_playback_file}" unless event.content[:playback_file_path] == "#{expected_playback_file[:enter_id]}" || event.content[:playback_file_path] == "#{expected_playback_file[:pound]}"
+        sleep(3)
+        
+        case event.content[:event_name]
+        	when "CHANNEL_EXECUTE_COMPLETE", "CHANNEL_EXECUTE", "HEARTBEAT", "RE_SCHEDULE"
+        	  puts "SUPPLY - 2 EM.run - CHANNEL MANAGEMENT : event.content[:event_name] = #{event.content[:event_name]}"
+
+        	when "PLAYBACK_START"
+        	  fs_playback_file = event.content[:playback_file_path]
+        	  puts "SUPPLY - 2 EM.run - #{Thread.current.to_s} - event.content[:event_name] = #{event.content[:event_name]} fs_playback_file: #{fs_playback_file}"
+
+        	when "PLAYBACK_STOP"
+        	  fs_playback_file = event.content[:playback_file_path]
+        	  puts "SUPPLY - 2 EM.run - #{Thread.current.to_s} - event.content[:event_name] = #{event.content[:event_name]} fs_playback_file: #{fs_playback_file}"
+
+        	when nil
+        	  puts "In 2nd EM.run 'case' - event.content[:event_name] is nil"
+        	  return
+
+        	else
+        	  fs_playback_file = event.content[:playback_file_path]
+            fail "Wrong file played: #{fs_playback_file}" unless event.content[:playback_file_path] == "#{expected_playback_file[:enter_id]}" || event.content[:playback_file_path] == "#{expected_playback_file[:pound]}"
+        	  puts "In 2nd EM.run 'case' - else hit!"
+        end        
           EM.stop
-        end
       end
     }
     # BROKEN: Not currently seeing /var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-enter_pass.wav
