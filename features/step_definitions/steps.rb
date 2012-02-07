@@ -170,19 +170,21 @@ When /^I am prompted for my extension and password$/ do
 
         #  What seems to be happening is the wav files are cycling play status within the timeframe of the checks. (Reprompt cycling)
         #  This is making this pass *and* fail. If we catch the order right, we pass. we don't, we fail.
+        sleep(2)
         if event.content[:event_name] == "PLAYBACK_START"
           fs_playback_file = event.content[:playback_file_path]
-          puts "In 1st EM.run 'if' - Prompted for Extension/Password: event.content[:event_name] = #{event.content[:event_name]} - PLAYBACK_FILE: #{fs_playback_file}"
+          puts "In 1st EM.run 'if' - Prompted for Extension/Password: event.content[:event_name] = #{event.content[:event_name]}\n\t\t\tevent.content[:playback_file_path] = #{fs_playback_file}"
           fail "Wrong file played: #{fs_playback_file}" if event.content[:playback_file_path] == "#{expected_playback_file[:abort]}"
         else
-            puts "In 1st EM.run 'else' - Prompted for Extension/Password: event.content[:event_name] = #{event.content[:event_name]} - PLAYBACK_FILE: #{fs_playback_file}"
-            if event.content[:playback_file_path] == expected_playback_file[:pound]
-              puts "Got '#' wav file! - Should send the vm_extension here, inside #{Thread.current}"
-              puts "EM.stop is called next because we exit the else, but THIS is the physical location where we need to send the tones for the extension"
-              puts "EVENT_NAME: #{event.content[:event_name]} - PLAYBACK_FILE_PATH: #{event.content[:playback_file_path]}"
-            end
-            # This fails IN the run because @sock is nilClass, meaning its not being passed in correctly
-            # so the call to vm_extension fails, which means we can't extend the logic to look for vm-enter_pass.wav
+          fs_playback_file = event.content[:playback_file_path]
+          puts "In 1st EM.run 'else' - Prompted for Extension/Password: event.content[:event_name] = #{event.content[:event_name]}\n\t\t\tevent.content[:playback_file_path] =  #{fs_playback_file}"
+          if event.content[:playback_file_path] == expected_playback_file[:pound]
+            puts "Got '#' wav file! - Should send the vm_extension here, inside #{Thread.current}"
+            puts "EM.stop is called next because we exit the else, but THIS is the physical location where we need to send the tones for the extension"
+            puts "EVENT_NAME: #{event.content[:event_name]} - PLAYBACK_FILE_PATH: #{event.content[:playback_file_path]}"
+          end
+          # This fails IN the run because @sock is nilClass, meaning its not being passed in correctly
+          # so the call to vm_extension fails, which means we can't extend the logic to look for vm-enter_pass.wav
         end
         EM.stop
       end
@@ -217,7 +219,7 @@ When /^I supply my extension and password$/ do
 
         if event.content[:event_name] == "PLAYBACK_START"
         fs_playback_file = event.content[:playback_file_path]
-        puts "In 1st EM.run 'if' - Supply Extension/Password: EVENT_NAME: #{event.content[:event_name]} - PLAYBACK_FILE: #{fs_playback_file}"
+        puts "In 1st EM.run 'if' - Supply Extension/Password: EVENT_NAME: #{event.content[:event_name]}\n\t\t\tevent.content[:playback_file_path] = #{fs_playback_file}"
         fail "Wrong file played: #{fs_playback_file}" unless event.content[:playback_file_path] == "#{expected_playback_file[:enter_id]}" || event.content[:playback_file_path] == "#{expected_playback_file[:pound]}"
           EM.stop
         end
@@ -245,7 +247,7 @@ When /^I supply my extension and password$/ do
 
         if event.content[:event_name] == "PLAYBACK_START"
           fs_playback_file = event.content[:playback_file_path]
-          puts "In 2nd EM.run 'if' - Supply Extension/Password: EVENT_NAME: #{event.content[:event_name]} - PLAYBACK_FILE: #{fs_playback_file}"
+          puts "In 2nd EM.run 'if' - Supply Extension/Password: EVENT_NAME: #{event.content[:event_name]}\n\t\t\tevent.content[:playback_file_path] = #{fs_playback_file}"
           fail "Wrong file played: #{fs_playback_file}" unless event.content[:playback_file_path] == "#{expected_playback_file[:enter_id]}" || event.content[:playback_file_path] == "#{expected_playback_file[:pound]}"
           EM.stop
         end
