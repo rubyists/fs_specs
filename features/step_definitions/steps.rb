@@ -119,11 +119,8 @@ When /^I am prompted for my extension and password$/ do
   $stdout.sync = true # always flush after
 
   EM.run do
-    # Wait 10 seconds for a voicemail prompt - This is only due to travis-ci to ensure we have enough time.
-    EM.add_periodic_timer(10) { |e| fail "Timed out waiting to get voicemail prompt"; EM.stop }
-
-    vm_extension = "1000#"
-    vm_password = "1000#"
+    # Wait 60 seconds for a voicemail prompt - This is only due to travis-ci to ensure we have enough time.
+    EM.add_periodic_timer(60) { |e| fail "Timed out waiting to get voicemail prompt"; EM.stop }
 
     listener = Class.new(FSL::Inbound){
 
@@ -170,7 +167,7 @@ When /^I am prompted for my extension and password$/ do
             @sock.uuid_send_dtmf(uuid: @uuid, dtmf: vm_extension)
         end
 
-          # We process on pound above because it denotes expectation change. If 
+          # We process on pound above because it denotes expectation change. If
         EM.stop
       end
     }
@@ -187,8 +184,8 @@ When /^I supply my extension and password$/ do
 
   # Start the actual work
   EM.run do
-    # Wait 15 seconds for response to dtmf input
-    EM.add_periodic_timer(15) { |e| fail "Timed out waiting to get voicemail prompt"; EM.stop }
+    # Wait 60 seconds for response to dtmf input
+    EM.add_periodic_timer(60) { |e| fail "Timed out waiting to get voicemail prompt"; EM.stop }
 
     listener = Class.new(FSL::Inbound){
     def before_session
@@ -216,8 +213,8 @@ When /^I supply my extension and password$/ do
   end
 
   EM.run do
-    # Wait 15 seconds for response to dtmf input
-    EM.add_periodic_timer(15) { |e| fail "Timed out waiting on password confirmation"; EM.stop }
+    # Wait 60 seconds for response to dtmf input
+    EM.add_periodic_timer(60) { |e| fail "Timed out waiting on password confirmation"; EM.stop }
     listener2 = Class.new(FSL::Inbound){
       def before_session
         # subscribe to events
