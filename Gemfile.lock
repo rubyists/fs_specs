@@ -1,6 +1,9 @@
 GEM
   remote: http://rubygems.org/
   specs:
+    ZenTest (4.6.2)
+    autotest (4.4.6)
+      ZenTest (>= 4.4.1)
     builder (3.0.0)
     cucumber (1.1.4)
       builder (>= 2.1.2)
@@ -40,6 +43,8 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  ZenTest
+  autotest
   builder
   cucumber
   diff-lcs

@@ -20,4 +20,6 @@ group :development, :test do
   gem 'rspec-mocks'
   gem 'term-ansicolor'
   gem 'webrat'
+  gem 'ZenTest'
+  gem 'autotest'
 end
