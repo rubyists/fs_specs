@@ -1,3 +1,5 @@
+require './helpers'
+
 require 'yaml'
 require 'rspec/autorun'
 
