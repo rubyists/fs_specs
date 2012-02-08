@@ -214,8 +214,8 @@ When /^I supply my extension and password$/ do
 
   # Start the actual work
   EM.run do
-    # Wait 60 seconds for response to dtmf input
-    EM.add_periodic_timer(60) { |e| fail "Timed out waiting to get voicemail prompt"; EM.stop }
+    # Wait 10 seconds for response to dtmf input
+    EM.add_periodic_timer(10) { |e| fail "Timed out waiting to get voicemail prompt"; EM.stop }
 
     listener2 = Class.new(FSL::Inbound){
       def before_session
@@ -272,8 +272,8 @@ When /^I supply my extension and password$/ do
   end
 
   EM.run do
-    # Wait 60 seconds for response to dtmf input
-    EM.add_periodic_timer(60) { |e| fail "Timed out waiting on password confirmation"; EM.stop }
+    # Wait 10 seconds for response to dtmf input
+    EM.add_periodic_timer(10) { |e| fail "Timed out waiting on password confirmation"; EM.stop }
     listener2 = Class.new(FSL::Inbound){
       def before_session
         # subscribe to events
