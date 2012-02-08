@@ -30,9 +30,10 @@ flow of the feature sets themselves.
 
 Development has no guarantee to work. It is what it is, which is a work in progress.
 
-We curently hook into Travis-CI: http://travis-ci.org/#!/rubyists/fs_specs
-You can watch how the tree progresses from there.
-
+== Travis CI
+  We curently hook into Travis-CI: http://travis-ci.org/#!/rubyists/fs_specs
+  You can watch how the tree progresses from there.
+  Current Build Status: [![Build Status](https://secure.travis-ci.org/rubyists/fs_specs.png)](http://travis-ci.org/rubyists/fs_specs)
 
 Enjoy!
 
