@@ -2,7 +2,6 @@ require "fsr"
 require "fsr/command_socket"
 require "fsr/listener/inbound"
 
-# Require Bacon for specs
-require 'bacon'
+require 'rspec'
 
 FSR.load_all_commands

@@ -1,5 +1,9 @@
-And /^I should see false$/ do
-       true.should == "false"
+And /^true.should == true$/ do
+       true.should == true
+end
+
+And /^false.should != true$/ do
+  false.should_not == true
 end
 
 When /^I make a phone call$/ do

@@ -7,8 +7,11 @@ Feature: Establish that phone infrastructure is working
   Background: 
     Given I have 2 servers named blackbird.rubyists.com and tigershark.rubyists.com
 
+  Scenario: Show that True and False express correctly, and exactly, with should and should_not
+    Then true.should == true
+    And  false.should != true
+
   Scenario: 
     When I make a phone call
     Then I should be able to terminate the call
-    And I should see false
 
