@@ -10,8 +10,13 @@ describe FSSpecs::TestRunner do
     @testrunner = FSSpecs::TestRunner.new
   end
 
-  it "should be false" do
-      true.should == false
+  it "true should be true" do
+      true.should == true
   end
+
+  it "false should_not be true" do
+    false.should_not == true
+  end
+
 end
 
