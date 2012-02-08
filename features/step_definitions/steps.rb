@@ -148,13 +148,12 @@ When /^I am prompted for my extension and password$/ do
 
         case event.content[:event_name]
         	when "CHANNEL_EXECUTE_COMPLETE", "CHANNEL_EXECUTE", "HEARTBEAT", "RE_SCHEDULE"
-        	  puts "PROMPTED - 1 EM.run - #{Thread.current.to_s} - CHANNEL MANAGEMENT : event.content[:event_name] = #{event.content[:event_name]}"
 
         	when "PLAYBACK_START"
             fail "We got vm-abort.wav!" if event.content[:playback_file_path] == expected_playback_file[:abort]
         	
             if event.content[:playback_file_path] == "#{expected_playback_file[:enter_id]}" || event.content[:playback_file_path] == "#{expected_playback_file[:pound]}"
-              puts "SUCCEEDED! Got #{event.content[:playback_file_path]}"
+              puts "SUCCEEDED! WE WERE PROMPTED - Got #{event.content[:playback_file_path]}"
               return 0
             end
 
@@ -163,7 +162,7 @@ When /^I am prompted for my extension and password$/ do
 
         	when "PLAYBACK_STOP"
             if event.content[:playback_file_path] == "#{expected_playback_file[:enter_id]}" || event.content[:playback_file_path] == "#{expected_playback_file[:pound]}"
-              puts "SUCCEEDED! Got #{event.content[:playback_file_path]}"
+              puts "SUCCEEDED! WE WERE PROMPTED - Got #{event.content[:playback_file_path]}"
               return 0
             end
 
@@ -175,10 +174,7 @@ When /^I am prompted for my extension and password$/ do
         	  return
 
         	else
-        	  fs_playback_file = event.content[:playback_file_path]
             fail "Wrong file played: #{fs_playback_file}" unless event.content[:playback_file_path] == "#{expected_playback_file[:enter_id]}" || event.content[:playback_file_path] == "#{expected_playback_file[:pound]}"
-      	    puts "In 1st EM.run 'case' - else hit! - PROMPTED - #{Thread.current.to_s}"
-            puts "In 1st EM.run 'case' - Prompted for Extension/Password: EVENT_NAME: #{event.content[:event_name]} - PLAYBACK_FILE: #{fs_playback_file}"
         end
         EM.stop
       end
