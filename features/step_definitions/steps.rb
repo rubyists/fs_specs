@@ -151,7 +151,7 @@ When /^I am prompted for my extension and password$/ do
 
         	when "PLAYBACK_START"
             fail "We got vm-abort.wav!" if event.content[:playback_file_path] == expected_playback_file[:abort]
-        	
+
             if event.content[:playback_file_path] == "#{expected_playback_file[:enter_id]}" || event.content[:playback_file_path] == "#{expected_playback_file[:pound]}"
               puts "SUCCEEDED! WE WERE PROMPTED - Got #{event.content[:playback_file_path]}"
               return 0
@@ -164,10 +164,10 @@ When /^I am prompted for my extension and password$/ do
             if event.content[:playback_file_path] == "#{expected_playback_file[:enter_id]}" || event.content[:playback_file_path] == "#{expected_playback_file[:pound]}"
               puts "SUCCEEDED! WE WERE PROMPTED - Got #{event.content[:playback_file_path]}"
               return 0
+            else
+              fs_playback_file = event.content[:playback_file_path]
+        	    puts "PROMPTED - 1 EM.run - #{Thread.current.to_s} - event.content[:event_name] = #{event.content[:event_name]} fs_playback_file: #{fs_playback_file}"
             end
-
-            fs_playback_file = event.content[:playback_file_path]
-        	  puts "PROMPTED - 1 EM.run - #{Thread.current.to_s} - event.content[:event_name] = #{event.content[:event_name]} fs_playback_file: #{fs_playback_file}"
 
         	when nil
         	  puts "In 1st EM.run 'case' - event.content[:event_name] is nil"
@@ -236,7 +236,6 @@ When /^I supply my extension and password$/ do
             puts "In 1st EM.run 'case' - Supply Extension/Password: EVENT_NAME: #{event.content[:event_name]} - PLAYBACK_FILE: #{fs_playback_file}"
             fail "Not 'Enter ID' or 'Pound'. Wrong file played: #{fs_playback_file}" unless event.content[:playback_file_path] == "#{expected_playback_file[:enter_id]}" || event.content[:playback_file_path] == "#{expected_playback_file[:pound]}"
         end
-
         EM.stop
       end
     }
