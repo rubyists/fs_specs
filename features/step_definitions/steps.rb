@@ -29,15 +29,18 @@ Given /^I have 2 servers named ([\w.]+) and ([\w.]+)$/ do |server1, server2|
 end
 
 Then /^I should be able to terminate the call$/ do
-  fail "I Have no UUID!" if @uuid.nil?
+  @uuid.should_not be_nil
+
   resp = @sock.kill(@uuid).run(:api)
-  fail "Response #{resp} was not OK" unless resp["body"].match /^\+OK/
+  
+  resp["body"].should match(/^\+OK/)
+
   30.times do
     sleep 0.1
     break unless @sock.calls.run.detect { |c| c.uuid == @uuid }
   end
-  # This is failing for phone_infrastructure
-  fail "Call not terminated!" unless @sock.calls.run.detect { |c| c.uuid == @uuid } == nil
+  # Make sure there are no calls left still dangling
+  @sock.calls.run.detect { |c| c.uuid == @uuid }.should be_nil
 end
 
 Then /^I should be able to terminate all calls$/ do
@@ -57,7 +60,7 @@ end
 
 Given /^([\w.]+) is accessible via the Event Socket$/ do |es_server|
   @sock = FSR::CommandSocket.new(server: @server1)
-  fail if @sock.nil?
+  @sock.should_not be_nil
 end
 
 Given /^I am known to FreeSWITCH$/ do
@@ -68,6 +71,7 @@ end
 
 Given /^I have a conference object$/ do
   @confs = @sock.conference(:list).run
+  @confs.should_not be_nil
 end
 
 When /^I issue command "([^"]*)"$/ do |cmd|
@@ -83,19 +87,23 @@ Then /^I should not see an error status$/ do
 end
 
 When /^I dial extension "([^"]*)" on ([\w.]+)$/ do |known_extension, server|
-  fail "No endpoint created" unless orig = @sock.originate(target: 'sofia/external/%s@%s' % [known_extension, @server2],
-                         endpoint: "&transfer('3000 XML default')")
+  orig = @sock.originate(target: 'sofia/external/%s@%s' % [known_extension, @server2], endpoint: "&transfer('3000 XML default')")
+  orig.should_not be_nil
+
   @resp = orig.run(:api)
   fail "Response does not contain OK" unless (@resp["body"].match /^\+OK \w{8}-(?:\w{4}-){3}\w{12}$/)
 end
 
 And /^I dial into voicemail using extension "([^"]*)"$/ do |vm_extension|
   # Create connection to extension 4000 OR '*98' for voicemail access
-  fail "No endpoint created" unless orig = @sock.originate(target: 'sofia/external/%s@%s' % [vm_extension, @server2],
-                  endpoint: "&transfer('#{vm_extension} XML default')")
+  orig = @sock.originate(target: 'sofia/external/%s@%s' % [vm_extension, @server2], endpoint: "&transfer('#{vm_extension} XML default')")
+  orig.should_not be_nil
+
   # Store the response
   resp = orig.run(:api)
-  fail "Unable to connect to voicemail" unless (resp["body"].match /^\+OK /)
+
+  resp["body"].should match(/^\+OK /)
+
   @uuid = resp["body"].split[1] # This should have the uuid It's what I was trying to see.
   # We use @uuid in further steps
 end
@@ -109,16 +117,19 @@ When /^I dial unknown extension "([^"]*)"$/ do | unknown_extension|
   orig = @sock.originate(target: 'sofia/external/%s@%s' % [unknown_extension, @server2],
                          endpoint: "&transfer('3000 XML default')")
   @resp = orig.run(:api)
-  fail "Previous command did not generate an error" unless @resp["body"].match /^-ERR/
+
+  @resp["body"].should match(/^-ERR/)
+
 end
 
 Then /^I should be notified the call failed$/ do
   status, @message = @resp["body"].split(" ")
-  fail unless status == '-ERR'
+  status.should match('-ERR')
+
 end
 
 Then /^I should recieve call failure type "([^"]*)"$/ do |failure_type|
-  fail unless @message == "#{failure_type}"
+  @message.should match("#{failure_type}")
 end
 
 When /^I am prompted for my extension and password$/ do
