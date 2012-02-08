@@ -240,8 +240,8 @@ When /^I supply my extension and password$/ do
       end
     }
     # BROKEN: We're just being prompted over and over for the extension
-    # even after the test fails. So we need to check for a response to uuid_send_dtf
-    # and that FS has actually processed it!
+    # even after the test fails. So we need to check for a response to uuid_send_dtmf
+    # and that FS has actually processed it! Looking on both switch, that DTMF send is never seen.
     @sock.uuid_send_dtmf(uuid: @uuid, dtmf: vm_extension)
     EM.connect(@server2, 8021, listener2)
   end
@@ -298,6 +298,8 @@ When /^I supply my extension and password$/ do
     # BROKEN: Not currently seeing /var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-enter_pass.wav
     # requested. I don't think we're successfully completing passing the extension in order to get 'here'
     # to even be offered vm-enter_pass.wav
+    vm_password = "1000#"
+
     @sock.uuid_send_dtmf(uuid: @uuid, dtmf: vm_password)
     EM.connect(@server2, 8021, listener2)
   end
