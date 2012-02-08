@@ -114,8 +114,6 @@ Then /^I should recieve call failure type "([^"]*)"$/ do |failure_type|
 end
 
 When /^I am prompted for my extension and password$/ do
-  # Here we do the em run, we can do one per step for now
-  # TODO: Make a listener class for this
   $stdout.sync = true # always flush after
 
   EM.run do
@@ -132,16 +130,11 @@ When /^I am prompted for my extension and password$/ do
       end
 
       def on_event(event)
-        # are you not seeing these?
-        #
         # It looks like in both checks on the playback_file we get either of these 4.
         #   /var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-enter_id.wav
         #  file_string://ascii/35.wav for '#' key
         #  /var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-abort.wav after failure to authenticate vm_extension+vm_password pairs
         #  /var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-goodbye.wav upon FS drop/destroy of call
-        #
-        vm_extension = "1000#"
-        vm_password = "1000#"
 
         expected_playback_file = {
           :enter_id => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-enter_id.wav",
@@ -153,21 +146,28 @@ When /^I am prompted for my extension and password$/ do
           :logged_in => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-no_messages.wav"
         }
 
-        #  What seems to be happening is the wav files are cycling play status within the timeframe of the checks. (Reprompt cycling)
-        #  This is making this pass *and* fail. If we catch the order right, we pass. we don't, we fail.
-        sleep(1)
-
         case event.content[:event_name]
         	when "CHANNEL_EXECUTE_COMPLETE", "CHANNEL_EXECUTE", "HEARTBEAT", "RE_SCHEDULE"
         	  puts "PROMPTED - 1 EM.run - #{Thread.current.to_s} - CHANNEL MANAGEMENT : event.content[:event_name] = #{event.content[:event_name]}"
 
         	when "PLAYBACK_START"
             fail "We got vm-abort.wav!" if event.content[:playback_file_path] == expected_playback_file[:abort]
-        	  fs_playback_file = event.content[:playback_file_path]
+        	
+            if event.content[:playback_file_path] == "#{expected_playback_file[:enter_id]}" || event.content[:playback_file_path] == "#{expected_playback_file[:pound]}"
+              puts "SUCCEEDED! Got #{event.content[:playback_file_path]}"
+              return 0
+            end
+
+            fs_playback_file = event.content[:playback_file_path]
         	  puts "PROMPTED - 1 EM.run - #{Thread.current.to_s} - event.content[:event_name] = #{event.content[:event_name]} fs_playback_file: #{fs_playback_file}"
 
         	when "PLAYBACK_STOP"
-        	  fs_playback_file = event.content[:playback_file_path]
+            if event.content[:playback_file_path] == "#{expected_playback_file[:enter_id]}" || event.content[:playback_file_path] == "#{expected_playback_file[:pound]}"
+              puts "SUCCEEDED! Got #{event.content[:playback_file_path]}"
+              return 0
+            end
+
+            fs_playback_file = event.content[:playback_file_path]
         	  puts "PROMPTED - 1 EM.run - #{Thread.current.to_s} - event.content[:event_name] = #{event.content[:event_name]} fs_playback_file: #{fs_playback_file}"
 
         	when nil
@@ -183,10 +183,6 @@ When /^I am prompted for my extension and password$/ do
         EM.stop
       end
     }
-    # - All of this is executed on a terminated reactor because its after the EM.stop call. So we're dealing with 'last-state' from here on.
-    # - The EM.connect just spins off the actual payload we built in the EM.run, which for us equates to event.content subscriptions we then cherry pick.
-    #
-    # This needs to be done IN the listener's @sock.uuid_send_dtmf(uuid: @uuid, dtmf: vm_extension)
     EM.connect(@server2, 8021, listener1)
   end
 end
