@@ -10,4 +10,5 @@ Feature: Establish that phone infrastructure is working
   Scenario: 
     When I make a phone call
     Then I should be able to terminate the call
+    And I should see false
 

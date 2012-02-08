@@ -1,3 +1,7 @@
+And /^I should see false$/ do
+       true.should == "false"
+end
+
 When /^I make a phone call$/ do
   orig = @sock.originate(target: "sofia/external/3000@#{@server2}", endpoint: '&transfer(9664)')
   @uuid = orig.run(:api)['body'].split[1]

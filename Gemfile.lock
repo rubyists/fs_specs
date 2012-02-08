@@ -1,7 +1,6 @@
 GEM
   remote: http://rubygems.org/
   specs:
-    bacon (1.1.0)
     builder (3.0.0)
     cucumber (1.1.4)
       builder (>= 2.1.2)
@@ -13,7 +12,7 @@ GEM
     eventmachine (0.12.10)
     freeswitcher (0.7.1)
       eventmachine
-    gherkin (2.7.6)
+    gherkin (2.7.7)
       json (>= 1.4.6)
     gist (2.0.4)
     json (1.6.5)
@@ -41,7 +40,6 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  bacon
   builder
   cucumber
   diff-lcs
