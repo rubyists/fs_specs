@@ -124,22 +124,6 @@ When /^I am prompted for my extension and password$/ do
     #
     EM.add_periodic_timer(10) { |e| fail "Timed out waiting to get voicemail prompt"; EM.stop }
 
-    # NOTE: This should make it stop. we don't want that, so I'm removing for now via comment.
-    # EM.add_periodic_timer(10) { |e| fail "Timed out waiting to get voicemail prompt"; EM.stop }
-
-    # Now we process all of the
-    #EM.add_periodic_timer(30) do
-      # Should we be doing all the work that we're doing within the listener itself, via events, here?
-    #end
-
-    EM.add_timer(5) do
-      EM.next_tick do
-        # This sends the command from within the reactor to FS.
-        # We need @sock from specs level to be available here.
-        @sock.uuid_send_dtmf(uuid: @uuid, dtmf: vm_extension)
-      end
-    end
-
     listener1 = Class.new(FSL::Inbound){
 
       def before_session
