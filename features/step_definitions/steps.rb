@@ -137,69 +137,64 @@ When /^I am prompted for my extension and password$/ do
   $stdout.sync = true # always flush after
 
   EM.run do
-    # Inside EM.run block so this is operating full speed and live on the listener sockets we create in here.
-    # Wait 10 seconds for a voicemail prompt - This is only due to travis-ci to ensure we have enough time.
-    #
-    EM.add_periodic_timer(10) { |e| fail "Timed out waiting to get voicemail prompt"; EM.stop }
+    EM.add_timer(10) { |e| fail "Timed out waiting to get voicemail prompt"; EM.stop }
 
-    listener1 = Class.new(FSL::Inbound){
+    prompt_listener = Class.new(FSL::Inbound){
+
+      @expected_playback_file = {
+        :enter_id => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-enter_id.wav",
+        :enter_pass => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-enter_pass.wav",
+        :pound => "file_string://ascii/35.wav",
+        :abort => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-abort.wav",
+        :goodbye => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-goodbye.wav",
+        :press => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-press.wav",
+        :logged_in => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-no_messages.wav"
+      }
 
       def before_session
-        # subscribe to events
-        add_event(:ALL){|event| on_event(event) }
+        # subscribe to all events
+        add_event(:ALL) { |event| on_event(event) }
       end
 
       def on_event(event)
-        # It looks like in both checks on the playback_file we get either of these 4.
-        #   /var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-enter_id.wav
-        #  file_string://ascii/35.wav for '#' key
-        #  /var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-abort.wav after failure to authenticate vm_extension+vm_password pairs
-        #  /var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-goodbye.wav upon FS drop/destroy of call
-
-        expected_playback_file = {
-          :enter_id => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-enter_id.wav",
-          :enter_pass => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-enter_pass.wav",
-          :pound => "file_string://ascii/35.wav",
-          :abort => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-abort.wav",
-          :goodbye => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-goodbye.wav",
-          :press => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-press.wav",
-          :logged_in => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-no_messages.wav"
-        }
 
         case event.content[:event_name]
-        	when "CHANNEL_EXECUTE_COMPLETE", "CHANNEL_EXECUTE", "HEARTBEAT", "RE_SCHEDULE"
-
-        	when "PLAYBACK_START"
-            fail "We got vm-abort.wav!" if event.content[:playback_file_path] == expected_playback_file[:abort]
-
-            if event.content[:playback_file_path] == "#{expected_playback_file[:enter_id]}" || event.content[:playback_file_path] == "#{expected_playback_file[:pound]}"
-              puts "SUCCEEDED! WE WERE PROMPTED - Got #{event.content[:playback_file_path]}"
-              return 0
-            end
-
-            fs_playback_file = event.content[:playback_file_path]
-        	  puts "PROMPTED - 1 EM.run - #{Thread.current.to_s} - event.content[:event_name] = #{event.content[:event_name]} fs_playback_file: #{fs_playback_file}"
-
-        	when "PLAYBACK_STOP"
-            if event.content[:playback_file_path] == "#{expected_playback_file[:enter_id]}" || event.content[:playback_file_path] == "#{expected_playback_file[:pound]}"
-              puts "SUCCEEDED! WE WERE PROMPTED - Got #{event.content[:playback_file_path]}"
-              return 0
-            else
-              fs_playback_file = event.content[:playback_file_path]
-        	    puts "PROMPTED - 1 EM.run - #{Thread.current.to_s} - event.content[:event_name] = #{event.content[:event_name]} fs_playback_file: #{fs_playback_file}"
-            end
 
         	when nil
         	  puts "In 1st EM.run 'case' - event.content[:event_name] is nil"
         	  return
 
+        	when "CHANNEL_EXECUTE_COMPLETE", "CHANNEL_EXECUTE", "HEARTBEAT", "RE_SCHEDULE"
+            # Empty, just processing them out of the list. Lets us process on any channel state as well.
+
+        	when "PLAYBACK_START"
+            # Abort early if we see 'vm-abort.wav' or 'vm-goodbye.wav'
+            event.content[:playback_file_path].should_not match("#{@expected_playback_file[:abort]}")
+            event.content[:playback_file_path].should_not match("#{@expected_playback_file[:goodbye]}")
+
+            # START - If the file is 'vm-enter_id.wav' or 'file_string://ascii/35.wav' for '#' then output we got prompted by the system. Part of the sequence
+            # 'return 0' for now until we decide what to do here.
+            if event.content[:playback_file_path] == "#{@expected_playback_file[:enter_id]}" || event.content[:playback_file_path] == "#{expected_playback_file[:pound]}"
+              puts "SUCCEEDED! WE WERE PROMPTED - START - Got #{event.content[:playback_file_path]}"
+              return 0
+            end
+
+        	when "PLAYBACK_STOP"
+            # STOP - If the file is 'vm-enter_id.wav' or 'file_string://ascii/35.wav' for '#' then output we got prompted by the system. Part of the sequence
+            # 'return 0' for now until we decide what to do here.
+            if event.content[:playback_file_path] == "#{expected_playback_file[:enter_id]}" || event.content[:playback_file_path] == "#{expected_playback_file[:pound]}"
+              puts "SUCCEEDED! WE WERE PROMPTED - STOP - Got #{event.content[:playback_file_path]}"
+              return 0
+            end
+
         	else
-            fail "Wrong file played: #{fs_playback_file}" unless event.content[:playback_file_path] == "#{expected_playback_file[:enter_id]}" || event.content[:playback_file_path] == "#{expected_playback_file[:pound]}"
+            # Empty, just falling through. This will probably change.
         end
-        EM.stop
       end
+      EM.stop # Stop the EM instance
     }
-    EM.connect(@server2, 8021, listener1)
+    
+    EM.connect(@server2, 8021, prompt_listener) # Fire off our listener
   end
 end
 
