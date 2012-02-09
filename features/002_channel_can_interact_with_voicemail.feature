@@ -8,26 +8,10 @@ Feature: Channel can interact with voicemail
     And blackbird.rubyists.com is accessible via the Event Socket
 
   Scenario: Successfully log into voicemail using extension
-    And I dial into voicemail using extension "4000"
-    And I am prompted for and enter my extension and password
-    And I supply my extension and password
+    And I check voicemail for user 1000 with good password 1000
     Then I should be logged into voicemail
 
   Scenario: Fail to log into voicemail using extension
-    And I dial into voicemail using extension "4000"
-    And I am prompted for and enter my extension and password
-    And I supply an incorrect extension and password
-    Then I should be prompted to try again
-
-  Scenario: Successfully log into voicemail using shortcut
-    And I dial into voicemail using extension "*98"
-    And I am prompted for and enter my extension and password
-    And I supply my extension and password
-    Then I should be logged into voicemail
-
-  Scenario: Fail to log into voicemail using shortcut
-    And I dial into voicemail using extension "*98"
-    And I am prompted for and enter my extension and password
-    And I supply an incorrect extension and password
+    And I check voicemail for user 1000 with bad password 1001
     Then I should be prompted to try again
 
