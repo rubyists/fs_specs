@@ -108,6 +108,7 @@ When /^I dial into voicemail using extension "([^"]*)"$/ do |vm_extension|
 
   @uuid = resp["body"].split[1] # This should have the uuid It's what I was trying to see.
   # We use @uuid in further steps
+  # return @sock2, @uuid
 end
 
 Then /^I should be connected to that extension$/ do
@@ -121,7 +122,6 @@ When /^I dial unknown extension "([^"]*)"$/ do | unknown_extension|
   @resp = orig.run(:api)
 
   @resp["body"].should match(/^-ERR/)
-
 end
 
 Then /^I should be notified the call failed$/ do
@@ -224,11 +224,12 @@ When /^I supply my extension and password$/ do
 
     @vm_extension = "1000#"
     @vm_password = "1000#"
-    
+
     # Wait 10 seconds for response to dtmf input
     EM.add_periodic_timer(10) { |e| EM.stop }
     supply_listener = Class.new(FSL::Inbound){
-      PLAYBACK_FILES = []
+      # Commented out PLAYBACK_FILES because its already defined higher
+      # PLAYBACK_FILES = []
       def before_session
         @expected = {
           vm_enter_id: "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-enter_id.wav",
@@ -245,12 +246,12 @@ When /^I supply my extension and password$/ do
 
       def enter_extension
         PLAYBACK_FILES.delete @expected[:pound]
-        @sock.uuid_send_dtmf(uuid: @uuid, dtmf: vm_extension)
+        @sock2.uuid_send_dtmf(uuid: @uuid, dtmf: @vm_extension)
       end
 
       def enter_password
         PLAYBACK_FILES.delete @expected[:pound]
-        @sock2.uuid_send_dtmf(uuid: @uuid, dtmf: vm_password)
+        @sock2.uuid_send_dtmf(uuid: @uuid, dtmf: @vm_password)
       end
 
       def on_event(event)
@@ -268,7 +269,11 @@ When /^I supply my extension and password$/ do
       @sock2.uuid_send_dtmf(uuid: @uuid, dtmf: @vm_password)
     end
   end
-  PLAYBACK_FILES.should == @expected.values_at(:vm_enter_id, :vm_enter_pass, :pound, :vm_logged_in)
+  #PLAYBACK_FILES.should == @expected.values_at(:vm_enter_id, :vm_enter_pass, :pound, :vm_logged_in)
+  PLAYBACK_FILES.should include ("#{@expected[:vm_enter_id]}")
+  PLAYBACK_FILES.should include ("#{@expected[:vm_enter_pass]}")
+  PLAYBACK_FILES.should include ("#{@expected[:pound]}")
+
 end
 
 Then /^I should be logged into voicemail$/ do
