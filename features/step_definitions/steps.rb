@@ -204,77 +204,19 @@ When /^I supply my extension and password$/ do
   vm_password = "1000#"
 
   # Start the actual work
-  EM.run do
-    EM.add_timer(10) { |e| fail "Timed out waiting to get voicemail prompt"; EM.stop }
-
-    supply_listener1 = Class.new(FSL::Inbound){
-
-      @expected_playback_file = {
-        :enter_id => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-enter_id.wav",
-        :enter_pass => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-enter_pass.wav",
-        :pound => "file_string://ascii/35.wav",
-        :abort => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-abort.wav",
-        :goodbye => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-goodbye.wav",
-        :press => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-press.wav",
-        :logged_in => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-no_messages.wav"
-      }
-
-      def before_session
-        # subscribe to all events
-        add_event(:ALL) { |event| on_event(event) }
-      end
-
-      def on_event(event)
-
-        case event.content[:event_name]
-
-        	when nil
-        	  puts "In 1st EM.run 'case' - event.content[:event_name] is nil"
-        	  return
-
-        	when "CHANNEL_EXECUTE_COMPLETE", "CHANNEL_EXECUTE", "HEARTBEAT", "RE_SCHEDULE"
-            # Empty, just processing them out of the list. Lets us process on any channel state as well.
-
-        	when "PLAYBACK_START"
-            # Abort early if we see 'vm-abort.wav' or 'vm-goodbye.wav'
-            event.content[:playback_file_path].should_not match("#{@expected_playback_file[:abort]}")
-            event.content[:playback_file_path].should_not match("#{@expected_playback_file[:goodbye]}")
-
-            # START - If the file is 'vm-enter_id.wav' or 'file_string://ascii/35.wav' for '#' then output we got prompted by the system. Part of the sequence
-            # 'return 0' for now until we decide what to do here.
-            if event.content[:playback_file_path] == "#{@expected_playback_file[:enter_id]}" || event.content[:playback_file_path] == "#{expected_playback_file[:pound]}"
-              puts "SUPPLY - WE SAW THE PROMPT - START - Got #{event.content[:playback_file_path]}"
-              return 0
-            end
-
-        	when "PLAYBACK_STOP"
-            # STOP - If the file is 'vm-enter_id.wav' or 'file_string://ascii/35.wav' for '#' then output we got prompted by the system. Part of the sequence
-            # 'return 0' for now until we decide what to do here.
-            if event.content[:playback_file_path] == "#{expected_playback_file[:enter_id]}" || event.content[:playback_file_path] == "#{expected_playback_file[:pound]}"
-              puts "SUPPLY _ WE SAW THE PROMPT - STOP - Got #{event.content[:playback_file_path]}"
-              return 0
-            end
-
-        	else
-            # Empty, just falling through. This will probably change.
-        end
-      end
-      EM.stop # Stop the EM instance
-    }
     # BROKEN: We're just being prompted over and over for the extension
     # even after the test fails. So we need to check for a response to uuid_send_dtmf
     # and that FS has actually processed it! Looking on both switch, that DTMF send is never seen.
-    @sock.uuid_send_dtmf(uuid: @uuid, dtmf: vm_extension)
-    @sock.uuid_send_dtmf(uuid: @uuid, dtmf: vm_password)
-    $stdout.sync = true
-
-    EM.connect(@server2, 8021, supply_listener1) # Fire off our listener
-  end
+  
+  # NOTE: I am sending both at the top of the spec itself here, and again at the end of the EM.run
+  @sock.uuid_send_dtmf(uuid: @uuid, dtmf: vm_extension)
+  @sock.uuid_send_dtmf(uuid: @uuid, dtmf: vm_password)
+  $stdout.sync = true
 
   EM.run do
     # Wait 10 seconds for response to dtmf input
     EM.add_periodic_timer(10) { |e| fail "Timed out waiting on password confirmation"; EM.stop }
-    supply_listener2 = Class.new(FSL::Inbound){
+    supply_listener = Class.new(FSL::Inbound){
       def before_session
         # subscribe to events
         add_event(:ALL){|event| on_event(event) }
@@ -314,10 +256,13 @@ When /^I supply my extension and password$/ do
     # BROKEN: Not currently seeing /var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-enter_pass.wav
     # requested. I don't think we're successfully completing passing the extension in order to get 'here'
     # to even be offered vm-enter_pass.wav
+    vm_extension = "1000#"
     vm_password = "1000#"
 
+    @sock.uuid_send_dtmf(uuid: @uuid, dtmf: vm_extension)
     @sock.uuid_send_dtmf(uuid: @uuid, dtmf: vm_password)
-    EM.connect(@server2, 8021, supply_listener2)
+    $stdout.sync = true
+    EM.connect(@server2, 8021, supply_listener)
   end
 end
 
