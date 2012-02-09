@@ -32,7 +32,7 @@ Then /^I should be able to terminate the call$/ do
   @uuid.should_not be_nil
 
   resp = @sock.kill(@uuid).run(:api)
-  
+
   resp["body"].should match(/^\+OK/)
 
   30.times do
@@ -193,7 +193,7 @@ When /^I am prompted for my extension and password$/ do
       end
       EM.stop # Stop the EM instance
     }
-    
+
     EM.connect(@server2, 8021, prompt_listener) # Fire off our listener
   end
 end
@@ -201,13 +201,13 @@ end
 When /^I supply my extension and password$/ do
   # Configure extension and pass, as well as expected wav files.
   vm_extension = "1000#"
-  vm_password = "1000"
+  vm_password = "1000#"
 
   # Start the actual work
   EM.run do
     EM.add_timer(10) { |e| fail "Timed out waiting to get voicemail prompt"; EM.stop }
 
-    supply_listener = Class.new(FSL::Inbound){
+    supply_listener1 = Class.new(FSL::Inbound){
 
       @expected_playback_file = {
         :enter_id => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-enter_id.wav",
@@ -265,14 +265,16 @@ When /^I supply my extension and password$/ do
     # even after the test fails. So we need to check for a response to uuid_send_dtmf
     # and that FS has actually processed it! Looking on both switch, that DTMF send is never seen.
     @sock.uuid_send_dtmf(uuid: @uuid, dtmf: vm_extension)
-    
-    EM.connect(@server2, 8021, supply_listener) # Fire off our listener
+    @sock.uuid_send_dtmf(uuid: @uuid, dtmf: vm_password)
+    $stdout.sync = true
+
+    EM.connect(@server2, 8021, supply_listener1) # Fire off our listener
   end
 
   EM.run do
     # Wait 10 seconds for response to dtmf input
     EM.add_periodic_timer(10) { |e| fail "Timed out waiting on password confirmation"; EM.stop }
-    listener2 = Class.new(FSL::Inbound){
+    supply_listener2 = Class.new(FSL::Inbound){
       def before_session
         # subscribe to events
         add_event(:ALL){|event| on_event(event) }
@@ -324,7 +326,7 @@ When /^I supply my extension and password$/ do
     vm_password = "1000#"
 
     @sock.uuid_send_dtmf(uuid: @uuid, dtmf: vm_password)
-    EM.connect(@server2, 8021, listener2)
+    EM.connect(@server2, 8021, supply_listener2)
   end
 end
 
