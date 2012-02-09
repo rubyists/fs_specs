@@ -55,7 +55,8 @@ Then /^I should be able to terminate all calls$/ do
     sleep 0.1
     break unless @sock.calls.run.size > 0
   end
-  fail unless @sock.calls.run.size == 0
+  @sock.calls.run.size.should == 0
+
 end
 
 Given /^([\w.]+) is accessible via the Event Socket$/ do |es_server|
