@@ -6,6 +6,7 @@ Feature: Establish that phone infrastructure is working
 
   Background: 
     Given I have 2 servers named blackbird.rubyists.com and tigershark.rubyists.com
+    And blackbird.rubyists.com is accessible via the Event Socket
 
   Scenario: Show that True and False express correctly, and exactly, with should and should_not
     Then true.should == true
