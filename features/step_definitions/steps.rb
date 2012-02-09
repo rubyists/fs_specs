@@ -1,6 +1,5 @@
-require_relative "./vm_listener"
 Then /^true.should == true$/ do
-       true.should == true
+  true.should == true
 end
 
 Then /^false.should != true$/ do
