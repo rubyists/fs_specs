@@ -37,16 +37,16 @@ end
 Then /^I should be able to terminate the call$/ do
   @uuid.should_not be_nil
 
-  resp = @sock.kill(@uuid).run(:api)
+  resp = @sock2.kill(@uuid).run(:api)
 
   resp["body"].should match(/^\+OK/)
 
   30.times do
     sleep 0.1
-    break unless @sock.calls.run.detect { |c| c.uuid == @uuid }
+    break unless @sock2.calls.run.detect { |c| c.uuid == @uuid }
   end
   # Make sure there are no calls left still dangling
-  @sock.calls.run.detect { |c| c.uuid == @uuid }.should be_nil
+  @sock2.calls.run.detect { |c| c.uuid == @uuid }.should be_nil
 end
 
 Then /^I should be able to terminate all calls$/ do
@@ -72,7 +72,7 @@ Given /^I am known to FreeSWITCH$/ do
 end
 
 Given /^I have a conference object$/ do
-  @confs = @sock.conference(:list).run
+  @confs = @sock2.conference(:list).run
   @confs.should_not be_nil
 end
 
@@ -108,7 +108,6 @@ When /^I dial into voicemail using extension "([^"]*)"$/ do |vm_extension|
 
   @uuid = resp["body"].split[1] # This should have the uuid It's what I was trying to see.
   # We use @uuid in further steps
-  # return @sock2, @uuid
 end
 
 Then /^I should be connected to that extension$/ do
@@ -226,7 +225,7 @@ When /^I supply my extension and password$/ do
     @vm_password = "1000#"
 
     # Wait 10 seconds for response to dtmf input
-    EM.add_periodic_timer(10) { |e| EM.stop }
+    EM.add_periodic_timer(20) { |e| EM.stop }
     supply_listener = Class.new(FSL::Inbound){
       # Commented out PLAYBACK_FILES because its already defined higher
       # PLAYBACK_FILES = []
