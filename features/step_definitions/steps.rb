@@ -205,60 +205,68 @@ When /^I supply my extension and password$/ do
 
   # Start the actual work
   EM.run do
-    # Wait 10 seconds for response to dtmf input
-    EM.add_periodic_timer(10) { |e| fail "Timed out waiting to get voicemail prompt"; EM.stop }
+    EM.add_timer(10) { |e| fail "Timed out waiting to get voicemail prompt"; EM.stop }
 
-    listener2 = Class.new(FSL::Inbound){
+    supply_listener = Class.new(FSL::Inbound){
+
+      @expected_playback_file = {
+        :enter_id => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-enter_id.wav",
+        :enter_pass => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-enter_pass.wav",
+        :pound => "file_string://ascii/35.wav",
+        :abort => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-abort.wav",
+        :goodbye => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-goodbye.wav",
+        :press => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-press.wav",
+        :logged_in => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-no_messages.wav"
+      }
+
       def before_session
-        # subscribe to events
-        add_event(:ALL){|event| on_event(event) }
+        # subscribe to all events
+        add_event(:ALL) { |event| on_event(event) }
       end
 
       def on_event(event)
-        # are you not seeing these?
-        expected_playback_file = {
-          :enter_id => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-enter_id.wav",
-          :enter_pass => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-enter_pass.wav",
-          :pound => "file_string://ascii/35.wav",
-          :abort => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-abort.wav",
-          :goodbye => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-goodbye.wav",
-          :press => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-press.wav",
-          :logged_in => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-no_messages.wav"
-        }
-
-        #sleep(1)
 
         case event.content[:event_name]
-        	when "CHANNEL_EXECUTE_COMPLETE", "CHANNEL_EXECUTE", "HEARTBEAT", "RE_SCHEDULE"
-        	  puts "SUPPLY - 1 EM.run - #{Thread.current.to_s} - CHANNEL MANAGEMENT : event.content[:event_name] = #{event.content[:event_name]}"
-
-        	when "PLAYBACK_START"
-            fail "We got vm-abort.wav!" if event.content[:playback_file_path] == expected_playback_file[:abort]
-        	  fs_playback_file = event.content[:playback_file_path]
-        	  puts "SUPPLY - 1 EM.run - #{Thread.current.to_s} - event.content[:event_name] = #{event.content[:event_name]} fs_playback_file: #{fs_playback_file}"
-
-        	when "PLAYBACK_STOP"
-        	  fs_playback_file = event.content[:playback_file_path]
-        	  puts "SUPPLY - 1 EM.run - #{Thread.current.to_s} - event.content[:event_name] = #{event.content[:event_name]} fs_playback_file: #{fs_playback_file}"
 
         	when nil
         	  puts "In 1st EM.run 'case' - event.content[:event_name] is nil"
         	  return
 
+        	when "CHANNEL_EXECUTE_COMPLETE", "CHANNEL_EXECUTE", "HEARTBEAT", "RE_SCHEDULE"
+            # Empty, just processing them out of the list. Lets us process on any channel state as well.
+
+        	when "PLAYBACK_START"
+            # Abort early if we see 'vm-abort.wav' or 'vm-goodbye.wav'
+            event.content[:playback_file_path].should_not match("#{@expected_playback_file[:abort]}")
+            event.content[:playback_file_path].should_not match("#{@expected_playback_file[:goodbye]}")
+
+            # START - If the file is 'vm-enter_id.wav' or 'file_string://ascii/35.wav' for '#' then output we got prompted by the system. Part of the sequence
+            # 'return 0' for now until we decide what to do here.
+            if event.content[:playback_file_path] == "#{@expected_playback_file[:enter_id]}" || event.content[:playback_file_path] == "#{expected_playback_file[:pound]}"
+              puts "SUPPLY - WE SAW THE PROMPT - START - Got #{event.content[:playback_file_path]}"
+              return 0
+            end
+
+        	when "PLAYBACK_STOP"
+            # STOP - If the file is 'vm-enter_id.wav' or 'file_string://ascii/35.wav' for '#' then output we got prompted by the system. Part of the sequence
+            # 'return 0' for now until we decide what to do here.
+            if event.content[:playback_file_path] == "#{expected_playback_file[:enter_id]}" || event.content[:playback_file_path] == "#{expected_playback_file[:pound]}"
+              puts "SUPPLY _ WE SAW THE PROMPT - STOP - Got #{event.content[:playback_file_path]}"
+              return 0
+            end
+
         	else
-        	  fs_playback_file = event.content[:playback_file_path]
-        	  puts "In 1st EM.run 'case' - else hit! - SUPPLY - #{Thread.current.to_s}"
-            puts "In 1st EM.run 'case' - Supply Extension/Password: EVENT_NAME: #{event.content[:event_name]} - PLAYBACK_FILE: #{fs_playback_file}"
-            fail "Not 'Enter ID' or 'Pound'. Wrong file played: #{fs_playback_file}" unless event.content[:playback_file_path] == "#{expected_playback_file[:enter_id]}" || event.content[:playback_file_path] == "#{expected_playback_file[:pound]}"
+            # Empty, just falling through. This will probably change.
         end
-        EM.stop
       end
+      EM.stop # Stop the EM instance
     }
     # BROKEN: We're just being prompted over and over for the extension
     # even after the test fails. So we need to check for a response to uuid_send_dtmf
     # and that FS has actually processed it! Looking on both switch, that DTMF send is never seen.
     @sock.uuid_send_dtmf(uuid: @uuid, dtmf: vm_extension)
-    EM.connect(@server2, 8021, listener2)
+    
+    EM.connect(@server2, 8021, supply_listener) # Fire off our listener
   end
 
   EM.run do
