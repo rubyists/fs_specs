@@ -282,7 +282,7 @@ When /^I supply my extension and password$/ do
 
       def on_event(event)
         # are you not seeing these?
-        expected_playback_file = {
+        @expected_playback_file = {
           :enter_id => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-enter_id.wav",
           :enter_pass => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-enter_pass.wav",
           :pound => "file_string://ascii/35.wav",
@@ -292,17 +292,10 @@ When /^I supply my extension and password$/ do
           :logged_in => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-no_messages.wav"
         }
 
-        #sleep(1)
-
         case event.content[:event_name]
-        	when "CHANNEL_EXECUTE_COMPLETE", "CHANNEL_EXECUTE", "HEARTBEAT", "RE_SCHEDULE"
-        	  puts "SUPPLY - 2 EM.run - CHANNEL MANAGEMENT : event.content[:event_name] = #{event.content[:event_name]}"
-
         	when "PLAYBACK_START"
-            fail "We got vm-abort.wav!" if event.content[:playback_file_path] == expected_playback_file[:abort]
-
-        	  fs_playback_file = event.content[:playback_file_path]
-        	  puts "SUPPLY - 2 EM.run - #{Thread.current.to_s} - event.content[:event_name] = #{event.content[:event_name]} fs_playback_file: #{fs_playback_file}"
+            event.content[:playback_file_path].should_not == "#{@expected_playback_file[:abort]}"
+            event.content[:playback_file_path].should_not == "#{@expected_playback_file[:goodbye]}"
 
         	when "PLAYBACK_STOP"
         	  fs_playback_file = event.content[:playback_file_path]
@@ -313,9 +306,7 @@ When /^I supply my extension and password$/ do
         	  return
 
         	else
-        	  fs_playback_file = event.content[:playback_file_path]
-            fail "Wrong file played: #{fs_playback_file}" unless event.content[:playback_file_path] == "#{expected_playback_file[:enter_id]}" || event.content[:playback_file_path] == "#{expected_playback_file[:pound]}"
-        	  puts "In 2nd EM.run 'case' - else hit!"
+            fail "We fell completely through the Supply chain, and already processed PLAYBACK_START and PLAYBACK_STOP. Do something here!"
         end
           EM.stop
       end
