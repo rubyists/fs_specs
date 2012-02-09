@@ -1,8 +1,8 @@
-And /^true.should == true$/ do
+Then /^true.should == true$/ do
        true.should == true
 end
 
-And /^false.should != true$/ do
+Then /^false.should != true$/ do
   false.should_not == true
 end
 
@@ -95,7 +95,7 @@ When /^I dial extension "([^"]*)" on ([\w.]+)$/ do |known_extension, server|
   fail "Response does not contain OK" unless (@resp["body"].match /^\+OK \w{8}-(?:\w{4}-){3}\w{12}$/)
 end
 
-And /^I dial into voicemail using extension "([^"]*)"$/ do |vm_extension|
+When /^I dial into voicemail using extension "([^"]*)"$/ do |vm_extension|
   # Create connection to extension 4000 OR '*98' for voicemail access
   orig = @sock.originate(target: 'sofia/external/%s@%s' % [vm_extension, @server2], endpoint: "&transfer('#{vm_extension} XML default')")
   orig.should_not be_nil
@@ -358,4 +358,3 @@ end
 Then /^I should hear "([^"]*)"$/ do |sound_byte|
     pending # express the regexp above with the code you wish you had
 end
-
