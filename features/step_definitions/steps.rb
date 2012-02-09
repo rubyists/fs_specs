@@ -6,8 +6,19 @@ Then /^false.should != true$/ do
   false.should_not == true
 end
 
+Given /^I have 2 servers named ([\w.]+) and ([\w.]+)$/ do |server1, server2|
+  @server1, @server2 = server1, server2
+  @sock1 = FSR::CommandSocket.new(server: @server1, port: 8021)
+  @played_files = []
+end
+
+Given /^([\w.]+) is accessible via the Event Socket$/ do |es_server|
+  @sock2 = FSR::CommandSocket.new(server: @server1)
+  @sock2.should_not be_nil
+end
+
 When /^I make a phone call$/ do
-  orig = @sock.originate(target: "sofia/external/3000@#{@server2}", endpoint: '&transfer(9664)')
+  orig = @sock2.originate(target: "sofia/external/3000@#{@server2}", endpoint: '&transfer(9664)')
   @uuid = orig.run(:api)['body'].split[1]
 
   # Due to asyncronous nature of the entire method chain
@@ -17,15 +28,10 @@ When /^I make a phone call$/ do
   # and include additional checks oside the sleep to limit wait time further.
   30.times do
     sleep 0.1
-    break if @sock.calls.run.any?{|call| call.uuid == @uuid }
+    break if @sock2.calls.run.any?{|call| call.uuid == @uuid }
   end
-  our_call = @sock.calls.run.detect { |call| call.uuid == @uuid }
+  our_call = @sock2.calls.run.detect { |call| call.uuid == @uuid }
   fail "No Call Exists!" unless our_call and our_call.uuid == @uuid
-end
-
-Given /^I have 2 servers named ([\w.]+) and ([\w.]+)$/ do |server1, server2|
-  @server1, @server2 = server1, server2
-  @sock = FSR::CommandSocket.new(server: @server1, port: 8021)
 end
 
 Then /^I should be able to terminate the call$/ do
@@ -44,8 +50,8 @@ Then /^I should be able to terminate the call$/ do
 end
 
 Then /^I should be able to terminate all calls$/ do
-  @sock.calls.run.each do |call|
-    @sock.say("api uuid_kill #{call.uuid}")
+  @sock2.calls.run.each do |call|
+    @sock2.say("api uuid_kill #{call.uuid}")
   end
 
   # Due to asynchronous nature of the entire method chain
@@ -53,15 +59,10 @@ Then /^I should be able to terminate all calls$/ do
   # We wait until all call deletions have caught up to us.
   30.times do
     sleep 0.1
-    break unless @sock.calls.run.size > 0
+    break unless @sock2.calls.run.size > 0
   end
-  @sock.calls.run.size.should == 0
+  @sock2.calls.run.size.should == 0
 
-end
-
-Given /^([\w.]+) is accessible via the Event Socket$/ do |es_server|
-  @sock = FSR::CommandSocket.new(server: @server1)
-  @sock.should_not be_nil
 end
 
 Given /^I am known to FreeSWITCH$/ do
@@ -88,7 +89,7 @@ Then /^I should not see an error status$/ do
 end
 
 When /^I dial extension "([^"]*)" on ([\w.]+)$/ do |known_extension, server|
-  orig = @sock.originate(target: 'sofia/external/%s@%s' % [known_extension, @server2], endpoint: "&transfer('3000 XML default')")
+  orig = @sock2.originate(target: 'sofia/external/%s@%s' % [known_extension, @server2], endpoint: "&transfer('3000 XML default')")
   orig.should_not be_nil
 
   @resp = orig.run(:api)
@@ -97,7 +98,7 @@ end
 
 When /^I dial into voicemail using extension "([^"]*)"$/ do |vm_extension|
   # Create connection to extension 4000 OR '*98' for voicemail access
-  orig = @sock.originate(target: 'sofia/external/%s@%s' % [vm_extension, @server2], endpoint: "&transfer('#{vm_extension} XML default')")
+  orig = @sock2.originate(target: 'sofia/external/%s@%s' % [vm_extension, @server2], endpoint: "&transfer('#{vm_extension} XML default')")
   orig.should_not be_nil
 
   # Store the response
@@ -115,7 +116,7 @@ Then /^I should be connected to that extension$/ do
 end
 
 When /^I dial unknown extension "([^"]*)"$/ do | unknown_extension|
-  orig = @sock.originate(target: 'sofia/external/%s@%s' % [unknown_extension, @server2],
+  orig = @sock2.originate(target: 'sofia/external/%s@%s' % [unknown_extension, @server2],
                          endpoint: "&transfer('3000 XML default')")
   @resp = orig.run(:api)
 
@@ -133,7 +134,7 @@ Then /^I should recieve call failure type "([^"]*)"$/ do |failure_type|
   @message.should match("#{failure_type}")
 end
 
-When /^I am prompted for my extension and password$/ do
+When /^I am prompted for and enter my extension and password$/ do
   $stdout.sync = true # always flush after
 
   EM.run do
@@ -174,7 +175,7 @@ When /^I am prompted for my extension and password$/ do
 
             # START - If the file is 'vm-enter_id.wav' or 'file_string://ascii/35.wav' for '#' then output we got prompted by the system. Part of the sequence
             # 'return 0' for now until we decide what to do here.
-            if event.content[:playback_file_path] == "#{@expected_playback_file[:enter_id]}" || event.content[:playback_file_path] == "#{expected_playback_file[:pound]}"
+            if event.content[:playback_file_path] == "#{@expected_playback_file[:enter_id]}" || event.content[:playback_file_path] == "#{@expected_playback_file[:pound]}"
               puts "SUCCEEDED! WE WERE PROMPTED - START - Got #{event.content[:playback_file_path]}"
               return 0
             end
@@ -200,70 +201,74 @@ end
 
 When /^I supply my extension and password$/ do
   # Configure extension and pass, as well as expected wav files.
-  vm_extension = "1000#"
-  vm_password = "1000#"
 
   # Start the actual work
     # BROKEN: We're just being prompted over and over for the extension
     # even after the test fails. So we need to check for a response to uuid_send_dtmf
     # and that FS has actually processed it! Looking on both switch, that DTMF send is never seen.
-  
+
   # NOTE: I am sending both at the top of the spec itself here, and again at the end of the EM.run
-  @sock.uuid_send_dtmf(uuid: @uuid, dtmf: vm_extension)
-  @sock.uuid_send_dtmf(uuid: @uuid, dtmf: vm_password)
   $stdout.sync = true
+  PLAYBACK_FILES = []
+  @expected = {
+    vm_enter_id: "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-enter_id.wav",
+    vm_enter_pass: "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-enter_pass.wav",
+    pound: "file_string://ascii/35.wav",
+    vm_abort: "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-abort.wav",
+    vm_goodbye: "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-goodbye.wav",
+    vm_press: "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-press.wav",
+    vm_logged_in: "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-no_messages.wav"
+  }
 
   EM.run do
+
+    @vm_extension = "1000#"
+    @vm_password = "1000#"
+    
     # Wait 10 seconds for response to dtmf input
-    EM.add_periodic_timer(10) { |e| fail "Timed out waiting on password confirmation"; EM.stop }
+    EM.add_periodic_timer(10) { |e| EM.stop }
     supply_listener = Class.new(FSL::Inbound){
+      PLAYBACK_FILES = []
       def before_session
+        @expected = {
+          vm_enter_id: "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-enter_id.wav",
+          vm_enter_pass: "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-enter_pass.wav",
+          pound: "file_string://ascii/35.wav",
+          vm_abort: "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-abort.wav",
+          vm_goodbye: "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-goodbye.wav",
+          vm_press: "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-press.wav",
+          vm_logged_in: "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-no_messages.wav"
+        }
         # subscribe to events
         add_event(:ALL){|event| on_event(event) }
       end
 
+      def enter_extension
+        PLAYBACK_FILES.delete @expected[:pound]
+        @sock.uuid_send_dtmf(uuid: @uuid, dtmf: vm_extension)
+      end
+
+      def enter_password
+        PLAYBACK_FILES.delete @expected[:pound]
+        @sock2.uuid_send_dtmf(uuid: @uuid, dtmf: vm_password)
+      end
+
       def on_event(event)
-        # are you not seeing these?
-        @expected_playback_file = {
-          :enter_id => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-enter_id.wav",
-          :enter_pass => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-enter_pass.wav",
-          :pound => "file_string://ascii/35.wav",
-          :abort => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-abort.wav",
-          :goodbye => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-goodbye.wav",
-          :press => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-press.wav",
-          :logged_in => "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-no_messages.wav"
-        }
-
-        case event.content[:event_name]
-        	when "PLAYBACK_START"
-            event.content[:playback_file_path].should_not == "#{@expected_playback_file[:abort]}"
-            event.content[:playback_file_path].should_not == "#{@expected_playback_file[:goodbye]}"
-
-        	when "PLAYBACK_STOP"
-        	  fs_playback_file = event.content[:playback_file_path]
-        	  puts "SUPPLY - 2 EM.run - #{Thread.current.to_s} - event.content[:event_name] = #{event.content[:event_name]} fs_playback_file: #{fs_playback_file}"
-
-        	when nil
-        	  puts "In 2nd EM.run 'case' - event.content[:event_name] is nil"
-        	  return
-
-        	else
-            fail "We fell completely through the Supply chain, and already processed PLAYBACK_START and PLAYBACK_STOP. Do something here!"
-        end
-          EM.stop
+        path = event.content[:playback_file_path]
+        enter_extension if(path == @expected[:vm_enter_id] and PLAYBACK_FILES.include?(@expected[:pound]))
+        enter_password if(path == @expected[:vm_enter_pass] and PLAYBACK_FILES.include?(@expected[:pound]))
+        PLAYBACK_FILES << path
       end
     }
     # BROKEN: Not currently seeing /var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-enter_pass.wav
     # requested. I don't think we're successfully completing passing the extension in order to get 'here'
     # to even be offered vm-enter_pass.wav
-    vm_extension = "1000#"
-    vm_password = "1000#"
 
-    @sock.uuid_send_dtmf(uuid: @uuid, dtmf: vm_extension)
-    @sock.uuid_send_dtmf(uuid: @uuid, dtmf: vm_password)
-    $stdout.sync = true
-    EM.connect(@server2, 8021, supply_listener)
+    EM.connect(@server2, 8021, supply_listener) do |listener|
+      @sock2.uuid_send_dtmf(uuid: @uuid, dtmf: @vm_password)
+    end
   end
+  PLAYBACK_FILES.should == @expected.values_at(:vm_enter_id, :vm_enter_pass, :pound, :vm_logged_in)
 end
 
 Then /^I should be logged into voicemail$/ do
