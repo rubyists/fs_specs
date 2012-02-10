@@ -46,10 +46,6 @@ class IvrListener < FSL::Inbound
     if(path == SOUNDS[:ivr_welcome])
       enter_key_sequence
     end
-    if(path == SOUNDS[:ivr_press] and PLAYBACK_FILES.last == SOUNDS[:ivr_please])
-      #enter_password
-      puts "Holding off on the send in the 'else'"
-    end
     # We call it logged in (or unsuccessful) when we hear any of these wavs
     if(path == SOUNDS[:ivr_welcome] || path == SOUNDS[:ivr_screaming_monkeys])
       # And hang up the call
@@ -57,6 +53,7 @@ class IvrListener < FSL::Inbound
       # Then stop the reactor
       EM.stop
     end
+
     PLAYBACK_FILES << path
   end
 
