@@ -41,7 +41,8 @@ Currently we cover the following scenarios as of 2012/02/09. More will, of cours
   - 000_phone_infrastructure.feature
   - 001_channel_can_dial_extensions.feature
   - 002_channel_can_interact_with_voicemail.feature
-  - 003_channel_can_interact_with_demo_ivr.feature
+
+    NOTE: The current Demo IVR system is non-testable. Removed associated feature
 
 Both the voicemail and demo are fed using EventMachine (hereafter called EM), by basically cloning features/step_definitions/(vm|ivr)_listener.rb
 depending on what segment of the system you're trying to interact with. Then you feed it to EM.run via the timers. 
