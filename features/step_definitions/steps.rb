@@ -158,3 +158,4 @@ end
 When /^I press "([^"]*)"$/ do |key_sequence|
   @key_sequence = key_sequence or fail "We got no key_sequence for generating DTMF presses with!"
 end
+
