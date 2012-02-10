@@ -6,20 +6,15 @@ class IvrListener < FSL::Inbound
   # Commented out PLAYBACK_FILES because its already defined higher
   PLAYBACK_FILES = []
   SOUNDS = {
-    vm_enter_id: "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-enter_id.wav",
-    vm_enter_pass: "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-enter_pass.wav",
-    pound: "file_string://ascii/35.wav",
-    vm_abort: "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-abort.wav",
-    vm_goodbye: "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-goodbye.wav",
-    vm_press: "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-press.wav",
-    vm_no_messages: "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-no_messages.wav",
-    vm_fail: "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-fail_auth.wav",
-    vm_has_messages: "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-you_have.wav",
+    ivr_welcome: "/var/lib/freeswitch/sounds/en/us/callie/ivr/ivr-welcome_to_freeswitch.wav",
+    ivr_screaming_monkeys: "/var/lib/freeswitch/sounds/en/us/callie/ivr/ivr-to_hear_screaming_monkeys.wav",
+    ivr_please: "/var/lib/freeswitch/sounds/en/us/callie/ivr/ivr-please.wav",
+    ivr_press: "/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-press.wav",
+    ivr_digit: "/var/lib/freeswitch/sounds/en/us/callie/digits/#{@ivr_digit}.wav"
   }
-  def initialize(sock1, sock2, server1, server2, username, password)
-    @sock1, @sock2, @server1, @server2 = sock1, sock2, server1, server2, username, password
-    @vm_extension = "%s#" % username
-    @vm_password = "%s#" % password
+  def initialize(sock1, sock2, server1, server2, key_sequence)
+    @sock1, @sock2, @server1, @server2 = sock1, sock2, server1, server2, key_sequence
+    @ivr_digit = "%s#" % key_sequence
     super()
   end
 
@@ -36,8 +31,8 @@ class IvrListener < FSL::Inbound
     warn "spec_id is #{@spec_id}"
   end
 
-  def enter_extension
-    @sock1.uuid_send_dtmf(uuid: @uuid, dtmf: @vm_extension).run
+  def enter_key_sequence
+    @sock1.uuid_send_dtmf(uuid: @uuid, dtmf: IvrListener::SOUNDS[:ivr_digit]).run
   end
 
   def enter_password
@@ -48,14 +43,15 @@ class IvrListener < FSL::Inbound
     #p event.content[:caller_caller_id_number]
     return unless (event.content[:caller_caller_id_number] == @spec_id)
     path = event.content[:playback_file_path]
-    if(path == SOUNDS[:pound] and PLAYBACK_FILES.last == SOUNDS[:vm_enter_id])
-      enter_extension
+    if(path == SOUNDS[:ivr_welcome])
+      enter_key_sequence
     end
-    if(path == SOUNDS[:pound] and PLAYBACK_FILES.last == SOUNDS[:vm_enter_pass])
-      enter_password
+    if(path == SOUNDS[:ivr_press] and PLAYBACK_FILES.last == SOUNDS[:ivr_please])
+      #enter_password
+      puts "Holding off on the send in the 'else'"
     end
     # We call it logged in (or unsuccessful) when we hear any of these wavs
-    if(path == SOUNDS[:vm_no_messages] || path == SOUNDS[:vm_has_messages] || path == SOUNDS[:vm_fail])
+    if(path == SOUNDS[:ivr_welcome] || path == SOUNDS[:ivr_screaming_monkeys])
       # And hang up the call
       @sock1.kill(@uuid).run
       # Then stop the reactor
