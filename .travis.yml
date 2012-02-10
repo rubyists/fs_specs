@@ -1,4 +1,10 @@
 language: ruby
 rvm:
   - 1.9.3
-script: 'bundle exec cucumber features'
+script: 'bundle exec cucumber features && bundle exec rspec spec --format doc'
+notifications:
+  irc:
+    channels:
+      - "irc.freenode.org#fs_specs"
+    on_success: change
+    on_failure: always

@@ -2,7 +2,6 @@ source "http://rubygems.org"
 
 group :development, :test do
   gem 'rake'
-  gem 'bacon'
   gem 'builder'
   gem 'cucumber'
   gem 'diff-lcs'
@@ -21,4 +20,6 @@ group :development, :test do
   gem 'rspec-mocks'
   gem 'term-ansicolor'
   gem 'webrat'
+  gem 'ZenTest'
+  gem 'autotest'
 end

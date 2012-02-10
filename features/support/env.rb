@@ -1,4 +1,8 @@
 require "fsr"
 require "fsr/command_socket"
+require "fsr/listener/inbound"
 
-FSR.load_all_commands 
+require 'rspec'
+require 'rspec-expectations'
+
+FSR.load_all_commands
