@@ -30,10 +30,35 @@ flow of the feature sets themselves.
 
 Development has no guarantee to work. It is what it is, which is a work in progress.
 
-#### Travis CI
-  We curently hook into Travis-CI: http://travis-ci.org/#!/rubyists/fs_specs
-  You can watch how the tree progresses from there.
+#### Development Progress
+When we say we have a single thing mapped, we mean that we have left a single test for, say, being able to connect to extension 1000.
+Originally I was hitting every single extension that FS leaves enabled by default (default as in they regularly are enabled but not promised to be)
+through Cucumber Scenario Outline. Those have all been condensed down to a single hit to FS. If you want the mapping of *each* and *every* one,
+you'll have to just make the Scenario Outline and map your vars. Easy Peasy.
 
+Currently we cover the following scenarios as of 2012/02/09. More will, of course, be piling on as time progresses. These are considered part of 'core'.
+
+  - 000_phone_infrastructure.feature
+  - 001_channel_can_dial_extensions.feature
+  - 002_channel_can_interact_with_voicemail.feature
+  - 003_channel_can_interact_with_demo_ivr.feature
+
+Both the voicemail and demo are fed using EventMachine (hereafter called EM), by basically cloning features/step_definitions/(vm|ivr)_listener.rb
+depending on what segment of the system you're trying to interact with. Then you feed it to EM.run via the timers. 
+The real guts of what is being done is based in the handle_event() in both. Basically, this should be reduced down to just changing out the wav files
+you're looking for depending on which part of the system you're in. Other channel data can also be mined looking at 'p event.content.keys' at the beginning
+or end of any particular (Vm|Ivr)Listener factory (the map to the class(es) are in the already named files) that are fed to the EM reactor.
+
+The next to be tackled will probably be the echo extensions and the like. I'm basically using the 'default' extensions and services that come enabled in FreeSWITCH.
+NOTE: This does *not* mean we map a 'default config' of freeswitch. There is no such thing. The *only* thing meant is we tag the services we know are *usually* enabled.
+WHAT THAT IS CAN CHANGE! Be aware of that!
+
+Feel free to submit pull requests. Also, if you're using this, then you shouldn't be afraid to file Issues either! :-)
+
+
+#### Continous Integrated Testing - Travis CI
+  We curently hook into [Travis-CI](http://travis-ci.org): http://travis-ci.org/rubyists/fs_specs which will show you the status of all tests as of the last commit
+  that was *not* marked '[cs skip]'. You can watch how the tree progresses from there.
 
   _Current Build Status_: [![Build Status](https://secure.travis-ci.org/rubyists/fs_specs.png)](http://travis-ci.org/rubyists/fs_specs)
 
