@@ -155,31 +155,7 @@ Then /^I should be prompted to try again$/ do
   VmListener::PLAYBACK_FILES.should == []
 end
 
-Then /^I should hear "([^"]*)"$/ do |required_sound|
-  # Factory primed. Fire @ timer
-   EM.run do
-    EM.add_periodic_timer(30) { |e| EM.stop }
-    # OK, we need to just listen, don't need to send anything here. If we get the right wavs, we're good
-    EM.connect(@server2, 8021, IvrListener, @sock1, @sock2, @server1, @server2, IvrListener::SOUNDS[:ivr_digit] )
-  end
-   if(IvrListener::PLAYBACK_FILES.include?(IvrListener::SOUNDS.any?{|k,v| v =~ /ivr-welcome_to_freebsd\.wav/ }))
-     puts "Found Wlecome"
-   end
-  if IvrListener::PLAYBACK_FILES.include?(IvrListener::SOUNDS[:ivr_screaming_monkeys])
-    IvrListener::PLAYBACK_FILES.should == IvrListener::SOUNDS.values_at(:ivr_screaming_monkeys, :ivr_please, :ivr_press, :ivr_digit)
-  else
-    IvrListener::PLAYBACK_FILES.include?(IvrListener::SOUNDS.values_at(:ivr_welcome))
-  end
-
-  IvrListener::PLAYBACK_FILES.clear
-  IvrListener::PLAYBACK_FILES.should == []
-
-end
-
-When /^I dial extension "([^"]*)"$/ do |extension|
-    pending # express the regexp above with the code you wish you had
-end
-
 When /^I press "([^"]*)"$/ do |key_sequence|
-  true
+  @key_sequence = key_sequence or fail "We got no key_sequence for generating DTMF presses with!"
 end
+
