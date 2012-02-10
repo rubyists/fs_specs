@@ -6,3 +6,5 @@ notifications:
   irc:
     channels:
       - "irc.freenode.org#fs_specs"
+    on_success: change
+    on_failure: always
