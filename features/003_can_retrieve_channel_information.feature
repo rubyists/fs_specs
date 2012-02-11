@@ -7,5 +7,4 @@ Feature: Can receive channel event data of current call
   Scenario:
     When I dial extension "9192" on tigershark.rubyists.com
     Then I should be connected to that extension
-    And I should be able to access event data
     And I should be able to access channel data

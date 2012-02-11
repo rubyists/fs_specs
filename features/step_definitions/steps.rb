@@ -159,10 +159,10 @@ When /^I press "([^"]*)"$/ do |key_sequence|
   @key_sequence = key_sequence or fail "We got no key_sequence for generating DTMF presses with!"
 end
 
-Then /^I should be able to access event data$/ do
-    pending # express the regexp above with the code you wish you had
-end
-
 Then /^I should be able to access channel data$/ do
-    pending # express the regexp above with the code you wish you had
+  EM.run do
+    # Wait 60 seconds
+    EM.add_periodic_timer(60) { |e| EM.stop }
+    EM.connect(@server2, 8021, ChanListener, @sock1, @sock2, @server1, @server2, known_extension = "9192")
+  end
 end
