@@ -159,3 +159,10 @@ When /^I press "([^"]*)"$/ do |key_sequence|
   @key_sequence = key_sequence or fail "We got no key_sequence for generating DTMF presses with!"
 end
 
+Then /^I should be able to access event data$/ do
+    pending # express the regexp above with the code you wish you had
+end
+
+Then /^I should be able to access channel data$/ do
+    pending # express the regexp above with the code you wish you had
+end
