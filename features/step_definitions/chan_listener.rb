@@ -39,8 +39,8 @@ class ChanListener < FSL::Inbound
       fail "event.headers[:content_type] is NOT json! Check event!"
     end
     puts
-    puts "CHANNEL DATA - (For this specific event) - contents of event.content hash"
-    puts "event.content.keys = #{event.content.keys.to_s}"
+    puts "CONTENT For Event: #{event.content[:event_name]} - (For this specific event) - contents of event.content hash"
+    puts "event.content.keys = #{event.content.keys}"
     
     #pp event.content
     # We check if event.content exists. if it dont we're in deep doodoo. only using check to shut down the reactor
