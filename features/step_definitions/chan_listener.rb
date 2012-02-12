@@ -50,7 +50,6 @@ class ChanListener < FSL::Inbound
       # Then stop the reactor
       EM.stop
     end
-
   end
 
   def unbind
