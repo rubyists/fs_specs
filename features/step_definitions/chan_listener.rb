@@ -42,13 +42,13 @@ class ChanListener < FSL::Inbound
     puts "CHANNEL DATA - (For this specific event) - contents of event.content hash\n"
     printf("event.content.keys = #{event.content.keys.to_s}")
     puts
-    # We call it logged in (or unsuccessful) when we hear any of these wavs
-    #if(path == @expected_sound)
+    # We check if event.content exists. if it dont we're in deep doodoo. only using check to shut down the reactor
+    if event.content
       # And hang up the call
       @sock1.kill(@uuid).run
       # Then stop the reactor
       EM.stop
-    #end
+    end
 
   end
 
