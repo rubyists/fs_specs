@@ -2,8 +2,8 @@ require "fsr"
 require "fsr/listener/inbound"
 require "fsr/command_socket"
 FSR.load_all_commands
-class ChanListener < FSL::Inbound
-  # Commented out PLAYBACK_FILES because its already defined higher
+class SimulAgentListener < FSL::Inbound
+  # Use this for tracking channel state (like :channel_state and :channel_call_state)
   CHAN_STATE= {}
 
   def initialize(sock1, sock2, server1, server2, known_extension)
@@ -28,19 +28,13 @@ class ChanListener < FSL::Inbound
   def handle_event(event)
     #p event.content[:caller_caller_id_number]
     return unless (event.content[:caller_caller_id_number] == @spec_id)
-    puts "EVENT DATA - contents of event"
     puts "event.content class = #{event.content.class} (contents displayed after headers)"
-    puts "event.headers class = #{event.headers.class}"
-    puts "event.headers content = #{event.headers}"
-    puts "event.headers.keys = #{event.headers.keys}"
     if (event.headers[:content_type] == "text/event-json")
       puts "event.headers[:content_type] == #{event.headers[:content_type]}"
     else
       fail "event.headers[:content_type] is NOT json! Check event!"
     end
     puts
-    puts "CONTENT For Event: #{event.content[:event_name]} - (For this specific event) - contents of event.content hash"
-    puts "event.content.keys = #{event.content.keys}"
     puts "event.content[:event_calling_file] == #{event.content[:event_calling_file]} | spec_id == #{@spec_id}"
     puts "event.content[:event_calling_function] == #{event.content[:event_calling_function]} | spec_id == #{@spec_id}"
     puts "event.content[:channel_name] == #{event.content[:channel_name]}"
@@ -62,7 +56,6 @@ class ChanListener < FSL::Inbound
     puts "event.content[:freeswitch_switchname] == #{event.content[:freeswitch_switchname]} | spec_id == #{@spec_id}"
 
 
-
     #pp event.content
     # We check if event.content exists. if it dont we're in deep doodoo. only using check to shut down the reactor
     if event.content
@@ -82,9 +75,9 @@ if __FILE__ == $0
   @server2 = 'tigershark.rubyists.com'
   @sock1 = FSR::CommandSocket.new(server: @server1)
   @sock2 = FSR::CommandSocket.new(server: @server2)
-  warn "Starting ChanListener.. Mining socket.."
+  warn "Starting SimulAgentListener.. Mining socket.."
   EM.run do
     EM.add_periodic_timer(20) { |e| EM.stop }
-    EM.connect(@server2, 8021, ChanListener, @sock1, @sock2, @server1, @server2, "9192")
+    EM.connect(@server2, 8021, SimulAgentListener, @sock1, @sock2, @server1, @server2, "9192")
   end
 end
