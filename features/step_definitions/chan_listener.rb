@@ -33,10 +33,10 @@ class ChanListener < FSL::Inbound
     puts "event.headers class = #{event.headers.class}"
     puts "event.headers content = #{event.headers}"
     puts "event.headers.keys = #{event.headers.keys}"
-    puts "=============="
+    puts
     puts "CHANNEL DATA - (For this specific event) - contents of event.content hash\n"
     printf("event.content.keys = #{event.content.keys.to_s}")
-    puts "=============="
+    puts
     # We call it logged in (or unsuccessful) when we hear any of these wavs
     #if(path == @expected_sound)
       # And hang up the call
