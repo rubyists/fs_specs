@@ -33,6 +33,11 @@ class ChanListener < FSL::Inbound
     puts "event.headers class = #{event.headers.class}"
     puts "event.headers content = #{event.headers}"
     puts "event.headers.keys = #{event.headers.keys}"
+    if (event.headers[:content_type].should == "text/event-json")
+      puts "event.headers[:content_type] == #{event.headers[:content_type]}"
+    else
+      fail "event.headers[:content_type] is NOT json! Check event!"
+    end
     puts
     puts "CHANNEL DATA - (For this specific event) - contents of event.content hash\n"
     printf("event.content.keys = #{event.content.keys.to_s}")
