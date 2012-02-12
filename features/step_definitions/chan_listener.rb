@@ -33,7 +33,7 @@ class ChanListener < FSL::Inbound
     puts "event.headers class = #{event.headers.class}"
     puts "event.headers content = #{event.headers}"
     puts "event.headers.keys = #{event.headers.keys}"
-    if (event.headers[:content_type].should == "text/event-json")
+    if (event.headers[:content_type] == "text/event-json")
       puts "event.headers[:content_type] == #{event.headers[:content_type]}"
     else
       fail "event.headers[:content_type] is NOT json! Check event!"
@@ -61,11 +61,9 @@ if __FILE__ == $0
   @server2 = 'tigershark.rubyists.com'
   @sock1 = FSR::CommandSocket.new(server: @server1)
   @sock2 = FSR::CommandSocket.new(server: @server2)
-  warn "Starting ChanListener, someone better check the IVR quick!"
+  warn "Starting ChanListener.. Mining socket.."
   EM.run do
     EM.add_periodic_timer(20) { |e| EM.stop }
-    # When I press 5, I expect 'screaming monkeys' or what-not
-    EM.connect(@server2, 8021, ChanListener, @sock1, @sock2, @server1, @server2, "4", ChanListener::SOUNDS[:ivr_cluecon])
+    EM.connect(@server2, 8021, ChanListener, @sock1, @sock2, @server1, @server2, "9192")
   end
-  p ChanListener::PLAYBACK_FILES
 end
