@@ -4,7 +4,21 @@ require "fsr/command_socket"
 FSR.load_all_commands
 class ChanListener < FSL::Inbound
   # Commented out PLAYBACK_FILES because its already defined higher
-  CHAN_STATE= {}
+  CHANNEL_STATE = {
+    CS_NEW: "CS_NEW",
+    CS_INIT: "CS_INIT",
+    CS_ROUTING: "CS_ROUTING",
+    CS_SOFT_EXECUTE: "CS_SOFT_EXECUTE",
+    CS_EXECUTE: "CS_EXECUTE",
+    CS_EXCHANGE_MEDIA: "CS_EXCHANGE_MEDIA",
+    CS_PARK: "CS_PARK",
+    CS_CONSUME_MEDIA: "CS_CONSUME_MEDIA",
+    CS_HIBERNATE: "CS_HIBERNATE",
+    CS_RESET: "CS_RESET",
+    CS_HANGUP: "CS_HANGUP",
+    CS_REPORTING: "CS_REPORTING",
+    CS_DESTROY: "CS_DESTROY"
+  }
 
   def initialize(sock1, sock2, server1, server2, known_extension)
     @sock1, @sock2, @server1, @server2 = sock1, sock2, server1, server2
@@ -38,6 +52,13 @@ class ChanListener < FSL::Inbound
     else
       fail "event.headers[:content_type] is NOT json! Check event!"
     end
+    if CHANNEL_STATE.keys.include?(:"#{event.content[:channel_state]}")
+      puts "CHANNEL STATE - #{event.content[:channel_state]}"
+      if (! event.content[:channel_call_state].nil?)
+        puts "  CALL STATE == #{event.content[:channel_call_state]}"
+      end
+    end
+
     puts
     puts "CONTENT For Event: #{event.content[:event_name]} - (For this specific event) - contents of event.content hash"
     puts "event.content.keys = #{event.content.keys}"
@@ -45,10 +66,10 @@ class ChanListener < FSL::Inbound
     puts "event.content[:event_calling_function] == #{event.content[:event_calling_function]} | spec_id == #{@spec_id}"
     puts "event.content[:channel_name] == #{event.content[:channel_name]}"
     puts "event.content[:unique_id] == #{event.content[:unique_id]}"
-    puts "event.content[:channel_state] == #{event.content[:channel_state]} | spec_id == #{@spec_id}" # Is effective_caller_id_number the same as caller_caller_id_number
-    puts "event.content[:channel_call_state] == #{event.content[:channel_call_state]} | spec_id == #{@spec_id}" # Is effective_caller_id_number the same as caller_caller_id_number
-    puts "event.content[:caller_channel_name] == #{event.content[:caller_channel_name]} | spec_id == #{@spec_id}" # Is effective_caller_id_number the same as caller_caller_id_number
-    puts "event.content[:caller_caller_id_number] == #{event.content[:caller_caller_id_number]} | spec_id == #{@spec_id}" # Is effective_caller_id_number the same as caller_caller_id_number
+    puts "event.content[:channel_state] == #{event.content[:channel_state]} | spec_id == #{@spec_id}"
+    puts "event.content[:channel_call_state] == #{event.content[:channel_call_state]} | spec_id == #{@spec_id}"
+    puts "event.content[:caller_channel_name] == #{event.content[:caller_channel_name]} | spec_id == #{@spec_id}"
+    puts "event.content[:caller_caller_id_number] == #{event.content[:caller_caller_id_number]} | spec_id == #{@spec_id}"
     puts "event.content[:caller_unique_id] == #{event.content[:caller_unique_id]} | spec_id == #{@spec_id}"
     puts "event.content[:variable_uuid] == #{event.content[:variable_uuid]} | spec_id == #{@spec_id}"
     puts "event.content[:caller_direction] == #{event.content[:caller_direction]} | spec_id == #{@spec_id}"
@@ -60,8 +81,6 @@ class ChanListener < FSL::Inbound
     puts "event.content[:presence_call_direction] == #{event.content[:presence_call_direction]} | spec_id == #{@spec_id}"
     puts "event.content[:caller_network_addr] == #{event.content[:caller_network_addr]} | spec_id == #{@spec_id}"
     puts "event.content[:freeswitch_switchname] == #{event.content[:freeswitch_switchname]} | spec_id == #{@spec_id}"
-
-
 
     #pp event.content
     # We check if event.content exists. if it dont we're in deep doodoo. only using check to shut down the reactor

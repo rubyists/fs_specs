@@ -4,7 +4,22 @@ require "fsr/command_socket"
 FSR.load_all_commands
 class SimulAgentListener < FSL::Inbound
   # Use this for tracking channel state (like :channel_state and :channel_call_state)
-  CHAN_STATE= {}
+  CHANNEL_STATE = {
+    CS_NEW: "CS_NEW",
+    CS_INIT: "CS_INIT",
+    CS_ROUTING: "CS_ROUTING",
+    CS_SOFT_EXECUTE: "CS_SOFT_EXECUTE",
+    CS_EXECUTE: "CS_EXECUTE",
+    CS_EXCHANGE_MEDIA: "CS_EXCHANGE_MEDIA",
+    CS_PARK: "CS_PARK",
+    CS_CONSUME_MEDIA: "CS_CONSUME_MEDIA",
+    CS_HIBERNATE: "CS_HIBERNATE",
+    CS_RESET: "CS_RESET",
+    CS_HANGUP: "CS_HANGUP",
+    CS_REPORTING: "CS_REPORTING",
+    CS_DESTROY: "CS_DESTROY"
+  }
+
 
   def initialize(sock1, sock2, server1, server2, known_extension)
     @sock1, @sock2, @server1, @server2 = sock1, sock2, server1, server2
@@ -28,31 +43,37 @@ class SimulAgentListener < FSL::Inbound
   def handle_event(event)
     #p event.content[:caller_caller_id_number]
     return unless (event.content[:caller_caller_id_number] == @spec_id)
-    puts "event.content class = #{event.content.class} (contents displayed after headers)"
+    puts "event.content class = #{event.content.class}"
     if (event.headers[:content_type] == "text/event-json")
       puts "event.headers[:content_type] == #{event.headers[:content_type]}"
     else
       fail "event.headers[:content_type] is NOT json! Check event!"
     end
+    if CHANNEL_STATE.keys.include?(:"#{event.content[:channel_state]}")
+      puts "EVENT NAME - #{event.content[:event_name]}"
+      puts "  CHANNEL STATE - #{event.content[:channel_state]}"
+      if (! event.content[:channel_call_state].nil?)
+        puts "    CALL STATE == #{event.content[:channel_call_state]}"
+      end
+    end
+
     puts
+    puts "event.content[:event_name] == #{event.content[:event_name]} | spec_id == #{@spec_id}"
+    puts "event.content[:unique_id] == #{event.content[:unique_id]}"
     puts "event.content[:event_calling_file] == #{event.content[:event_calling_file]} | spec_id == #{@spec_id}"
     puts "event.content[:event_calling_function] == #{event.content[:event_calling_function]} | spec_id == #{@spec_id}"
     puts "event.content[:channel_name] == #{event.content[:channel_name]}"
-    puts "event.content[:unique_id] == #{event.content[:unique_id]}"
-    puts "event.content[:channel_state] == #{event.content[:channel_state]} | spec_id == #{@spec_id}" # Is effective_caller_id_number the same as caller_caller_id_number
-    puts "event.content[:channel_call_state] == #{event.content[:channel_call_state]} | spec_id == #{@spec_id}" # Is effective_caller_id_number the same as caller_caller_id_number
-    puts "event.content[:caller_channel_name] == #{event.content[:caller_channel_name]} | spec_id == #{@spec_id}" # Is effective_caller_id_number the same as caller_caller_id_number
-    puts "event.content[:caller_caller_id_number] == #{event.content[:caller_caller_id_number]} | spec_id == #{@spec_id}" # Is effective_caller_id_number the same as caller_caller_id_number
+    puts "event.content[:channel_state] == #{event.content[:channel_state]} | spec_id == #{@spec_id}"
+    puts "event.content[:channel_call_state] == #{event.content[:channel_call_state]} | spec_id == #{@spec_id}"
+    puts "event.content[:channel_hit_dialplan] == #{event.content[:channel_hit_dialplan]} | spec_id == #{@spec_id}"
+    puts "event.content[:caller_channel_name] == #{event.content[:caller_channel_name]} | spec_id == #{@spec_id}"
     puts "event.content[:caller_unique_id] == #{event.content[:caller_unique_id]} | spec_id == #{@spec_id}"
-    puts "event.content[:variable_uuid] == #{event.content[:variable_uuid]} | spec_id == #{@spec_id}"
+    puts "event.content[:caller_network_addr] == #{event.content[:caller_network_addr]} | spec_id == #{@spec_id}"
+    puts "event.content[:caller_caller_id_number] == #{event.content[:caller_caller_id_number]} | spec_id == #{@spec_id}"
     puts "event.content[:caller_direction] == #{event.content[:caller_direction]} | spec_id == #{@spec_id}"
     puts "event.content[:caller_context] == #{event.content[:caller_context]} | spec_id == #{@spec_id}"
     puts "event.content[:caller_dialplan] == #{event.content[:caller_dialplan]} | spec_id == #{@spec_id}"
     puts "event.content[:caller_destination_number] == #{event.content[:caller_destination_number]} | spec_id == #{@spec_id}"
-    puts "event.content[:channel_hit_dialplan] == #{event.content[:channel_hit_dialplan]} | spec_id == #{@spec_id}"
-    puts "event.content[:channel_presence_id] == #{event.content[:channel_presence_id]} | spec_id == #{@spec_id}"
-    puts "event.content[:presence_call_direction] == #{event.content[:presence_call_direction]} | spec_id == #{@spec_id}"
-    puts "event.content[:caller_network_addr] == #{event.content[:caller_network_addr]} | spec_id == #{@spec_id}"
     puts "event.content[:freeswitch_switchname] == #{event.content[:freeswitch_switchname]} | spec_id == #{@spec_id}"
 
 
@@ -77,7 +98,7 @@ if __FILE__ == $0
   @sock2 = FSR::CommandSocket.new(server: @server2)
   warn "Starting SimulAgentListener.. Mining socket.."
   EM.run do
-    EM.add_periodic_timer(20) { |e| EM.stop }
+    EM.add_periodic_timer(60) { |e| EM.stop }
     EM.connect(@server2, 8021, SimulAgentListener, @sock1, @sock2, @server1, @server2, "9192")
   end
 end
