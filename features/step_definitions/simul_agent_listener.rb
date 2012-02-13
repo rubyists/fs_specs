@@ -20,6 +20,11 @@ class SimulAgentListener < FSL::Inbound
     CS_DESTROY: "CS_DESTROY"
   }
 
+WANTED_STATE ={
+  channel_state: "CS_EXECUTE",
+  call_state: "ACTIVE"
+}
+
 
   def initialize(sock1, sock2, server1, server2, known_extension)
     @sock1, @sock2, @server1, @server2 = sock1, sock2, server1, server2
@@ -42,22 +47,23 @@ class SimulAgentListener < FSL::Inbound
 
   def handle_event(event)
     #p event.content[:caller_caller_id_number]
+    #
+    # Make sure we *only* process this specific spec's events
     return unless (event.content[:caller_caller_id_number] == @spec_id)
-    puts "event.content class = #{event.content.class}"
-    if (event.headers[:content_type] == "text/event-json")
-      puts "event.headers[:content_type] == #{event.headers[:content_type]}"
-    else
-      fail "event.headers[:content_type] is NOT json! Check event!"
-    end
-    if CHANNEL_STATE.keys.include?(:"#{event.content[:channel_state]}")
-      puts "EVENT NAME - #{event.content[:event_name]}"
-      puts "  CHANNEL STATE - #{event.content[:channel_state]}"
-      if (! event.content[:channel_call_state].nil?)
-        puts "    CALL STATE == #{event.content[:channel_call_state]}"
-      end
-    end
+    return "NOT a json'd event!" unless (event.headers[:content_type] == "text/event-json")
+    
+    # If the event's channel_call_state doesn't match our wanted state, no sense doing anything else. so, fail
+    fail if WANTED_STATE[:call_state] != "#{event.content[:channel_call_state]}"
 
-    puts
+    # This is what we really want to see
+    if WANTED_STATE[:channel_state] == "#{event.content[:channel_state]}" && WANTED_STATE[:call_state] == "#{event.content[:channel_call_state]}"
+      # Got what we wanted, so do your 'something'
+      puts "GOT CHANNEL STATE - #{WANTED_STATE[:channel_state]}"
+      puts "GOT CALL STATE == #{WANTED_STATE[:call_state]}"
+    end
+    
+    puts "QUERIED VALUE SETS"
+    puts "=================="
     puts "event.content[:event_name] == #{event.content[:event_name]} | spec_id == #{@spec_id}"
     puts "event.content[:unique_id] == #{event.content[:unique_id]}"
     puts "event.content[:event_calling_file] == #{event.content[:event_calling_file]} | spec_id == #{@spec_id}"
@@ -98,7 +104,7 @@ if __FILE__ == $0
   @sock2 = FSR::CommandSocket.new(server: @server2)
   warn "Starting SimulAgentListener.. Mining socket.."
   EM.run do
-    EM.add_periodic_timer(60) { |e| EM.stop }
+    EM.add_periodic_timer(20) { |e| EM.stop }
     EM.connect(@server2, 8021, SimulAgentListener, @sock1, @sock2, @server1, @server2, "9192")
   end
 end
