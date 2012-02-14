@@ -82,7 +82,7 @@ WANTED_STATE ={
       puts "event.content[:caller_destination_number] == #{event.content[:caller_destination_number]} | spec_id == #{@spec_id}"
       puts "event.content[:freeswitch_switchname] == #{event.content[:freeswitch_switchname]} | spec_id == #{@spec_id}"
     else
-      puts "Got different than WANTED_STATE. Processing different event than we though. We got: "
+      puts "Got different than WANTED_STATE. Processing different event than we thought. We got: "
       puts "event.content[:event_name] == #{event.content[:event_name]} - event.content[:channel_state] == #{event.content[:channel_state]}  - event.content[:channel_call_state] == #{event.content[:channel_call_state]}"
     end
 
