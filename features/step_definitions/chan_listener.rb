@@ -59,28 +59,27 @@ class ChanListener < FSL::Inbound
       end
     end
 
-    puts
-    puts "CONTENT For Event: #{event.content[:event_name]} - (For this specific event) - contents of event.content hash"
-    puts "event.content.keys = #{event.content.keys}"
-    puts "event.content[:event_calling_file] == #{event.content[:event_calling_file]} | spec_id == #{@spec_id}"
-    puts "event.content[:event_calling_function] == #{event.content[:event_calling_function]} | spec_id == #{@spec_id}"
-    puts "event.content[:channel_name] == #{event.content[:channel_name]}"
-    puts "event.content[:unique_id] == #{event.content[:unique_id]}"
-    puts "event.content[:channel_state] == #{event.content[:channel_state]} | spec_id == #{@spec_id}"
-    puts "event.content[:channel_call_state] == #{event.content[:channel_call_state]} | spec_id == #{@spec_id}"
-    puts "event.content[:caller_channel_name] == #{event.content[:caller_channel_name]} | spec_id == #{@spec_id}"
-    puts "event.content[:caller_caller_id_number] == #{event.content[:caller_caller_id_number]} | spec_id == #{@spec_id}"
-    puts "event.content[:caller_unique_id] == #{event.content[:caller_unique_id]} | spec_id == #{@spec_id}"
-    puts "event.content[:variable_uuid] == #{event.content[:variable_uuid]} | spec_id == #{@spec_id}"
-    puts "event.content[:caller_direction] == #{event.content[:caller_direction]} | spec_id == #{@spec_id}"
-    puts "event.content[:caller_context] == #{event.content[:caller_context]} | spec_id == #{@spec_id}"
-    puts "event.content[:caller_dialplan] == #{event.content[:caller_dialplan]} | spec_id == #{@spec_id}"
-    puts "event.content[:caller_destination_number] == #{event.content[:caller_destination_number]} | spec_id == #{@spec_id}"
-    puts "event.content[:channel_hit_dialplan] == #{event.content[:channel_hit_dialplan]} | spec_id == #{@spec_id}"
-    puts "event.content[:channel_presence_id] == #{event.content[:channel_presence_id]} | spec_id == #{@spec_id}"
-    puts "event.content[:presence_call_direction] == #{event.content[:presence_call_direction]} | spec_id == #{@spec_id}"
-    puts "event.content[:caller_network_addr] == #{event.content[:caller_network_addr]} | spec_id == #{@spec_id}"
-    puts "event.content[:freeswitch_switchname] == #{event.content[:freeswitch_switchname]} | spec_id == #{@spec_id}"
+      puts "event.content[:event_name] == #{event.content[:event_name]} | spec_id == #{@spec_id}"
+      puts "event.content[:unique_id] == #{event.content[:unique_id]}"
+      puts "event.content[:event_calling_file] == #{event.content[:event_calling_file]} | spec_id == #{@spec_id}"
+      puts "event.content[:event_calling_function] == #{event.content[:event_calling_function]} | spec_id == #{@spec_id}"
+      puts "event.content[:channel_name] == #{event.content[:channel_name]}"
+      puts "event.content[:channel_state] == #{event.content[:channel_state]} | spec_id == #{@spec_id}"
+      puts "event.content[:channel_call_state] == #{event.content[:channel_call_state]} | spec_id == #{@spec_id}"
+      puts "event.content[:channel_hit_dialplan] == #{event.content[:channel_hit_dialplan]} | spec_id == #{@spec_id}"
+      puts "event.content[:caller_channel_name] == #{event.content[:caller_channel_name]} | spec_id == #{@spec_id}"
+      puts "event.content[:caller_unique_id] == #{event.content[:caller_unique_id]} | spec_id == #{@spec_id}"
+      puts "event.content[:caller_source] == #{event.content[:caller_source]}"
+      puts "event.content[:caller_network_addr] == #{event.content[:caller_network_addr]} | spec_id == #{@spec_id}"
+      puts "event.content[:caller_caller_id_number] == #{event.content[:caller_caller_id_number]} | spec_id == #{@spec_id}"
+      puts "event.content[:caller_direction] == #{event.content[:caller_direction]} | spec_id == #{@spec_id}"
+      puts "event.content[:caller_context] == #{event.content[:caller_context]} | spec_id == #{@spec_id}"
+      puts "event.content[:caller_dialplan] == #{event.content[:caller_dialplan]} | spec_id == #{@spec_id}"
+      puts "event.content[:caller_destination_number] == #{event.content[:caller_destination_number]} | spec_id == #{@spec_id}"
+      puts "event.content[:variable_current_application] == #{event.content[:variable_current_application]}"
+      puts "event.content[:variable_originate_disposition] == #{event.content[:variable_originate_disposition]}"
+      puts "event.content[:variable_endpoint_disposition] == #{event.content[:variable_endpoint_disposition]}"
+      puts "event.content[:freeswitch_switchname] == #{event.content[:freeswitch_switchname]} | spec_id == #{@spec_id}"
 
     #pp event.content
     # We check if event.content exists. if it dont we're in deep doodoo. only using check to shut down the reactor
@@ -103,7 +102,8 @@ if __FILE__ == $0
   @sock2 = FSR::CommandSocket.new(server: @server2)
   warn "Starting ChanListener.. Mining socket.."
   EM.run do
-    EM.add_periodic_timer(20) { |e| EM.stop }
+    # This is to do the line from the Step when this is run directly
+    EM.add_periodic_timer(60) { |e| EM.stop }
     EM.connect(@server2, 8021, ChanListener, @sock1, @sock2, @server1, @server2, "9192")
   end
 end
