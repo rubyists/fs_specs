@@ -51,37 +51,33 @@ WANTED_STATE ={
     # Make sure we *only* process this specific spec's events
     return unless (event.content[:caller_caller_id_number] == @spec_id)
     return "NOT a json'd event!" unless (event.headers[:content_type] == "text/event-json")
-    
-    # If the event's channel_call_state doesn't match our wanted state, no sense doing anything else. so, fail
-    fail if WANTED_STATE[:call_state] != "#{event.content[:channel_call_state]}"
 
     # This is what we really want to see
     if WANTED_STATE[:channel_state] == "#{event.content[:channel_state]}" && WANTED_STATE[:call_state] == "#{event.content[:channel_call_state]}"
+
       # Got what we wanted, so do your 'something'
+      puts "Event we're handing is: #{event.content[:event_name]}"
       puts "GOT CHANNEL STATE - #{WANTED_STATE[:channel_state]}"
       puts "GOT CALL STATE == #{WANTED_STATE[:call_state]}"
+      puts "WANTED_STATE triggered this. We can do fill_in_blank using just these:"
+      puts "event.content[:event_name] == #{event.content[:event_name]} | spec_id == #{@spec_id}"
+      puts "event.content[:unique_id] == #{event.content[:unique_id]}"
+      puts "event.content[:event_calling_file] == #{event.content[:event_calling_file]} | spec_id == #{@spec_id}"
+      puts "event.content[:event_calling_function] == #{event.content[:event_calling_function]} | spec_id == #{@spec_id}"
+      puts "event.content[:channel_name] == #{event.content[:channel_name]}"
+      puts "event.content[:channel_state] == #{event.content[:channel_state]} | spec_id == #{@spec_id}"
+      puts "event.content[:channel_call_state] == #{event.content[:channel_call_state]} | spec_id == #{@spec_id}"
+      puts "event.content[:channel_hit_dialplan] == #{event.content[:channel_hit_dialplan]} | spec_id == #{@spec_id}"
+      puts "event.content[:caller_channel_name] == #{event.content[:caller_channel_name]} | spec_id == #{@spec_id}"
+      puts "event.content[:caller_unique_id] == #{event.content[:caller_unique_id]} | spec_id == #{@spec_id}"
+      puts "event.content[:caller_network_addr] == #{event.content[:caller_network_addr]} | spec_id == #{@spec_id}"
+      puts "event.content[:caller_caller_id_number] == #{event.content[:caller_caller_id_number]} | spec_id == #{@spec_id}"
+      puts "event.content[:caller_direction] == #{event.content[:caller_direction]} | spec_id == #{@spec_id}"
+      puts "event.content[:caller_context] == #{event.content[:caller_context]} | spec_id == #{@spec_id}"
+      puts "event.content[:caller_dialplan] == #{event.content[:caller_dialplan]} | spec_id == #{@spec_id}"
+      puts "event.content[:caller_destination_number] == #{event.content[:caller_destination_number]} | spec_id == #{@spec_id}"
+      puts "event.content[:freeswitch_switchname] == #{event.content[:freeswitch_switchname]} | spec_id == #{@spec_id}"
     end
-    
-    puts "QUERIED VALUE SETS"
-    puts "=================="
-    puts "event.content[:event_name] == #{event.content[:event_name]} | spec_id == #{@spec_id}"
-    puts "event.content[:unique_id] == #{event.content[:unique_id]}"
-    puts "event.content[:event_calling_file] == #{event.content[:event_calling_file]} | spec_id == #{@spec_id}"
-    puts "event.content[:event_calling_function] == #{event.content[:event_calling_function]} | spec_id == #{@spec_id}"
-    puts "event.content[:channel_name] == #{event.content[:channel_name]}"
-    puts "event.content[:channel_state] == #{event.content[:channel_state]} | spec_id == #{@spec_id}"
-    puts "event.content[:channel_call_state] == #{event.content[:channel_call_state]} | spec_id == #{@spec_id}"
-    puts "event.content[:channel_hit_dialplan] == #{event.content[:channel_hit_dialplan]} | spec_id == #{@spec_id}"
-    puts "event.content[:caller_channel_name] == #{event.content[:caller_channel_name]} | spec_id == #{@spec_id}"
-    puts "event.content[:caller_unique_id] == #{event.content[:caller_unique_id]} | spec_id == #{@spec_id}"
-    puts "event.content[:caller_network_addr] == #{event.content[:caller_network_addr]} | spec_id == #{@spec_id}"
-    puts "event.content[:caller_caller_id_number] == #{event.content[:caller_caller_id_number]} | spec_id == #{@spec_id}"
-    puts "event.content[:caller_direction] == #{event.content[:caller_direction]} | spec_id == #{@spec_id}"
-    puts "event.content[:caller_context] == #{event.content[:caller_context]} | spec_id == #{@spec_id}"
-    puts "event.content[:caller_dialplan] == #{event.content[:caller_dialplan]} | spec_id == #{@spec_id}"
-    puts "event.content[:caller_destination_number] == #{event.content[:caller_destination_number]} | spec_id == #{@spec_id}"
-    puts "event.content[:freeswitch_switchname] == #{event.content[:freeswitch_switchname]} | spec_id == #{@spec_id}"
-
 
     #pp event.content
     # We check if event.content exists. if it dont we're in deep doodoo. only using check to shut down the reactor
