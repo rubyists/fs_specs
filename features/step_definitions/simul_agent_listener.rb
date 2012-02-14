@@ -60,6 +60,8 @@ WANTED_STATE ={
       puts "GOT CHANNEL STATE - #{WANTED_STATE[:channel_state]}"
       puts "GOT CALL STATE == #{WANTED_STATE[:call_state]}"
       puts "WANTED_STATE triggered this. We can do fill_in_blank using just these:"
+      puts "Caller #{event.content[:caller_channel_name]} dialed extension #{event.content[:caller_destination_number]} in the #{event.content[:caller_dialplan]} dialplan on #{event.content[:freeswitch_switchname]}."
+      puts
       puts "event.content[:event_name] == #{event.content[:event_name]} | spec_id == #{@spec_id}"
       puts "event.content[:unique_id] == #{event.content[:unique_id]}"
       puts "event.content[:event_calling_file] == #{event.content[:event_calling_file]} | spec_id == #{@spec_id}"
