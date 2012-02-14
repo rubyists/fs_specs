@@ -21,9 +21,9 @@ class SimulAgentListener < FSL::Inbound
   }
 
 WANTED_STATE ={
-  event_name: "CHANNEL_CALLSTATE",
-  channel_state: "CS_HANGUP",
-  call_state: "HANGUP"
+  event_name: "CHANNEL_EXECUTE",
+  channel_state: "CS_EXECUTE",
+  call_state: "ACTIVE"
 }
 
 
@@ -55,7 +55,7 @@ WANTED_STATE ={
 
     # This is what we really want to see
     if WANTED_STATE[:event_name] == "#{event.content[:event_name]}" && WANTED_STATE[:channel_state] == "#{event.content[:channel_state]}" && WANTED_STATE[:call_state] == "#{event.content[:channel_call_state]}"
-    
+
       # Got what we wanted, so do your 'something'
       puts "Event we're handing is: #{event.content[:event_name]}"
       puts "GOT CHANNEL STATE - #{WANTED_STATE[:channel_state]}"
@@ -81,9 +81,11 @@ WANTED_STATE ={
       puts "event.content[:caller_dialplan] == #{event.content[:caller_dialplan]} | spec_id == #{@spec_id}"
       puts "event.content[:caller_destination_number] == #{event.content[:caller_destination_number]} | spec_id == #{@spec_id}"
       puts "event.content[:freeswitch_switchname] == #{event.content[:freeswitch_switchname]} | spec_id == #{@spec_id}"
+      puts "event.content[:variable_endpoint_disposition] == #{event.content[:variable_endpoint_disposition]}"
     else
       puts "Got different than WANTED_STATE. Processing different event than we thought. We got: "
       puts "event.content[:event_name] == #{event.content[:event_name]} - event.content[:channel_state] == #{event.content[:channel_state]}  - event.content[:channel_call_state] == #{event.content[:channel_call_state]}"
+      puts "event.content[:variable_endpoint_disposition] == #{event.content[:variable_endpoint_disposition]}"
     end
 
     #pp event.content
@@ -107,7 +109,7 @@ if __FILE__ == $0
   @sock2 = FSR::CommandSocket.new(server: @server2)
   warn "Starting SimulAgentListener.. Mining socket.."
   EM.run do
-    EM.add_periodic_timer(20) { |e| EM.stop }
+    EM.add_periodic_timer(30) { |e| EM.stop }
     EM.connect(@server2, 8021, SimulAgentListener, @sock1, @sock2, @server1, @server2, "9192")
   end
 end
