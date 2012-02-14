@@ -21,8 +21,9 @@ class SimulAgentListener < FSL::Inbound
   }
 
 WANTED_STATE ={
-  channel_state: "CS_EXECUTE",
-  call_state: "ACTIVE"
+  event_name: "CHANNEL_CALLSTATE",
+  channel_state: "CS_HANGUP",
+  call_state: "HANGUP"
 }
 
 
@@ -53,8 +54,8 @@ WANTED_STATE ={
     return "NOT a json'd event!" unless (event.headers[:content_type] == "text/event-json")
 
     # This is what we really want to see
-    if WANTED_STATE[:channel_state] == "#{event.content[:channel_state]}" && WANTED_STATE[:call_state] == "#{event.content[:channel_call_state]}"
-
+    if WANTED_STATE[:event_name] == "#{event.content[:event_name]}" && WANTED_STATE[:channel_state] == "#{event.content[:channel_state]}" && WANTED_STATE[:call_state] == "#{event.content[:channel_call_state]}"
+    
       # Got what we wanted, so do your 'something'
       puts "Event we're handing is: #{event.content[:event_name]}"
       puts "GOT CHANNEL STATE - #{WANTED_STATE[:channel_state]}"
@@ -72,6 +73,7 @@ WANTED_STATE ={
       puts "event.content[:channel_hit_dialplan] == #{event.content[:channel_hit_dialplan]} | spec_id == #{@spec_id}"
       puts "event.content[:caller_channel_name] == #{event.content[:caller_channel_name]} | spec_id == #{@spec_id}"
       puts "event.content[:caller_unique_id] == #{event.content[:caller_unique_id]} | spec_id == #{@spec_id}"
+      puts "event.content[:caller_source] == #{event.content[:caller_source]}"
       puts "event.content[:caller_network_addr] == #{event.content[:caller_network_addr]} | spec_id == #{@spec_id}"
       puts "event.content[:caller_caller_id_number] == #{event.content[:caller_caller_id_number]} | spec_id == #{@spec_id}"
       puts "event.content[:caller_direction] == #{event.content[:caller_direction]} | spec_id == #{@spec_id}"
@@ -79,6 +81,9 @@ WANTED_STATE ={
       puts "event.content[:caller_dialplan] == #{event.content[:caller_dialplan]} | spec_id == #{@spec_id}"
       puts "event.content[:caller_destination_number] == #{event.content[:caller_destination_number]} | spec_id == #{@spec_id}"
       puts "event.content[:freeswitch_switchname] == #{event.content[:freeswitch_switchname]} | spec_id == #{@spec_id}"
+    else
+      puts "Got different than WANTED_STATE. Processing different event than we though. We got: "
+      puts "event.content[:event_name] == #{event.content[:event_name]} - event.content[:channel_state] == #{event.content[:channel_state]}  - event.content[:channel_call_state] == #{event.content[:channel_call_state]}"
     end
 
     #pp event.content
