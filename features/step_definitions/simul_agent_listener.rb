@@ -80,11 +80,15 @@ WANTED_STATE ={
       puts "event.content[:caller_context] == #{event.content[:caller_context]} | spec_id == #{@spec_id}"
       puts "event.content[:caller_dialplan] == #{event.content[:caller_dialplan]} | spec_id == #{@spec_id}"
       puts "event.content[:caller_destination_number] == #{event.content[:caller_destination_number]} | spec_id == #{@spec_id}"
-      puts "event.content[:freeswitch_switchname] == #{event.content[:freeswitch_switchname]} | spec_id == #{@spec_id}"
+      puts "event.content[:variable_current_application] == #{event.content[:variable_current_application]}"
+      puts "event.content[:variable_originate_disposition] == #{event.content[:variable_originate_disposition]}"
       puts "event.content[:variable_endpoint_disposition] == #{event.content[:variable_endpoint_disposition]}"
+      puts "event.content[:freeswitch_switchname] == #{event.content[:freeswitch_switchname]} | spec_id == #{@spec_id}"
+      puts "= ENDS WANTED_STATE ="
     else
       puts "Got different than WANTED_STATE. Processing different event than we thought. We got: "
       puts "event.content[:event_name] == #{event.content[:event_name]} - event.content[:channel_state] == #{event.content[:channel_state]}  - event.content[:channel_call_state] == #{event.content[:channel_call_state]}"
+      puts "event.content[:variable_originate_disposition] == #{event.content[:variable_originate_disposition]}"
       puts "event.content[:variable_endpoint_disposition] == #{event.content[:variable_endpoint_disposition]}"
     end
 
