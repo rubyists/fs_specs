@@ -94,7 +94,7 @@ class SimulAgentListener < FSL::Inbound
         puts "event.content[:variable_originate_disposition] == #{event.content[:variable_originate_disposition]}"
         puts "event.content[:variable_endpoint_disposition] == #{event.content[:variable_endpoint_disposition]}"
       end
-    # end ## Belongs to commented EM.add_periodic_timer(5) do 
+    #end ## Belongs to commented EM.add_periodic_timer(5) do 
   end
 
   def unbind
