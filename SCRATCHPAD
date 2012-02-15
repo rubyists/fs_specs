@@ -1,0 +1,10 @@
+== NOTES TO MYSELF ON WHAT I AM THINKING OF ==
+----------------------------------------------
+
+I want to create a EM factory.
+In that EM factory, I want a timer that makes the EM factory live for 60 seconds
+In that EM factory, I also want a timer that fires every 0.1 seconds.
+I want that 0.1s timer to process any events and store them.
+I want those events available outside the EM factory.
+I want to process those events for known patterns.
+
