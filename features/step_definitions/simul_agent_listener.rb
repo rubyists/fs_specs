@@ -51,8 +51,6 @@ class SimulAgentListener < FSL::Inbound
   end
 
   def handle_event(event)
-    #p event.content[:caller_caller_id_number]
-    #
     # Make sure we *only* process this specific spec's events
     return unless (event.content[:caller_caller_id_number] == @spec_id)
     #EM.add_periodic_timer(5) do
@@ -96,15 +94,7 @@ class SimulAgentListener < FSL::Inbound
         puts "event.content[:variable_originate_disposition] == #{event.content[:variable_originate_disposition]}"
         puts "event.content[:variable_endpoint_disposition] == #{event.content[:variable_endpoint_disposition]}"
       end
-    #end
-    #pp event.content
-    # We check if event.content exists. if it dont we're in deep doodoo. only using check to shut down the reactor
-    #if event.content
-      # And hang up the call
-    #  @sock1.kill(@uuid).run
-      # Then stop the reactor
-    #  EM.stop
-    #end
+    # end ## Belongs to commented EM.add_periodic_timer(5) do 
   end
 
   def unbind
