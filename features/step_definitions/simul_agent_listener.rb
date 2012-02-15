@@ -4,6 +4,7 @@ require "fsr/command_socket"
 FSR.load_all_commands
 class SimulAgentListener < FSL::Inbound
   # Use this for tracking channel state (like :channel_state and :channel_call_state)
+  # These are all the currently documented __channel__ states for freeswitch.
   CHANNEL_STATE = {
     CS_NEW: "CS_NEW",
     CS_INIT: "CS_INIT",
@@ -21,7 +22,8 @@ class SimulAgentListener < FSL::Inbound
   }
   
   # These WANTED_STATE should eventually be populated externally from a step so that you can further refine granularity at the step level.
-  # I just hardcoded for purposes of working with the class directly.
+  # I just hardcoded for purposes of working with the class directly. This is where you would hunt on __call_state__ coupled with call-specific
+  # variable contents.
   WANTED_STATE ={
   event_name: "CHANNEL_EXECUTE",
   channel_state: "CS_EXECUTE",
