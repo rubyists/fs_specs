@@ -19,12 +19,14 @@ class SimulAgentListener < FSL::Inbound
     CS_REPORTING: "CS_REPORTING",
     CS_DESTROY: "CS_DESTROY"
   }
-
-WANTED_STATE ={
+  
+  # These WANTED_STATE should eventually be populated externally from a step so that you can further refine granularity at the step level.
+  # I just hardcoded for purposes of working with the class directly.
+  WANTED_STATE ={
   event_name: "CHANNEL_EXECUTE",
   channel_state: "CS_EXECUTE",
   call_state: "ACTIVE"
-}
+  }
 
 
   def initialize(sock1, sock2, server1, server2, known_extension)
