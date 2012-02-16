@@ -20,7 +20,7 @@ class SimulAgentListener < FSL::Inbound
     CS_REPORTING: "CS_REPORTING",
     CS_DESTROY: "CS_DESTROY"
   }
-  
+
   # These WANTED_STATE should eventually be populated externally from a step so that you can further refine granularity at the step level.
   # I just hardcoded for purposes of working with the class directly. This is where you would hunt on __call_state__ coupled with call-specific
   # variable contents.
@@ -94,7 +94,7 @@ class SimulAgentListener < FSL::Inbound
         puts "event.content[:variable_originate_disposition] == #{event.content[:variable_originate_disposition]}"
         puts "event.content[:variable_endpoint_disposition] == #{event.content[:variable_endpoint_disposition]}"
       end
-    #end ## Belongs to commented EM.add_periodic_timer(5) do 
+    #end ## Belongs to commented EM.add_periodic_timer(5) do
   end
 
   def unbind
