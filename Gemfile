@@ -22,4 +22,16 @@ group :development, :test do
   gem 'webrat'
   gem 'ZenTest'
   gem 'autotest'
+
+  # Adding pry for debugging
+  gem 'ruby-debug19'
+  gem 'ruby-debug-ide19'
+  gem 'pry'
+  gem 'pry-doc'
+  gem 'pry_debug'
+  gem 'pry-nav'
+  gem 'pry-stack_explorer'
+  gem 'pry-exception_explorer'
+  gem 'ruby-debug-pry'
+  gem 'plymouth'
 end

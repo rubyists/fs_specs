@@ -56,6 +56,11 @@ WHAT THAT IS CAN CHANGE! Be aware of that!
 
 Feel free to submit pull requests. Also, if you're using this, then you shouldn't be afraid to file Issues either! :-)
 
+## Ruby Debugging
+
+For debugging, I've decided to use 'pry' for debugging, but also have included ruby-debug19 and added ruby-debug-pry to allow you to embed pry into it. We've added pry,
+pry-doc, pry-nav, pry-stack_explorer, pry-exception_explorer, plymouth (for debugging failed tests), and the aforementioned, ruby-debug-pry. I also included pry_debug,
+but its entirely up to you if you wish to use it. I added for completeness. To use pry, just add 'binding.pry' (no '') anywhere in the code, and a pry session will open there.
 
 #### Continous Integrated Testing - Travis CI
   We curently hook into [Travis-CI](http://travis-ci.org): http://travis-ci.org/rubyists/fs_specs which will show you the status of all tests as of the last commit
