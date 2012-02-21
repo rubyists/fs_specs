@@ -4,7 +4,7 @@
   <title><![CDATA[FreeSWITCH And FreeSWITCHeR Ruby Library]]></title>
   <link href="http://rubyists.github.com/fs_specs/atom.xml" rel="self"/>
   <link href="http://rubyists.github.com/fs_specs/"/>
-  <updated>2012-02-21T11:59:39-05:00</updated>
+  <updated>2012-02-21T12:00:42-05:00</updated>
   <id>http://rubyists.github.com/fs_specs/</id>
   <author>
     <name><![CDATA[Deryl R. Doucette]]></name>
@@ -18,7 +18,7 @@
     <link href="http://rubyists.github.com/fs_specs/blog/2012/02/17/checking-out-extensions-001-channel-can-dial-extensions-feature/"/>
     <updated>2012-02-17T13:53:00-05:00</updated>
     <id>http://rubyists.github.com/fs_specs/blog/2012/02/17/checking-out-extensions-001-channel-can-dial-extensions-feature</id>
-    <content type="html"><![CDATA[<h3>Core Feature - <a href="https://github.com/rubyists/fs_specs/blob/master/features/001_channel_can_dial_extensions.feature">001_channel_can_dial_extensions.feature</a></h3>
+    <content type="html"><![CDATA[<h3><a href="https://github.com/rubyists/fs_specs/blob/master/features/001_channel_can_dial_extensions.feature">001_channel_can_dial_extensions.feature</a></h3>
 
 <p>  As I said in the previous article, there is some overlap here. Note that I will be referring to features by their ordering number e.g 000. 000 also dials an extension, but in this feature we wanted to specifically isolate, and focus on, that distinct capability of dialling extensions.</p>
 
