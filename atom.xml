@@ -4,7 +4,7 @@
   <title><![CDATA[FreeSWITCH And FreeSWITCHeR Ruby Library]]></title>
   <link href="http://rubyists.github.com/fs_specs/atom.xml" rel="self"/>
   <link href="http://rubyists.github.com/fs_specs/"/>
-  <updated>2012-02-20T23:25:21-05:00</updated>
+  <updated>2012-02-21T10:04:05-05:00</updated>
   <id>http://rubyists.github.com/fs_specs/</id>
   <author>
     <name><![CDATA[Deryl R. Doucette]]></name>
@@ -14,15 +14,97 @@
 
   
   <entry>
+    <title type="html"><![CDATA[Interacting With Voicemail - 002_channel_can_interact_with_voicemail feature]]></title>
+    <link href="http://rubyists.github.com/fs_specs/blog/2012/02/22/interacting-with-voicemail-002-channel-can-interact-with-voicemail-feature/"/>
+    <updated>2012-02-22T19:00:00-05:00</updated>
+    <id>http://rubyists.github.com/fs_specs/blog/2012/02/22/interacting-with-voicemail-002-channel-can-interact-with-voicemail-feature</id>
+    <content type="html"><![CDATA[<h3>What Are We Doing Today?</h3>
+
+<p>In this article, we’ll be discussing interacting with FreeSWITCH’s voicemail system using our <a href="https://github.com/rubyists/fs_specs/blob/master/features/002_channel_can_interact_with_voicemail.feature">002_channel_can_interact_with_voicemail</a> feature. This Feature will require that we write our own custom Listener class that we attach to the EventSocket’s <em>on_event()</em> method using our own customized <em>handle_event()</em> method.</p>
+
+<h3>Core Feature -  <a href="https://github.com/rubyists/fs_specs/blob/master/features/002_channel_can_interact_with_voicemail.feature">002_channel_can_interact_with_voicemail.feature</a></h3>
+
+<p>Here is the Feature itself.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='Cucumber'><span class='line'><span class="nf">        Feature: Channel can interact with voicemail</span>
+</span><span class='line'><span class="nf">     In order to utilize voicemail</span>
+</span><span class='line'><span class="nf">     As a channel</span>
+</span><span class='line'><span class="nf">     </span><span class="k">I </span><span class="nf">want to be able to log into, and use, the voicemail system</span>
+</span><span class='line'>
+</span><span class='line'><span class="nf">     </span><span class="k">Background:</span><span class="nf"></span>
+</span><span class='line'><span class="k">      Given </span><span class="nf">I have </span><span class="s">2</span><span class="nf"> servers named blackbird.rubyists.com and tigershark.rubyists.com</span>
+</span><span class='line'><span class="nf">     </span><span class="k">And </span><span class="nf">blackbird.rubyists.com is accessible via the Event Socket</span>
+</span><span class='line'>
+</span><span class='line'><span class="nf">     </span><span class="k">Scenario:</span><span class="nf"> Successfully log into voicemail using extension</span>
+</span><span class='line'><span class="k">      And </span><span class="nf">I check voicemail for user </span><span class="s">1000</span><span class="nf"> with good password </span><span class="s">1000</span><span class="nf"></span>
+</span><span class='line'><span class="nf">     </span><span class="k">Then </span><span class="nf">I should be logged into voicemail</span>
+</span><span class='line'>
+</span><span class='line'><span class="nf">     </span><span class="k">Scenario:</span><span class="nf"> Fail to log into voicemail using extension</span>
+</span><span class='line'><span class="k">      And </span><span class="nf">I check voicemail for user </span><span class="s">1000</span><span class="nf"> with bad password </span><span class="s">1001</span><span class="nf"></span>
+</span><span class='line'><span class="nf">     </span><span class="k">Then </span><span class="nf">I should be prompted to try again</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>What Exactly Does It Do? - <a href="https://github.com/rubyists/fs_specs/blob/master/features/step_definitions/steps.rb">steps.rb</a></h3>
+
+<p>OK, here we go with the whirlwind ride of whats taking place within these Feature steps. The definitions of each of them are in the linked steps.rb file.</p>
+
+<p>  As usual, we briefly describe in the Feature line, and expand upon immediately following, what the feature is for. We, again, hit the Background step which set up the connection for the remaining scenarios to use. That steps right into our first Scenario, “Successfully log into voicemail using extension”. In this Scenario, we check that we can log into voicemail for a specific extension, using the known password for that extension’s mailbox. This Scenario tests several sets of ideas.</p>
+
+<p>It tests that we can:</p>
+
+<pre><code>    * connect to the server
+    * that it recognizes and sends us well formed data
+    * that it recognizes well formed data we send it (e.g pressed keys)
+    * that we recognize and identify the usage and response pattern freeswitch expects
+    * that the expected pattern for interaction is seen in the data
+    * that freeswitch responds correctly to our response. 
+</code></pre>
+
+<p>  The same is expected in the following Scenario, but for a negative test case. This ensures that we cover both states of recognition. Either we’re authenticated, or we’re not. If we are, use the system. If not, re-prompt and eventually drop.</p>
+
+<p>Before we get into the specifics of the extension, let me explain what we’re going to be doing. We need a way to validate that we’re actually connecting to the voicemail system, and that we can react based upon the state changes we see as we move through the system. In this instance, freeswitch uses wav files to communicate. It plays specific wavs, in specific patterns and sub-patterns, that describe the various options available under the voicemail menu. We need some way to capture and use that information. Enter our custom class, the VmListener!</p>
+
+<h3>The Code - What did we actually build? - <a href="https://github.com/rubyists/fs_specs/blob/master/features/step_definitions/vm_listener.rb">VmListener</a></h3>
+
+<p>[This is where you describe the lines of code and what each one does, walking through the steps. The code from the step definitions go here.]</p>
+
+<h3>The Round Up - And In Closing…</h3>
+
+<p>Your closing remarks go here including any last minute i-just-thought-of-this</p>
+
+<h3>Up Next - A Look Ahead..</h3>
+
+<p>A hint on what the next article is going to be about.</p>
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[Checking Out Extensions - 001_channel_can_dial_extensions feature]]></title>
     <link href="http://rubyists.github.com/fs_specs/blog/2012/02/17/checking-out-extensions-001-channel-can-dial-extensions-feature/"/>
     <updated>2012-02-17T13:53:00-05:00</updated>
     <id>http://rubyists.github.com/fs_specs/blog/2012/02/17/checking-out-extensions-001-channel-can-dial-extensions-feature</id>
     <content type="html"><![CDATA[<h3>Core Feature - <a href="https://github.com/rubyists/fs_specs/blob/master/features/001_channel_can_dial_extensions.feature">001_channel_can_dial_extensions.feature</a></h3>
 
-<p>As I said in the previous article, there is some overlap here. Note that I will be referring to features by their ordering number e.g 000. 000 also dials an extension, but in this feature we wanted to specifically isolate, and focus on, that distinct capability of dialling extensions.</p>
+<p>  As I said in the previous article, there is some overlap here. Note that I will be referring to features by their ordering number e.g 000. 000 also dials an extension, but in this feature we wanted to specifically isolate, and focus on, that distinct capability of dialling extensions.</p>
 
-<p>Here is the Feature itself. Remember, this is a testing framework targeting FreeSWITCH. So, we drive all of our actual code through the tests. We, in this instance, are using Cucumber to drive our entire framework so we start in the Feature itself.</p>
+<p>  Here is the Feature itself. Remember, this is a testing framework targeting FreeSWITCH. So, we drive all of our actual code through the tests. We, in this instance, are using Cucumber to drive our entire framework so we start in the Feature itself.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -41,23 +123,23 @@
 <span class='line-number'>15</span>
 <span class='line-number'>16</span>
 <span class='line-number'>17</span>
-</pre></td><td class='code'><pre><code class='Cucumber'><span class='line'><span class="k">Feature:</span><span class="nf"> A channel can dial an extension</span>
+</pre></td><td class='code'><pre><code class='Cucumber'><span class='line'><span class="nf">    Feature: A channel can dial an extension</span>
 </span><span class='line'>
-</span><span class='line'><span class="nf">Once a UserAgent (X-Lite, PolyCom, another FS) can successfully connect to freeswitch, that UserAgent should be able to place a call to any known extension. The UserAgent should be connected to that extension. If that extension can not be reached, or the extension is not known, then the UserAgent should be notified of both the fact of the failure, and the type of the failure.</span>
+</span><span class='line'><span class="nf"> Once a UserAgent (X-Lite, PolyCom, another FS) can successfully connect to freeswitch, that UserAgent should be able to place a call to any known extension. The UserAgent should be connected to that extension. If that extension can not be reached, or the extension is not known, then the UserAgent should be notified of both the fact of the failure, and the type of the failure.</span>
 </span><span class='line'>
-</span><span class='line'><span class="k">Background:</span><span class="nf"></span>
-</span><span class='line'><span class="nf">  Given I have 2 servers named blackbird.rubyists.com and tigershark.rubyists.com</span>
-</span><span class='line'><span class="nf">  And blackbird.rubyists.com is accessible via the Event Socket</span>
+</span><span class='line'><span class="nf"> </span><span class="k">Background:</span><span class="nf"></span>
+</span><span class='line'><span class="nf">   Given I have 2 servers named blackbird.rubyists.com and tigershark.rubyists.com</span>
+</span><span class='line'><span class="nf">   And blackbird.rubyists.com is accessible via the Event Socket</span>
 </span><span class='line'>
-</span><span class='line'><span class="nf">  Scenario:</span>
-</span><span class='line'><span class="nf">    When I dial extension “1000” on tigershark.rubyists.com</span>
-</span><span class='line'><span class="nf">    Then I should be connected to that extension</span>
-</span><span class='line'><span class="nf">    And I should be able to terminate the call</span>
+</span><span class='line'><span class="nf">   Scenario:</span>
+</span><span class='line'><span class="nf">     When I dial extension “1000” on tigershark.rubyists.com</span>
+</span><span class='line'><span class="nf">     Then I should be connected to that extension</span>
+</span><span class='line'><span class="nf">     And I should be able to terminate the call</span>
 </span><span class='line'>
-</span><span class='line'><span class="nf">  Scenario:</span>
-</span><span class='line'><span class="nf">    When I dial unknown extension “1020”</span>
-</span><span class='line'><span class="nf">    Then I should be notified the call failed</span>
-</span><span class='line'><span class="nf">    And I should receive call failure type “NO_USER_RESPONSE”</span>
+</span><span class='line'><span class="nf">   Scenario:</span>
+</span><span class='line'><span class="nf">     When I dial unknown extension “1020”</span>
+</span><span class='line'><span class="nf">     Then I should be notified the call failed</span>
+</span><span class='line'><span class="nf">     And I should receive call failure type “NO_USER_RESPONSE”</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
@@ -74,13 +156,13 @@
 <span class='line-number'>5</span>
 <span class='line-number'>6</span>
 <span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='Cucumber'><span class='line'><span class="k">When </span><span class="nf">/^I dial extension “([^”]*)” on ([\w.]+)$/ do |known_extension, server|</span>
-</span><span class='line'><span class="nf">  orig = </span><span class="nt">@sock2.originate(target:</span><span class="nf"> ‘sofia/external/%s</span><span class="nt">@%s’</span><span class="nf"> % [known_extension, </span><span class="nt">@server2],</span><span class="nf"> endpoint:</span>
-</span><span class='line'><span class="nf">                                           “&amp;transfer(‘</span><span class="s">3000</span><span class="nf"> XML default’)”)</span>
-</span><span class='line'><span class="nf">  orig.should_not be_nil</span>
-</span><span class='line'><span class="nf">  </span><span class="nt">@resp</span><span class="nf"> = orig.run(:api)</span>
-</span><span class='line'><span class="nf">  fail “Response does not contain OK” unless (</span><span class="nt">@resp[“body”].match</span><span class="nf"> /^\+OK \w{</span><span class="s">8</span><span class="nf">}-(?:\w{</span><span class="s">4</span><span class="nf">}-){</span><span class="s">3</span><span class="nf">}\w{</span><span class="s">12</span><span class="nf">}$/)</span>
-</span><span class='line'><span class="nf">end</span>
+</pre></td><td class='code'><pre><code class='Cucumber'><span class='line'><span class="nf">    </span><span class="k">When </span><span class="nf">/^I dial extension “([^”]*)” on ([\w.]+)$/ do |known_extension, server|</span>
+</span><span class='line'><span class="nf">   orig = </span><span class="nt">@sock2.originate(target:</span><span class="nf"> ‘sofia/external/%s</span><span class="nt">@%s’</span><span class="nf"> % [known_extension, </span><span class="nt">@server2],</span><span class="nf"> endpoint:</span>
+</span><span class='line'><span class="nf">                                            “&amp;transfer(‘</span><span class="s">3000</span><span class="nf"> XML default’)”)</span>
+</span><span class='line'><span class="nf">   orig.should_not be_nil</span>
+</span><span class='line'><span class="nf">   </span><span class="nt">@resp</span><span class="nf"> = orig.run(:api)</span>
+</span><span class='line'><span class="nf">   fail “Response does not contain OK” unless (</span><span class="nt">@resp[“body”].match</span><span class="nf"> /^\+OK \w{</span><span class="s">8</span><span class="nf">}-(?:\w{</span><span class="s">4</span><span class="nf">}-){</span><span class="s">3</span><span class="nf">}\w{</span><span class="s">12</span><span class="nf">}$/)</span>
+</span><span class='line'><span class="nf"> end</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
@@ -92,10 +174,10 @@
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='Cucumber'><span class='line'><span class="k">Then </span><span class="nf">/^I should be connected to that extension$/ do</span>
-</span><span class='line'><span class="nf">  message, </span><span class="nt">@uuid</span><span class="nf"> = </span><span class="nt">@resp[&quot;body&quot;].split(&quot;</span><span class="nf"> &quot;</span><span class="s">)</span>
-</span><span class='line'><span class="s">  fail </span><span class="nf">&quot;No UUID found&quot;</span><span class="s"> unless message == &#39;+OK&#39;</span>
-</span><span class='line'><span class="s">end</span>
+</pre></td><td class='code'><pre><code class='Cucumber'><span class='line'><span class="nf">    </span><span class="k">Then </span><span class="nf">/^I should be connected to that extension$/ do</span>
+</span><span class='line'><span class="nf">   message, </span><span class="nt">@uuid</span><span class="nf"> = </span><span class="nt">@resp[&quot;body&quot;].split(&quot;</span><span class="nf"> &quot;</span><span class="s">)</span>
+</span><span class='line'><span class="s">    fail </span><span class="nf">&quot;No UUID found&quot;</span><span class="s"> unless message == &#39;+OK&#39;</span>
+</span><span class='line'><span class="s">  end</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
@@ -114,17 +196,17 @@
 <span class='line-number'>9</span>
 <span class='line-number'>10</span>
 <span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='Cucumber'><span class='line'><span class="k">Then </span><span class="nf">/^I should be able to terminate the call$/ do</span>
-</span><span class='line'><span class="nf">  </span><span class="nt">@uuid.should_not</span><span class="nf"> be_nil</span>
-</span><span class='line'><span class="nf">  resp = </span><span class="nt">@sock2.kill(@uuid).run(:api)</span><span class="nf"></span>
-</span><span class='line'><span class="nf">  resp[“body”].should match(/^\+OK/)</span>
-</span><span class='line'><span class="nf">  </span><span class="s">30.</span><span class="nf">times do</span>
-</span><span class='line'><span class="nf">    sleep </span><span class="s">0.1</span><span class="nf"></span>
-</span><span class='line'><span class="nf">    break unless </span><span class="nt">@sock2.calls.run.detect</span><span class="nf"> {</span><span class="k"> |</span><span class="s">c</span><span class="k">|</span><span class="s"> c.uuid == @uuid }</span>
-</span><span class='line'><span class="s">  end</span>
-</span><span class='line'><span class="s">  </span><span class="c"># Make sure there are no calls left still dangling</span><span class="s"></span>
-</span><span class='line'><span class="s">  @sock2.calls.run.detect {</span><span class="k"> |</span><span class="s">c</span><span class="k">|</span><span class="s"> c.uuid == @uuid }.should be_nil</span>
-</span><span class='line'><span class="s">end</span>
+</pre></td><td class='code'><pre><code class='Cucumber'><span class='line'><span class="nf">    </span><span class="k">Then </span><span class="nf">/^I should be able to terminate the call$/ do</span>
+</span><span class='line'><span class="nf">   </span><span class="nt">@uuid.should_not</span><span class="nf"> be_nil</span>
+</span><span class='line'><span class="nf">   resp = </span><span class="nt">@sock2.kill(@uuid).run(:api)</span><span class="nf"></span>
+</span><span class='line'><span class="nf">   resp[“body”].should match(/^\+OK/)</span>
+</span><span class='line'><span class="nf">   </span><span class="s">30.</span><span class="nf">times do</span>
+</span><span class='line'><span class="nf">     sleep </span><span class="s">0.1</span><span class="nf"></span>
+</span><span class='line'><span class="nf">     break unless </span><span class="nt">@sock2.calls.run.detect</span><span class="nf"> {</span><span class="k"> |</span><span class="s">c</span><span class="k">|</span><span class="s"> c.uuid == @uuid }</span>
+</span><span class='line'><span class="s">    end</span>
+</span><span class='line'><span class="s">    </span><span class="c"># Make sure there are no calls left still dangling</span><span class="s"></span>
+</span><span class='line'><span class="s">    @sock2.calls.run.detect {</span><span class="k"> |</span><span class="s">c</span><span class="k">|</span><span class="s"> c.uuid == @uuid }.should be_nil</span>
+</span><span class='line'><span class="s">  end</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
@@ -149,21 +231,21 @@
 <span class='line-number'>13</span>
 <span class='line-number'>14</span>
 <span class='line-number'>15</span>
-</pre></td><td class='code'><pre><code class='Cucumber'><span class='line'><span class="k">When </span><span class="nf">/^I dial unknown extension “([^”]*)”$/ do | unknown_extension|</span>
-</span><span class='line'><span class="nf">  orig = </span><span class="nt">@sock2.originate(target:</span><span class="nf"> ‘sofia/external/%s</span><span class="nt">@%s’</span><span class="nf"> % [unknown_extension, </span><span class="nt">@server2],</span><span class="nf"></span>
-</span><span class='line'><span class="nf">  endpoint: “&amp;transfer(‘</span><span class="s">3000</span><span class="nf"> XML default’)”)</span>
-</span><span class='line'><span class="nf">  </span><span class="nt">@resp</span><span class="nf"> = orig.run(:api)</span>
-</span><span class='line'><span class="nf">  </span><span class="nt">@resp[“body”].should</span><span class="nf"> match(/^-ERR/)</span>
-</span><span class='line'><span class="nf">end</span>
+</pre></td><td class='code'><pre><code class='Cucumber'><span class='line'><span class="nf">    </span><span class="k">When </span><span class="nf">/^I dial unknown extension “([^”]*)”$/ do | unknown_extension|</span>
+</span><span class='line'><span class="nf">   orig = </span><span class="nt">@sock2.originate(target:</span><span class="nf"> ‘sofia/external/%s</span><span class="nt">@%s’</span><span class="nf"> % [unknown_extension, </span><span class="nt">@server2],</span><span class="nf"></span>
+</span><span class='line'><span class="nf">   endpoint: “&amp;transfer(‘</span><span class="s">3000</span><span class="nf"> XML default’)”)</span>
+</span><span class='line'><span class="nf">   </span><span class="nt">@resp</span><span class="nf"> = orig.run(:api)</span>
+</span><span class='line'><span class="nf">   </span><span class="nt">@resp[“body”].should</span><span class="nf"> match(/^-ERR/)</span>
+</span><span class='line'><span class="nf"> end</span>
 </span><span class='line'>
-</span><span class='line'><span class="k">Then </span><span class="nf">/^I should be notified the call failed$/ do</span>
-</span><span class='line'><span class="nf">  status, </span><span class="nt">@message</span><span class="nf"> = </span><span class="nt">@resp[“body”].split(“</span><span class="nf"> “)</span>
-</span><span class='line'><span class="nf">  status.should match(‘-ERR’)</span>
-</span><span class='line'><span class="nf">end</span>
+</span><span class='line'><span class="nf"> </span><span class="k">Then </span><span class="nf">/^I should be notified the call failed$/ do</span>
+</span><span class='line'><span class="nf">   status, </span><span class="nt">@message</span><span class="nf"> = </span><span class="nt">@resp[“body”].split(“</span><span class="nf"> “)</span>
+</span><span class='line'><span class="nf">   status.should match(‘-ERR’)</span>
+</span><span class='line'><span class="nf"> end</span>
 </span><span class='line'>
-</span><span class='line'><span class="k">Then </span><span class="nf">/^I should receive call failure type “([^”]*)”$/ do |failure_type|</span>
-</span><span class='line'><span class="nf">  </span><span class="nt">@message.should</span><span class="nf"> match(“</span><span class="c">#{failure_type}”)</span><span class="nf"></span>
-</span><span class='line'><span class="nf">end</span>
+</span><span class='line'><span class="nf"> </span><span class="k">Then </span><span class="nf">/^I should receive call failure type “([^”]*)”$/ do |failure_type|</span>
+</span><span class='line'><span class="nf">   </span><span class="nt">@message.should</span><span class="nf"> match(“</span><span class="c">#{failure_type}”)</span><span class="nf"></span>
+</span><span class='line'><span class="nf"> end</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
@@ -175,6 +257,8 @@
 
 <p>  I realize, at this point, people might be asking themselves if its worth writing test features and step definitions for the little bit of code that is actually driven out by that process. Here are the step lines, minus their closing ‘end’, and the lines of code we generated as a result.</p>
 
+<p>  Feature Step Lines</p>
+
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
@@ -183,11 +267,7 @@
 <span class='line-number'>6</span>
 <span class='line-number'>7</span>
 <span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='Cucumber'><span class='line'><span class="nf">Feature Step Lines</span>
-</span><span class='line'>
-</span><span class='line'><span class="nf">    Given /^I have </span><span class="s">2</span><span class="nf"> servers named ([\w.]+) and ([\w.]+)$/ do</span><span class="k"> |</span><span class="s">server1, server2</span><span class="k">|</span><span class="s"></span>
+</pre></td><td class='code'><pre><code class='Cucumber'><span class='line'><span class="nf">    Given /^I have </span><span class="s">2</span><span class="nf"> servers named ([\w.]+) and ([\w.]+)$/ do</span><span class="k"> |</span><span class="s">server1, server2</span><span class="k">|</span><span class="s"></span>
 </span><span class='line'><span class="s">    Given /^([\w.]+) is accessible via the Event Socket$/ do</span><span class="k"> |</span><span class="s">es_server</span><span class="k">|</span><span class="s"></span>
 </span><span class='line'><span class="s">    When /^I dial extension &quot;([^&quot;]*)&quot; on ([\w.]+)$/ do</span><span class="k"> |</span><span class="s">known_extension, server</span><span class="k">|</span><span class="s"></span>
 </span><span class='line'><span class="s">    Then /^I should be connected to that extension$/ do</span>
@@ -198,7 +278,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Code Lines Driven Out</p>
+<p>  Code Lines Driven Out</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -227,41 +307,37 @@
 <span class='line-number'>25</span>
 <span class='line-number'>26</span>
 <span class='line-number'>27</span>
-</pre></td><td class='code'><pre><code class='Ruby'><span class='line'><span class="vi">@server1</span><span class="p">,</span> <span class="vi">@server2</span> <span class="o">=</span> <span class="n">server1</span><span class="p">,</span> <span class="n">server2</span>
-</span><span class='line'><span class="vi">@sock1</span> <span class="o">=</span> <span class="no">FSR</span><span class="o">::</span><span class="no">CommandSocket</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">server</span><span class="p">:</span> <span class="vi">@server1</span><span class="p">,</span> <span class="n">port</span><span class="p">:</span> <span class="mi">8021</span><span class="p">)</span>
-</span><span class='line'><span class="vi">@played_files</span> <span class="o">=</span> <span class="o">[]</span>
-</span><span class='line'><span class="vi">@sock2</span> <span class="o">=</span> <span class="no">FSR</span><span class="o">::</span><span class="no">CommandSocket</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">server</span><span class="p">:</span> <span class="vi">@server1</span><span class="p">)</span>
-</span><span class='line'><span class="vi">@sock2</span><span class="o">.</span><span class="n">should_not</span> <span class="n">be_nil</span>
-</span><span class='line'><span class="n">orig</span> <span class="o">=</span> <span class="vi">@sock2</span><span class="o">.</span><span class="n">originate</span><span class="p">(</span><span class="n">target</span><span class="p">:</span> <span class="err">‘</span><span class="n">sofia</span><span class="o">/</span><span class="n">external</span><span class="o">/</span><span class="sx">%s@%s’ % [known_extension, @</span><span class="n">server2</span><span class="o">]</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">:</span> <span class="err">“</span><span class="o">&amp;</span><span class="n">transfer</span><span class="p">(</span><span class="err">‘</span><span class="mi">3000</span> <span class="no">XML</span> <span class="n">default</span><span class="err">’</span><span class="p">)</span><span class="err">”</span><span class="p">)</span>
-</span><span class='line'><span class="n">orig</span><span class="o">.</span><span class="n">should_not</span> <span class="n">be_nil</span>
-</span><span class='line'><span class="vi">@resp</span> <span class="o">=</span> <span class="n">orig</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="ss">:api</span><span class="p">)</span>
-</span><span class='line'><span class="nb">fail</span> <span class="err">“</span><span class="no">Response</span> <span class="n">does</span> <span class="ow">not</span> <span class="n">contain</span> <span class="no">OK</span><span class="err">”</span> <span class="k">unless</span> <span class="p">(</span><span class="vi">@resp</span><span class="o">[</span><span class="err">“</span><span class="n">body</span><span class="err">”</span><span class="o">].</span><span class="n">match</span><span class="sr"> /^\+OK \w{8}-(?:\w{4}-){3}\w{12}$/</span><span class="p">)</span>
-</span><span class='line'><span class="n">message</span><span class="p">,</span> <span class="vi">@uuid</span> <span class="o">=</span> <span class="vi">@resp</span><span class="o">[</span><span class="err">“</span><span class="n">body</span><span class="err">”</span><span class="o">].</span><span class="n">split</span><span class="p">(</span><span class="err">“</span> <span class="err">“</span><span class="p">)</span>
-</span><span class='line'><span class="nb">fail</span> <span class="err">“</span><span class="no">No</span> <span class="no">UUID</span> <span class="n">found</span><span class="err">”</span> <span class="k">unless</span> <span class="n">message</span> <span class="o">==</span> <span class="err">‘</span><span class="o">+</span><span class="no">OK</span><span class="err">’</span>
-</span><span class='line'><span class="vi">@uuid</span><span class="o">.</span><span class="n">should_not</span> <span class="n">be_nil</span>
-</span><span class='line'><span class="n">resp</span> <span class="o">=</span> <span class="vi">@sock2</span><span class="o">.</span><span class="n">kill</span><span class="p">(</span><span class="vi">@uuid</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="ss">:api</span><span class="p">)</span>
-</span><span class='line'><span class="n">resp</span><span class="o">[</span><span class="err">“</span><span class="n">body</span><span class="err">”</span><span class="o">].</span><span class="n">should</span> <span class="n">match</span><span class="p">(</span><span class="sr">/^\+OK/</span><span class="p">)</span>
-</span><span class='line'><span class="mi">30</span><span class="o">.</span><span class="n">times</span> <span class="k">do</span>
-</span><span class='line'><span class="err"> </span> <span class="nb">sleep</span> <span class="mi">0</span><span class="o">.</span><span class="mi">1</span>
-</span><span class='line'><span class="err">  </span><span class="k">break</span> <span class="k">unless</span> <span class="vi">@sock2</span><span class="o">.</span><span class="n">calls</span><span class="o">.</span><span class="n">run</span><span class="o">.</span><span class="n">detect</span> <span class="p">{</span> <span class="o">|</span><span class="n">c</span><span class="o">|</span> <span class="n">c</span><span class="o">.</span><span class="n">uuid</span> <span class="o">==</span> <span class="vi">@uuid</span> <span class="p">}</span>
-</span><span class='line'><span class="k">end</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'> <span class="vi">@server1</span><span class="p">,</span> <span class="vi">@server2</span> <span class="o">=</span> <span class="n">server1</span><span class="p">,</span> <span class="n">server2</span>
+</span><span class='line'>  <span class="vi">@sock1</span> <span class="o">=</span> <span class="no">FSR</span><span class="o">::</span><span class="no">CommandSocket</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">server</span><span class="p">:</span> <span class="vi">@server1</span><span class="p">,</span> <span class="n">port</span><span class="p">:</span> <span class="mi">8021</span><span class="p">)</span>
+</span><span class='line'>  <span class="vi">@played_files</span> <span class="o">=</span> <span class="o">[]</span>
+</span><span class='line'>  <span class="vi">@sock2</span> <span class="o">=</span> <span class="no">FSR</span><span class="o">::</span><span class="no">CommandSocket</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">server</span><span class="p">:</span> <span class="vi">@server1</span><span class="p">)</span>
+</span><span class='line'>  <span class="vi">@sock2</span><span class="o">.</span><span class="n">should_not</span> <span class="n">be_nil</span>
+</span><span class='line'>  <span class="n">orig</span> <span class="o">=</span> <span class="vi">@sock2</span><span class="o">.</span><span class="n">originate</span><span class="p">(</span><span class="n">target</span><span class="p">:</span> <span class="err">‘</span><span class="n">sofia</span><span class="o">/</span><span class="n">external</span><span class="o">/</span><span class="sx">%s@%s’ % [known_extension, @</span><span class="n">server2</span><span class="o">]</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">:</span> <span class="err">“</span><span class="o">&amp;</span><span class="n">transfer</span><span class="p">(</span><span class="err">‘</span><span class="mi">3000</span> <span class="no">XML</span> <span class="n">default</span><span class="err">’</span><span class="p">)</span><span class="err">”</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">orig</span><span class="o">.</span><span class="n">should_not</span> <span class="n">be_nil</span>
+</span><span class='line'>  <span class="vi">@resp</span> <span class="o">=</span> <span class="n">orig</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="ss">:api</span><span class="p">)</span>
+</span><span class='line'>  <span class="nb">fail</span> <span class="err">“</span><span class="no">Response</span> <span class="n">does</span> <span class="ow">not</span> <span class="n">contain</span> <span class="no">OK</span><span class="err">”</span> <span class="k">unless</span> <span class="p">(</span><span class="vi">@resp</span><span class="o">[</span><span class="err">“</span><span class="n">body</span><span class="err">”</span><span class="o">].</span><span class="n">match</span><span class="sr"> /^\+OK \w{8}-(?:\w{4}-){3}\w{12}$/</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">message</span><span class="p">,</span> <span class="vi">@uuid</span> <span class="o">=</span> <span class="vi">@resp</span><span class="o">[</span><span class="err">“</span><span class="n">body</span><span class="err">”</span><span class="o">].</span><span class="n">split</span><span class="p">(</span><span class="err">“</span> <span class="err">“</span><span class="p">)</span>
+</span><span class='line'>  <span class="nb">fail</span> <span class="err">“</span><span class="no">No</span> <span class="no">UUID</span> <span class="n">found</span><span class="err">”</span> <span class="k">unless</span> <span class="n">message</span> <span class="o">==</span> <span class="err">‘</span><span class="o">+</span><span class="no">OK</span><span class="err">’</span>
+</span><span class='line'>  <span class="vi">@uuid</span><span class="o">.</span><span class="n">should_not</span> <span class="n">be_nil</span>
+</span><span class='line'>  <span class="n">resp</span> <span class="o">=</span> <span class="vi">@sock2</span><span class="o">.</span><span class="n">kill</span><span class="p">(</span><span class="vi">@uuid</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="ss">:api</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">resp</span><span class="o">[</span><span class="err">“</span><span class="n">body</span><span class="err">”</span><span class="o">].</span><span class="n">should</span> <span class="n">match</span><span class="p">(</span><span class="sr">/^\+OK/</span><span class="p">)</span>
+</span><span class='line'>  <span class="mi">30</span><span class="o">.</span><span class="n">times</span> <span class="k">do</span>
+</span><span class='line'>  <span class="err"> </span> <span class="nb">sleep</span> <span class="mi">0</span><span class="o">.</span><span class="mi">1</span>
+</span><span class='line'>  <span class="err">  </span><span class="k">break</span> <span class="k">unless</span> <span class="vi">@sock2</span><span class="o">.</span><span class="n">calls</span><span class="o">.</span><span class="n">run</span><span class="o">.</span><span class="n">detect</span> <span class="p">{</span> <span class="o">|</span><span class="n">c</span><span class="o">|</span> <span class="n">c</span><span class="o">.</span><span class="n">uuid</span> <span class="o">==</span> <span class="vi">@uuid</span> <span class="p">}</span>
+</span><span class='line'>  <span class="k">end</span>
 </span><span class='line'>
-</span><span class='line'><span class="vi">@sock2</span><span class="o">.</span><span class="n">calls</span><span class="o">.</span><span class="n">run</span><span class="o">.</span><span class="n">detect</span> <span class="p">{</span> <span class="o">|</span><span class="n">c</span><span class="o">|</span> <span class="n">c</span><span class="o">.</span><span class="n">uuid</span> <span class="o">==</span> <span class="vi">@uuid</span> <span class="p">}</span><span class="o">.</span><span class="n">should</span> <span class="n">be_nil</span>
-</span><span class='line'><span class="n">orig</span> <span class="o">=</span> <span class="vi">@sock2</span><span class="o">.</span><span class="n">originate</span><span class="p">(</span><span class="n">target</span><span class="p">:</span> <span class="err">‘</span><span class="n">sofia</span><span class="o">/</span><span class="n">external</span><span class="o">/</span><span class="sx">%s@%s’ % [unknown_extension, @</span><span class="n">server2</span><span class="o">]</span><span class="p">,</span>
-</span><span class='line'><span class="n">endpoint</span><span class="p">:</span> <span class="err">“</span><span class="o">&amp;</span><span class="n">transfer</span><span class="p">(</span><span class="err">‘</span><span class="mi">3000</span> <span class="no">XML</span> <span class="n">default</span><span class="err">’</span><span class="p">)</span><span class="err">”</span><span class="p">)</span>
-</span><span class='line'><span class="vi">@resp</span> <span class="o">=</span> <span class="n">orig</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="ss">:api</span><span class="p">)</span>
-</span><span class='line'><span class="vi">@resp</span><span class="o">[</span><span class="err">“</span><span class="n">body</span><span class="err">”</span><span class="o">].</span><span class="n">should</span> <span class="n">match</span><span class="p">(</span><span class="sr">/^-ERR/</span><span class="p">)</span>
-</span><span class='line'><span class="n">status</span><span class="p">,</span> <span class="vi">@message</span> <span class="o">=</span> <span class="vi">@resp</span><span class="o">[</span><span class="err">“</span><span class="n">body</span><span class="err">”</span><span class="o">].</span><span class="n">split</span><span class="p">(</span><span class="err">“</span> <span class="err">“</span><span class="p">)</span>
-</span><span class='line'><span class="n">status</span><span class="o">.</span><span class="n">should</span> <span class="n">match</span><span class="p">(</span><span class="err">‘</span><span class="o">-</span><span class="no">ERR</span><span class="err">’</span><span class="p">)</span>
-</span><span class='line'><span class="vi">@message</span><span class="o">.</span><span class="n">should</span> <span class="n">match</span><span class="p">(</span><span class="err">“</span><span class="c1">#{failure_type}”)</span>
+</span><span class='line'>  <span class="vi">@sock2</span><span class="o">.</span><span class="n">calls</span><span class="o">.</span><span class="n">run</span><span class="o">.</span><span class="n">detect</span> <span class="p">{</span> <span class="o">|</span><span class="n">c</span><span class="o">|</span> <span class="n">c</span><span class="o">.</span><span class="n">uuid</span> <span class="o">==</span> <span class="vi">@uuid</span> <span class="p">}</span><span class="o">.</span><span class="n">should</span> <span class="n">be_nil</span>
+</span><span class='line'>  <span class="n">orig</span> <span class="o">=</span> <span class="vi">@sock2</span><span class="o">.</span><span class="n">originate</span><span class="p">(</span><span class="n">target</span><span class="p">:</span> <span class="err">‘</span><span class="n">sofia</span><span class="o">/</span><span class="n">external</span><span class="o">/</span><span class="sx">%s@%s’ % [unknown_extension, @</span><span class="n">server2</span><span class="o">]</span><span class="p">,</span>
+</span><span class='line'>  <span class="n">endpoint</span><span class="p">:</span> <span class="err">“</span><span class="o">&amp;</span><span class="n">transfer</span><span class="p">(</span><span class="err">‘</span><span class="mi">3000</span> <span class="no">XML</span> <span class="n">default</span><span class="err">’</span><span class="p">)</span><span class="err">”</span><span class="p">)</span>
+</span><span class='line'>  <span class="vi">@resp</span> <span class="o">=</span> <span class="n">orig</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="ss">:api</span><span class="p">)</span>
+</span><span class='line'>  <span class="vi">@resp</span><span class="o">[</span><span class="err">“</span><span class="n">body</span><span class="err">”</span><span class="o">].</span><span class="n">should</span> <span class="n">match</span><span class="p">(</span><span class="sr">/^-ERR/</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">status</span><span class="p">,</span> <span class="vi">@message</span> <span class="o">=</span> <span class="vi">@resp</span><span class="o">[</span><span class="err">“</span><span class="n">body</span><span class="err">”</span><span class="o">].</span><span class="n">split</span><span class="p">(</span><span class="err">“</span> <span class="err">“</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">status</span><span class="o">.</span><span class="n">should</span> <span class="n">match</span><span class="p">(</span><span class="err">‘</span><span class="o">-</span><span class="no">ERR</span><span class="err">’</span><span class="p">)</span>
+</span><span class='line'>  <span class="vi">@message</span><span class="o">.</span><span class="n">should</span> <span class="n">match</span><span class="p">(</span><span class="err">“</span><span class="c1">#{failure_type}”)</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<hr />
-
-<p>Total Step Lines: 8 | Total Code Lines: 25 | Code To Step Ratio: 3:1</p>
-
-<hr />
+<p>  <em><em>Total Step Lines: 8 | Total Code Lines: 25 | Code To Step Ratio: 3:1</em></em></p>
 
 <p>  Not bad, we are averaging 3 lines of code being described by 1 step line. Or, if you prefer, we are averaging 3 lines of code to pass 1 step. To get back on the beaten path, we have completed the contents of 001 and proven out our Feature. So, far it looks like things are progressing right along.</p>
 
