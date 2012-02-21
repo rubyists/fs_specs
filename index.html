@@ -311,8 +311,12 @@
 <p>  So, thats what the next week of blog articles is about :) What we&#8217;re doing is taking Cucumber feature sets, augmented with RSpec for matchers, and using EventMachine, the FreeSWITCHeR ruby library, and a couple FreeSWITCH softswitches to:</p>
 
 <p>  Open a Listener
-  Hook into on_event with:
-  add_event(:ALL){|event| handle_event(event) }</p>
+  Hook into on_event with:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'>  <span class="n">add_event</span><span class="p">(</span><span class="ss">:ALL</span><span class="p">){</span> <span class="o">|</span><span class="n">event</span><span class="o">|</span> <span class="n">handle_event</span><span class="p">(</span><span class="n">event</span><span class="p">)</span> <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
 
 <p> In handle_event(event) we datamatch against channel_state and call_state based on the thrown events using a hash of WANTED_STATE. Basically, right now I&#8217;m trying to map the events thrown for both channel_state and call_state changes, and the channel state sequences that get thrown per event.</p>
 
