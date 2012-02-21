@@ -5,13 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Blog Archive - FreeSWITCH And FreeSWITCHeR Ruby Library</title>
+  <title>Stage Fright Gone! Brief Synopsis of Goal - FreeSWITCH And FreeSWITCHeR Ruby Library</title>
   <meta name="author" content="Deryl R. Doucette">
 
   
-  <meta name="description" content="Blog Archive 2012 Anatomy of an FS_SPECS Feature Set - 000_phone_infrastructure.feature
-Feb 20 2012 new-post
-Feb 20 2012 Stage Fright Gone! Brief &hellip;">
+  <meta name="description" content="What I was attempting to explain in the conferences was the subject of testing events within the context of channel and call state changes, and &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -20,7 +18,7 @@ Feb 20 2012 Stage Fright Gone! Brief &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://rubyists.github.com/fs_specs/blog/archives">
+  <link rel="canonical" href="http://rubyists.github.com/fs_specs/blog/2012/02/15/stage-fright-gone-brief-synopsis-of-goal">
   <link href="/fs_specs/favicon.png" rel="icon">
   <link href="/fs_specs/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/fs_specs/javascripts/modernizr-2.0.js"></script>
@@ -65,61 +63,96 @@ Feb 20 2012 Stage Fright Gone! Brief &hellip;">
   <div id="main">
     <div id="content">
       <div>
-<article role="article">
+<article class="hentry" role="article">
   
   <header>
-    <h1 class="entry-title">Blog Archive</h1>
+    
+      <h1 class="entry-title">Stage Fright Gone! Brief Synopsis of Goal</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-02-15T20:53:00-05:00" pubdate data-updated="true">Feb 15<span>th</span>, 2012</time>
+        
+      </p>
     
   </header>
-  
-  <div id="blog-archives">
 
 
+<div class="entry-content"><p>  What I was attempting to explain in the conferences was the subject of testing events within the context of channel and call state changes, and tracking those states for purposes of refining the granularity of both steps and EventSocket listener classes. I wasn&#8217;t .. clear .. (understatement) while explaining.</p>
 
-  
-  <h2>2012</h2>
+<p>  So, thats what the next week of blog articles is about :) What we&#8217;re doing is taking Cucumber feature sets, augmented with RSpec for matchers, and using EventMachine, the FreeSWITCHeR ruby library, and a couple FreeSWITCH softswitches to:</p>
 
-<article>
-  
-<h1><a href="/fs_specs/blog/2012/02/20/anatomy-of-an-fs-specs-feature-set-000-phone-infrastructure-feature/">Anatomy of an FS_SPECS Feature Set - 000_phone_infrastructure.feature</a></h1>
-<time datetime="2012-02-20T22:29:00-05:00" pubdate><span class='month'>Feb</span> <span class='day'>20</span> <span class='year'>2012</span></time>
+<p>  Open a Listener
+  Hook into on_event with:
+  add_event(:ALL){|event| handle_event(event) }</p>
 
+<p> In handle_event(event) we datamatch against channel_state and call_state based on the thrown events using a hash of WANTED_STATE. Basically, right now I&#8217;m trying to map the events thrown for both channel_state and call_state changes, and the channel state sequences that get thrown per event.</p>
 
-</article>
+<p>  E.g channel has an associated call, that call could be hanging up, dialing another extension, calling into voicemail, et al. The channel has state for length of its call&#8217;s action. The call has state for the specific action done. Routing and call progression states also affect channel state.</p>
 
+<p>  Channels have calls, both fire off events, events have names (CHANNEL_EXECUTE) and fire in specific order for a particular &#8216;action&#8217;, providing a mechanism for constant feedback on the current status of the channel and its associated call. The events fired are affected by the specific channel state e.g CS_HANGUP or CS_DESTROY and, internally, the call state e.g HANGUP or DESTROY.</p>
 
-
-<article>
-  
-<h1><a href="/fs_specs/blog/2012/02/20/new-post/">new-post</a></h1>
-<time datetime="2012-02-20T22:18:00-05:00" pubdate><span class='month'>Feb</span> <span class='day'>20</span> <span class='year'>2012</span></time>
-
-
-</article>
-
-
-
-<article>
-  
-<h1><a href="/fs_specs/blog/2012/02/15/stage-fright-gone-brief-synopsis-of-goal/">Stage Fright Gone! Brief Synopsis of Goal</a></h1>
-<time datetime="2012-02-15T20:53:00-05:00" pubdate><span class='month'>Feb</span> <span class='day'>15</span> <span class='year'>2012</span></time>
-
-
-</article>
-
-
-
-<article>
-  
-<h1><a href="/fs_specs/blog/2012/02/15/and-theyre-off-the-start-of-fs-specs/">And They&#8217;re Off! - The start of FS_SPECS</a></h1>
-<time datetime="2012-02-15T19:52:00-05:00" pubdate><span class='month'>Feb</span> <span class='day'>15</span> <span class='year'>2012</span></time>
-
-
-</article>
-
+<p> Its the combination of these three status/state settings (event, channel, &#8216;call/action&#8217;) that reveal the inner workings of whats going on inside FreeSWITCH as it sees things, the channel, and the call. Grouping the channel&#8217;s event chain for a specific action on that channel, and then mapping the channel state changes that take place during that channel&#8217;s lifecycle, and the channel&#8217;s call lifecycle I believe provides value by exposing that internal coordination in such a way it can be readily and repeatably tested in a myriad of combinations.</p>
 </div>
 
+
+  <footer>
+    <p class="meta">
+      
   
+
+<span class="byline author vcard">Posted by <span class="fn">Deryl R. Doucette</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-02-15T20:53:00-05:00" pubdate data-updated="true">Feb 15<span>th</span>, 2012</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://rubyists.github.com/fs_specs/blog/2012/02/15/stage-fright-gone-brief-synopsis-of-goal/" data-via="" data-counturl="http://rubyists.github.com/fs_specs/blog/2012/02/15/stage-fright-gone-brief-synopsis-of-goal/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/fs_specs/blog/2012/02/15/and-theyre-off-the-start-of-fs-specs/" title="Previous Post: And They're Off! - The start of FS_SPECS">&laquo; And They're Off! - The start of FS_SPECS</a>
+      
+      
+        <a class="basic-alignment right" href="/fs_specs/blog/2012/02/20/new-post/" title="Next Post: new-post">new-post &raquo;</a>
+      
+    </p>
+  </footer>
 </article>
 
 </div>

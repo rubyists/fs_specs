@@ -1,0 +1,269 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>And They're Off! - The start of FS_SPECS - FreeSWITCH And FreeSWITCHeR Ruby Library</title>
+  <meta name="author" content="Deryl R. Doucette">
+
+  
+  <meta name="description" content="My name is Deryl R. Doucette. I&#8217;m the originator of, but only one of a team on, fs_specs which means [F]ree[S]witch [SPEC]ification[S]. The &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://rubyists.github.com/fs_specs/blog/2012/02/15/and-theyre-off-the-start-of-fs-specs">
+  <link href="/fs_specs/favicon.png" rel="icon">
+  <link href="/fs_specs/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/fs_specs/javascripts/modernizr-2.0.js"></script>
+  <script src="/fs_specs/javascripts/ender.js"></script>
+  <script src="/fs_specs/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/fs_specs/atom.xml" rel="alternate" title="FreeSWITCH And FreeSWITCHeR Ruby Library" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/fs_specs/">FreeSWITCH And FreeSWITCHeR Ruby Library</a></h1>
+  
+    <h2>A Project for testing FreeSWITCH</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/fs_specs/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:rubyists.github.com/fs_specs" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/fs_specs/">Blog</a></li>
+  <li><a href="/fs_specs/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">And They're Off! - the Start of FS_SPECS</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-02-15T19:52:00-05:00" pubdate data-updated="true">Feb 15<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>My name is Deryl R. Doucette. I&#8217;m the originator of, but only one of a team on, fs_specs which means [F]ree[S]witch [SPEC]ification[S]. The group over at The Rubyists, LLC. has been in on it from the get go. It was through conversations with TJ that this project was born. TJ has contributed great amounts of time, energy, and code. Ken Rice (SwK on freenode) has helped direct the flow of my inquiries, and provided key conceptual information.</p>
+
+<p>So &#8220;What is &#8216;it&#8217;?&#8221;, you&#8217;re probably asking. FS_SPECs is a project to backfill testing into the FreeSWITCH Project utilizing the Ruby library FreeSWITCHeR as the interface to FreeSWITCH in an effort to enhance the stability, and usability, of both projects. The features and scenarios are written using Cucumber (which uses gherkin). We pull in RSpec for additional matchers. Everything else is Ruby. We are currently using Ruby 1.9.3p0, Cucumber 1.1.4, and RSpec 2.8.0. We use Bundler for gems management, which currently is 1.0.21. The Ruby environment is managed using RVM, and we utilize RVM&#8217;s per-project .rvmrc file capability.</p>
+
+<p>This is the first post for fs_specs. I&#8217;m not usually sure what to say in a first post because its one that defines your outlook for that specific project. I&#8217;ve several outlooks, hopes, and thoughts on direction for this project. The first of which is that it be useful in what it does.</p>
+
+<p>I&#8217;ve had the honor of speaking twice now during FreeSWITCH&#8217;s live weekly conference. I&#8217;ve come to realize that I do not, in any way shape or form, have the gift of &#8216;makin dah speech sounds&#8217;.</p>
+
+<p>So, I figure I&#8217;ll fall back to my comfort zone which is writing. I like to write. I can express myself a bit better with the written word. Hopefully, along the way I&#8217;ll be able to express here what I was unable to in the conferences. Much of what I was hoping to point out with regards to testing events within the context of channel and call state changes never made it into the conversation. My brain went for a walk and decided not to take me with it. I was drawing complete blanks. :/ Not fun on life audio.</p>
+
+<p>So, herein is where I&#8217;ll explain from top to bottom what I&#8217;m doing with fs_specs, urls for getting to the code, detailed explanations of the current Cucumber Features and Scenarios, and the exposed event&#8217;s content. On the code front, plaese be aware that I use the &#8216;master&#8217; branch as the &#8216;stable&#8217; branch. All development is done directly on, or in offshoots of, the &#8216;development&#8217; branch. Pulling master, which is the default, will always pull what is considered &#8216;Stable Release&#8217;.</p>
+
+<p>There might be a bit of meandering as I gather my thoughts and order my information. Trust me, if you saw the editing that goes on <em>before</em> I hit the save button, you would quickly agree the saved is a much cleaner piece than originally written. <grin></p>
+
+<p>Over th next few postings, I plan on taking apart the currently defined Features and their Scenarios on the master branch and explaining them here, along with the end-goal which might necessitate reworking some of the steps. I hope to use the explanations not only to educate on who, what, when, where, and why, but also because it might also serve to streamline my own thought processes thereby creating greater focus. One can hope!</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Deryl R. Doucette</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-02-15T19:52:00-05:00" pubdate data-updated="true">Feb 15<span>th</span>, 2012</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://rubyists.github.com/fs_specs/blog/2012/02/15/and-theyre-off-the-start-of-fs-specs/" data-via="" data-counturl="http://rubyists.github.com/fs_specs/blog/2012/02/15/and-theyre-off-the-start-of-fs-specs/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+      
+        <a class="basic-alignment right" href="/fs_specs/blog/2012/02/15/stage-fright-gone-brief-synopsis-of-goal/" title="Next Post: Stage Fright Gone! Brief Synopsis of Goal">Stage Fright Gone! Brief Synopsis of Goal &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/fs_specs/blog/2012/02/20/anatomy-of-an-fs-specs-feature-set-000-phone-infrastructure-feature/">Anatomy of an FS_SPECS Feature Set - 000_phone_infrastructure.feature</a>
+      </li>
+    
+      <li class="post">
+        <a href="/fs_specs/blog/2012/02/20/new-post/">new-post</a>
+      </li>
+    
+      <li class="post">
+        <a href="/fs_specs/blog/2012/02/15/stage-fright-gone-brief-synopsis-of-goal/">Stage Fright Gone! Brief Synopsis of Goal</a>
+      </li>
+    
+      <li class="post">
+        <a href="/fs_specs/blog/2012/02/15/and-theyre-off-the-start-of-fs-specs/">And They're Off! - The start of FS_SPECS</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/rubyists">@rubyists</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'rubyists',
+            count: 7,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/fs_specs/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/114407361520857511779?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2012 - Deryl R. Doucette -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

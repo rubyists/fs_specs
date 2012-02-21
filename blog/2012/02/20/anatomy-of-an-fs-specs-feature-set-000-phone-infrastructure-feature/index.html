@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>FreeSWITCH And FreeSWITCHeR Ruby Library</title>
+  <title>Anatomy of an FS_SPECS Feature Set - 000_phone_infrastructure.feature - FreeSWITCH And FreeSWITCHeR Ruby Library</title>
   <meta name="author" content="Deryl R. Doucette">
 
   
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://rubyists.github.com/fs_specs">
+  <link rel="canonical" href="http://rubyists.github.com/fs_specs/blog/2012/02/20/anatomy-of-an-fs-specs-feature-set-000-phone-infrastructure-feature">
   <link href="/fs_specs/favicon.png" rel="icon">
   <link href="/fs_specs/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/fs_specs/javascripts/modernizr-2.0.js"></script>
@@ -62,15 +62,12 @@
 </nav>
   <div id="main">
     <div id="content">
-      <div class="blog-index">
+      <div>
+<article class="hentry" role="article">
   
-  
-  
-    <article>
-      
   <header>
     
-      <h1 class="entry-title"><a href="/fs_specs/blog/2012/02/20/anatomy-of-an-fs-specs-feature-set-000-phone-infrastructure-feature/">Anatomy of an FS_SPECS Feature Set - 000_phone_infrastructure.feature</a></h1>
+      <h1 class="entry-title">Anatomy of an FS_SPECS Feature Set - 000_phone_infrastructure.feature</h1>
     
     
       <p class="meta">
@@ -93,7 +90,7 @@
   </header>
 
 
-  <div class="entry-content"><p>FS_SPECS Stable Branch - master</p>
+<div class="entry-content"><p>FS_SPECS Stable Branch - master</p>
 
 <p>As I stated earlier, our ‘master’ branch on GitHub is the ‘Stable Release’ branch for fs_specs. As of today’s date, we currently have 4 Features that test different aspects of FreeSWITCH through FreeSWITCHeR. They are:</p>
 
@@ -206,58 +203,16 @@ orig = @sock2.originate(target: “sofia/external/3000@#{@server2}”, endpoint:
 
 <p>  Thanks for reading!</p>
 </div>
-  
-  
 
 
-    </article>
-  
-  
-    <article>
+  <footer>
+    <p class="meta">
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/fs_specs/blog/2012/02/20/new-post/">New-post</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
   
 
+<span class="byline author vcard">Posted by <span class="fn">Deryl R. Doucette</span></span>
 
-<time datetime="2012-02-20T22:18:00-05:00" pubdate data-updated="true">Feb 20<span>th</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content">
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/fs_specs/blog/2012/02/15/stage-fright-gone-brief-synopsis-of-goal/">Stage Fright Gone! Brief Synopsis of Goal</a></h1>
-    
-    
-      <p class="meta">
-        
 
 
 
@@ -269,91 +224,34 @@ orig = @sock2.originate(target: “sofia/external/3000@#{@server2}”, endpoint:
   
 
 
-<time datetime="2012-02-15T20:53:00-05:00" pubdate data-updated="true">Feb 15<span>th</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>  What I was attempting to explain in the conferences was the subject of testing events within the context of channel and call state changes, and tracking those states for purposes of refining the granularity of both steps and EventSocket listener classes. I wasn&#8217;t .. clear .. (understatement) while explaining.</p>
-
-<p>  So, thats what the next week of blog articles is about :) What we&#8217;re doing is taking Cucumber feature sets, augmented with RSpec for matchers, and using EventMachine, the FreeSWITCHeR ruby library, and a couple FreeSWITCH softswitches to:</p>
-
-<p>  Open a Listener
-  Hook into on_event with:
-  add_event(:ALL){|event| handle_event(event) }</p>
-
-<p> In handle_event(event) we datamatch against channel_state and call_state based on the thrown events using a hash of WANTED_STATE. Basically, right now I&#8217;m trying to map the events thrown for both channel_state and call_state changes, and the channel state sequences that get thrown per event.</p>
-
-<p>  E.g channel has an associated call, that call could be hanging up, dialing another extension, calling into voicemail, et al. The channel has state for length of its call&#8217;s action. The call has state for the specific action done. Routing and call progression states also affect channel state.</p>
-
-<p>  Channels have calls, both fire off events, events have names (CHANNEL_EXECUTE) and fire in specific order for a particular &#8216;action&#8217;, providing a mechanism for constant feedback on the current status of the channel and its associated call. The events fired are affected by the specific channel state e.g CS_HANGUP or CS_DESTROY and, internally, the call state e.g HANGUP or DESTROY.</p>
-
-<p> Its the combination of these three status/state settings (event, channel, &#8216;call/action&#8217;) that reveal the inner workings of whats going on inside FreeSWITCH as it sees things, the channel, and the call. Grouping the channel&#8217;s event chain for a specific action on that channel, and then mapping the channel state changes that take place during that channel&#8217;s lifecycle, and the channel&#8217;s call lifecycle I believe provides value by exposing that internal coordination in such a way it can be readily and repeatably tested in a myriad of combinations.</p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
+<time datetime="2012-02-20T22:29:00-05:00" pubdate data-updated="true">Feb 20<span>th</span>, 2012</time>
       
-  <header>
+
+
+    </p>
     
-      <h1 class="entry-title"><a href="/fs_specs/blog/2012/02/15/and-theyre-off-the-start-of-fs-specs/">And They&#8217;re Off! - the Start of FS_SPECS</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
+      <div class="sharing">
   
-
-
-<time datetime="2012-02-15T19:52:00-05:00" pubdate data-updated="true">Feb 15<span>th</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>My name is Deryl R. Doucette. I&#8217;m the originator of, but only one of a team on, fs_specs which means [F]ree[S]witch [SPEC]ification[S]. The group over at The Rubyists, LLC. has been in on it from the get go. It was through conversations with TJ that this project was born. TJ has contributed great amounts of time, energy, and code. Ken Rice (SwK on freenode) has helped direct the flow of my inquiries, and provided key conceptual information.</p>
-
-<p>So &#8220;What is &#8216;it&#8217;?&#8221;, you&#8217;re probably asking. FS_SPECs is a project to backfill testing into the FreeSWITCH Project utilizing the Ruby library FreeSWITCHeR as the interface to FreeSWITCH in an effort to enhance the stability, and usability, of both projects. The features and scenarios are written using Cucumber (which uses gherkin). We pull in RSpec for additional matchers. Everything else is Ruby. We are currently using Ruby 1.9.3p0, Cucumber 1.1.4, and RSpec 2.8.0. We use Bundler for gems management, which currently is 1.0.21. The Ruby environment is managed using RVM, and we utilize RVM&#8217;s per-project .rvmrc file capability.</p>
-
-<p>This is the first post for fs_specs. I&#8217;m not usually sure what to say in a first post because its one that defines your outlook for that specific project. I&#8217;ve several outlooks, hopes, and thoughts on direction for this project. The first of which is that it be useful in what it does.</p>
-
-<p>I&#8217;ve had the honor of speaking twice now during FreeSWITCH&#8217;s live weekly conference. I&#8217;ve come to realize that I do not, in any way shape or form, have the gift of &#8216;makin dah speech sounds&#8217;.</p>
-
-<p>So, I figure I&#8217;ll fall back to my comfort zone which is writing. I like to write. I can express myself a bit better with the written word. Hopefully, along the way I&#8217;ll be able to express here what I was unable to in the conferences. Much of what I was hoping to point out with regards to testing events within the context of channel and call state changes never made it into the conversation. My brain went for a walk and decided not to take me with it. I was drawing complete blanks. :/ Not fun on life audio.</p>
-
-<p>So, herein is where I&#8217;ll explain from top to bottom what I&#8217;m doing with fs_specs, urls for getting to the code, detailed explanations of the current Cucumber Features and Scenarios, and the exposed event&#8217;s content. On the code front, plaese be aware that I use the &#8216;master&#8217; branch as the &#8216;stable&#8217; branch. All development is done directly on, or in offshoots of, the &#8216;development&#8217; branch. Pulling master, which is the default, will always pull what is considered &#8216;Stable Release&#8217;.</p>
-
-<p>There might be a bit of meandering as I gather my thoughts and order my information. Trust me, if you saw the editing that goes on <em>before</em> I hit the save button, you would quickly agree the saved is a much cleaner piece than originally written. <grin></p>
-
-<p>Over th next few postings, I plan on taking apart the currently defined Features and their Scenarios on the master branch and explaining them here, along with the end-goal which might necessitate reworking some of the steps. I hope to use the explanations not only to educate on who, what, when, where, and why, but also because it might also serve to streamline my own thought processes thereby creating greater focus. One can hope!</p>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://rubyists.github.com/fs_specs/blog/2012/02/20/anatomy-of-an-fs-specs-feature-set-000-phone-infrastructure-feature/" data-via="" data-counturl="http://rubyists.github.com/fs_specs/blog/2012/02/20/anatomy-of-an-fs-specs-feature-set-000-phone-infrastructure-feature/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
 </div>
-  
-  
 
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/fs_specs/blog/2012/02/20/new-post/" title="Previous Post: new-post">&laquo; new-post</a>
+      
+      
+    </p>
+  </footer>
+</article>
 
-    </article>
-  
-  <div class="pagination">
-    
-    <a href="/fs_specs/blog/archives">Blog Archives</a>
-    
-  </div>
 </div>
+
 <aside class="sidebar">
   
     <section>
@@ -373,7 +271,7 @@ orig = @sock2.originate(target: “sofia/external/3000@#{@server2}”, endpoint:
       </li>
     
       <li class="post">
-        <a href="/fs_specs/blog/2012/02/15/and-theyre-off-the-start-of-fs-specs/">And They&#8217;re Off! - The start of FS_SPECS</a>
+        <a href="/fs_specs/blog/2012/02/15/and-theyre-off-the-start-of-fs-specs/">And They're Off! - The start of FS_SPECS</a>
       </li>
     
   </ul>
@@ -382,7 +280,7 @@ orig = @sock2.originate(target: “sofia/external/3000@#{@server2}”, endpoint:
 <section>
   <h1>GitHub Repos</h1>
   <ul id="gh_repos">
-    <li class="loading">Status updating&#8230;</li>
+    <li class="loading">Status updating...</li>
   </ul>
   
   <a href="https://github.com/rubyists">@rubyists</a> on GitHub
@@ -424,6 +322,7 @@ orig = @sock2.originate(target: “sofia/external/3000@#{@server2}”, endpoint:
 
   
 </aside>
+
 
     </div>
   </div>
