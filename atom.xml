@@ -4,7 +4,7 @@
   <title><![CDATA[FreeSWITCH And FreeSWITCHeR Ruby Library]]></title>
   <link href="http://rubyists.github.com/fs_specs/atom.xml" rel="self"/>
   <link href="http://rubyists.github.com/fs_specs/"/>
-  <updated>2012-02-21T12:00:42-05:00</updated>
+  <updated>2012-02-21T12:02:56-05:00</updated>
   <id>http://rubyists.github.com/fs_specs/</id>
   <author>
     <name><![CDATA[Deryl R. Doucette]]></name>
@@ -14,7 +14,7 @@
 
   
   <entry>
-    <title type="html"><![CDATA[Checking Out Extensions - 001_channel_can_dial_extensions feature]]></title>
+    <title type="html"><![CDATA[Checking Out Extensions]]></title>
     <link href="http://rubyists.github.com/fs_specs/blog/2012/02/17/checking-out-extensions-001-channel-can-dial-extensions-feature/"/>
     <updated>2012-02-17T13:53:00-05:00</updated>
     <id>http://rubyists.github.com/fs_specs/blog/2012/02/17/checking-out-extensions-001-channel-can-dial-extensions-feature</id>
