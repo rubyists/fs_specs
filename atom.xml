@@ -4,7 +4,7 @@
   <title><![CDATA[FreeSWITCH And FreeSWITCHeR Ruby Library]]></title>
   <link href="http://rubyists.github.com/fs_specs/atom.xml" rel="self"/>
   <link href="http://rubyists.github.com/fs_specs/"/>
-  <updated>2012-02-20T22:40:27-05:00</updated>
+  <updated>2012-02-20T22:41:13-05:00</updated>
   <id>http://rubyists.github.com/fs_specs/</id>
   <author>
     <name><![CDATA[Deryl R. Doucette]]></name>
@@ -12,15 +12,6 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
-  
-  <entry>
-    <title type="html"><![CDATA[new-post]]></title>
-    <link href="http://rubyists.github.com/fs_specs/blog/2012/02/20/new-post/"/>
-    <updated>2012-02-20T22:18:00-05:00</updated>
-    <id>http://rubyists.github.com/fs_specs/blog/2012/02/20/new-post</id>
-    <content type="html"><![CDATA[
-]]></content>
-  </entry>
   
   <entry>
     <title type="html"><![CDATA[Anatomy of an FS_SPECS Feature Set - 000_phone_infrastructure.feature]]></title>
