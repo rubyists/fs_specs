@@ -4,7 +4,7 @@
   <title><![CDATA[FreeSWITCH And FreeSWITCHeR Ruby Library]]></title>
   <link href="http://rubyists.github.com/fs_specs/atom.xml" rel="self"/>
   <link href="http://rubyists.github.com/fs_specs/"/>
-  <updated>2012-02-21T11:00:50-05:00</updated>
+  <updated>2012-02-21T11:01:33-05:00</updated>
   <id>http://rubyists.github.com/fs_specs/</id>
   <author>
     <name><![CDATA[Deryl R. Doucette]]></name>
@@ -12,88 +12,6 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
-  
-  <entry>
-    <title type="html"><![CDATA[Interacting With Voicemail - 002_channel_can_interact_with_voicemail feature]]></title>
-    <link href="http://rubyists.github.com/fs_specs/blog/2012/02/22/interacting-with-voicemail-002-channel-can-interact-with-voicemail-feature/"/>
-    <updated>2012-02-22T19:00:00-05:00</updated>
-    <id>http://rubyists.github.com/fs_specs/blog/2012/02/22/interacting-with-voicemail-002-channel-can-interact-with-voicemail-feature</id>
-    <content type="html"><![CDATA[<h3>What Are We Doing Today?</h3>
-
-<p>In this article, we’ll be discussing interacting with FreeSWITCH’s voicemail system using our <a href="https://github.com/rubyists/fs_specs/blob/master/features/002_channel_can_interact_with_voicemail.feature">002_channel_can_interact_with_voicemail</a> feature. This Feature will require that we write our own custom Listener class that we attach to the EventSocket’s <em>on_event()</em> method using our own customized <em>handle_event()</em> method.</p>
-
-<h3>Core Feature -  <a href="https://github.com/rubyists/fs_specs/blob/master/features/002_channel_can_interact_with_voicemail.feature">002_channel_can_interact_with_voicemail.feature</a></h3>
-
-<p>Here is the Feature itself.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-</pre></td><td class='code'><pre><code class='Cucumber'><span class='line'><span class="nf">        Feature: Channel can interact with voicemail</span>
-</span><span class='line'><span class="nf">     In order to utilize voicemail</span>
-</span><span class='line'><span class="nf">     As a channel</span>
-</span><span class='line'><span class="nf">     </span><span class="k">I </span><span class="nf">want to be able to log into, and use, the voicemail system</span>
-</span><span class='line'>
-</span><span class='line'><span class="nf">     </span><span class="k">Background:</span><span class="nf"></span>
-</span><span class='line'><span class="k">      Given </span><span class="nf">I have </span><span class="s">2</span><span class="nf"> servers named blackbird.rubyists.com and tigershark.rubyists.com</span>
-</span><span class='line'><span class="nf">     </span><span class="k">And </span><span class="nf">blackbird.rubyists.com is accessible via the Event Socket</span>
-</span><span class='line'>
-</span><span class='line'><span class="nf">     </span><span class="k">Scenario:</span><span class="nf"> Successfully log into voicemail using extension</span>
-</span><span class='line'><span class="k">      And </span><span class="nf">I check voicemail for user </span><span class="s">1000</span><span class="nf"> with good password </span><span class="s">1000</span><span class="nf"></span>
-</span><span class='line'><span class="nf">     </span><span class="k">Then </span><span class="nf">I should be logged into voicemail</span>
-</span><span class='line'>
-</span><span class='line'><span class="nf">     </span><span class="k">Scenario:</span><span class="nf"> Fail to log into voicemail using extension</span>
-</span><span class='line'><span class="k">      And </span><span class="nf">I check voicemail for user </span><span class="s">1000</span><span class="nf"> with bad password </span><span class="s">1001</span><span class="nf"></span>
-</span><span class='line'><span class="nf">     </span><span class="k">Then </span><span class="nf">I should be prompted to try again</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>What Exactly Does It Do? - <a href="https://github.com/rubyists/fs_specs/blob/master/features/step_definitions/steps.rb">steps.rb</a></h3>
-
-<p>OK, here we go with the whirlwind ride of whats taking place within these Feature steps. The definitions of each of them are in the linked steps.rb file.</p>
-
-<p>  As usual, we briefly describe in the Feature line, and expand upon immediately following, what the feature is for. We, again, hit the Background step which set up the connection for the remaining scenarios to use. That steps right into our first Scenario, “Successfully log into voicemail using extension”. In this Scenario, we check that we can log into voicemail for a specific extension, using the known password for that extension’s mailbox. This Scenario tests several sets of ideas.</p>
-
-<p>It tests that we can:</p>
-
-<pre><code>    * connect to the server
-    * that it recognizes and sends us well formed data
-    * that it recognizes well formed data we send it (e.g pressed keys)
-    * that we recognize and identify the usage and response pattern freeswitch expects
-    * that the expected pattern for interaction is seen in the data
-    * that freeswitch responds correctly to our response. 
-</code></pre>
-
-<p>  The same is expected in the following Scenario, but for a negative test case. This ensures that we cover both states of recognition. Either we’re authenticated, or we’re not. If we are, use the system. If not, re-prompt and eventually drop.</p>
-
-<p>Before we get into the specifics of the extension, let me explain what we’re going to be doing. We need a way to validate that we’re actually connecting to the voicemail system, and that we can react based upon the state changes we see as we move through the system. In this instance, freeswitch uses wav files to communicate. It plays specific wavs, in specific patterns and sub-patterns, that describe the various options available under the voicemail menu. We need some way to capture and use that information. Enter our custom class, the VmListener!</p>
-
-<h3>The Code - What did we actually build? - <a href="https://github.com/rubyists/fs_specs/blob/master/features/step_definitions/vm_listener.rb">VmListener</a></h3>
-
-<p>[This is where you describe the lines of code and what each one does, walking through the steps. The code from the step definitions go here.]</p>
-
-<h3>The Round Up - And In Closing…</h3>
-
-<p>Your closing remarks go here including any last minute i-just-thought-of-this</p>
-
-<h3>Up Next - A Look Ahead..</h3>
-
-<p>A hint on what the next article is going to be about.</p>
-]]></content>
-  </entry>
   
   <entry>
     <title type="html"><![CDATA[Checking Out Extensions - 001_channel_can_dial_extensions feature]]></title>
