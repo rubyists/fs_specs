@@ -4,7 +4,7 @@
   <title><![CDATA[FreeSWITCH And FreeSWITCHeR Ruby Library]]></title>
   <link href="http://rubyists.github.com/fs_specs/atom.xml" rel="self"/>
   <link href="http://rubyists.github.com/fs_specs/"/>
-  <updated>2012-02-20T22:54:53-05:00</updated>
+  <updated>2012-02-20T23:06:05-05:00</updated>
   <id>http://rubyists.github.com/fs_specs/</id>
   <author>
     <name><![CDATA[Deryl R. Doucette]]></name>
@@ -14,92 +14,25 @@
 
   
   <entry>
-    <title type="html"><![CDATA[Interacting With Voicemail - 002_channel_can_interact_with_voicemail feature]]></title>
-    <link href="http://rubyists.github.com/fs_specs/blog/2012/02/20/interacting-with-voicemail-002-channel-can-interact-with-voicemail-feature/"/>
-    <updated>2012-02-20T22:44:00-05:00</updated>
-    <id>http://rubyists.github.com/fs_specs/blog/2012/02/20/interacting-with-voicemail-002-channel-can-interact-with-voicemail-feature</id>
-    <content type="html"><![CDATA[<p>What Are We Doing Today?</p>
-
-<p>In this article, we’ll be discussing interacting with FreeSWITCH’s voicemail system. This Feature will require that we write our own custom Listener class that we attach to the EventSocket’s on_event() method using our own customized handle_event() method.</p>
-
-<p>Core Feature - <a href="https://github.com/rubyists/fs_specs/blob/master/features/002_channel_can_interact_with_voicemail.feature">002_channel_can_interact_with_voicemail.feature</a></p>
-
-<p>Here is the Feature itself.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-</pre></td><td class='code'><pre><code class='cucumber'><span class='line'><span class="k">Feature:</span><span class="nf"> Channel can interact with voicemail</span>
-</span><span class='line'><span class="nf">In order to utilize voicemail</span>
-</span><span class='line'><span class="nf">As a channel</span>
-</span><span class='line'><span class="nf">I want to be able to log into, and use, the voicemail system</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">Background:</span><span class="nf"></span>
-</span><span class='line'><span class="k">Given </span><span class="nf">I have </span><span class="s">2</span><span class="nf"> servers named blackbird.rubyists.com and tigershark.rubyists.com</span>
-</span><span class='line'><span class="k">And </span><span class="nf">blackbird.rubyists.com is accessible via the Event Socket</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">Scenario:</span><span class="nf"> Successfully log into voicemail using extension</span>
-</span><span class='line'><span class="k">And </span><span class="nf">I check voicemail for user </span><span class="s">1000</span><span class="nf"> with good password </span><span class="s">1000</span><span class="nf"></span>
-</span><span class='line'><span class="k">Then </span><span class="nf">I should be logged into voicemail</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">Scenario:</span><span class="nf"> Fail to log into voicemail using extension</span>
-</span><span class='line'><span class="k">And </span><span class="nf">I check voicemail for user </span><span class="s">1000</span><span class="nf"> with bad password </span><span class="s">1001</span><span class="nf"></span>
-</span><span class='line'><span class="k">Then </span><span class="nf">I should be prompted to try again</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>What Exactly Does It Do? - <a href="https://github.com/rubyists/fs_specs/blob/master/features/step_definitions/steps.rb">steps.rb</a></p>
-
-<p>OK, here we go with the whirlwind ride of whats taking place within these Feature steps. The definitions of each of them are in the linked <a href="https://github.com/rubyists/fs_specs/blob/master/features/step_definitions/steps.rb">steps.rb</a> file, both just now and in this sub-topic’s title.</p>
-
-<p>As usual, we briefly describe in the Feature line, and expand upon immediately following, what the feature is for. We, again, hit the Background step which set up the connection for the remaining scenarios to use. That steps right into our first Scenario, “Successfully log into voicemail using extension”. In this Scenario, we check that we can log into voicemail for a specific extension, using the known password for that extension’s mailbox. This Scenario tests several sets of ideas. It tests that we can connect to the server, that it recognizes and sends us well formed data, that it recognizes well formed data we send it (e.g pressed keys), that we recognize and identify the usage and response pattern freeswitch expects, that the expected pattern for interaction is seen in the data, and that freeswitch responds correctly to our response. The same is expected in the following Scenario, but for a negative test case. This ensures that we cover both states of recognition. Either we’re authenticated, or we’re not. If we are, use the system. If not, re-prompt and eventually drop.</p>
-
-<p>Before we get into the specifics of the extension, let me explain what we’re going to be doing. We need a way to validate that we’re actually connecting to the voicemail system, and that we can react based upon the state changes we see as we move through the system. In this instance, freeswitch uses wav files to communicate. It plays specific wavs, in specific patterns and sub-patterns, that describe the various options available under the voicemail menu. We need some way to capture and use that information. Enter our custom class, the VmListener!</p>
-
-<p>The Code - What did we actually build? - [VmListener<a href="https://github.com/rubyists/fs_specs/blob/master/features/step_definitions/vm_listener.rb">steps.rb</a></p>
-
-<p>[This is where you describe the lines of code and what each one does, walking through the steps. The code from the step definitions go here.]</p>
-
-<p>The Round Up - And In Closing…</p>
-
-<p>Your closing remarks go here including any last minute i-just-thought-of-this</p>
-
-<p>Up Next - A Look Ahead..</p>
-
-<p>A hint on what the next article is going to be about.</p>
-]]></content>
-  </entry>
-  
-  <entry>
     <title type="html"><![CDATA[Anatomy of an FS_SPECS Feature Set - 000_phone_infrastructure.feature]]></title>
     <link href="http://rubyists.github.com/fs_specs/blog/2012/02/16/anatomy-of-an-fs-specs-feature-set-000-phone-infrastructure-feature/"/>
     <updated>2012-02-16T14:44:00-05:00</updated>
     <id>http://rubyists.github.com/fs_specs/blog/2012/02/16/anatomy-of-an-fs-specs-feature-set-000-phone-infrastructure-feature</id>
-    <content type="html"><![CDATA[<p>FS_SPECS Stable Branch - master</p>
+    <content type="html"><![CDATA[<h2>FS_SPECS Stable Branch - master</h2>
 
 <p>As I stated earlier, our ‘master’ branch on GitHub is the ‘Stable Release’ branch for fs_specs. As of today’s date, we currently have 4 Features that test different aspects of FreeSWITCH through FreeSWITCHeR. They are:</p>
 
-<p>000_phone_infrastructure.feature
-001_channel_can_dial_extensions.feature
-002_channel_can_interact_with_voicemail.feature
-003_can_retrieve_channel_information.feature</p>
+<ul>
+<li>000_phone_infrastructure.feature</li>
+<li>001_channel_can_dial_extensions.feature</li>
+<li>002_channel_can_interact_with_voicemail.feature</li>
+<li>003_can_retrieve_channel_information.feature</li>
+</ul>
 
-<p>Over the next few articles I’ll be diving into the anatomy of each feature, the attendant steps, and the FSL::Inbound *Listener classes for each.</p>
 
-<p>Core Feature - 000_phone_infrastructure.feature</p>
+<p>Over the next few articles I’ll be diving into the anatomy of each feature, the attendant steps, and the <strong>FSL::Inbound</strong> xxListener classes for each.</p>
+
+<h2>Core Feature - 000_phone_infrastructure.feature</h2>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -138,7 +71,7 @@
 
 <p>   This feature is the key to the entire set, both existing and those to come. The reason for this is the features job is solely to establish that you have a working configuration for running the rest of the features. If this particular feature fails nothing else will work.</p>
 
-<p>   To see what this feature is actually doing, lets open up the associated ‘steps.rb’ file and look for the matchers that comprise each step of each Scenario as they go along. Background in each feature file sets up stuff we need to make it all work and keeps it existing for each Scenario in the feature rather than tearing it all down in-between each one.</p>
+<p>   To see what this feature is actually doing, lets open up the associated <a href="https://github.com/rubyists/fs_specs/blob/master/features/step_definitions/steps.rb">‘steps.rb’</a> file and look for the matchers that comprise each step of each Scenario as they go along. Background in each feature file sets up stuff we need to make it all work and keeps it existing for each Scenario in the feature rather than tearing it all down in-between each one.</p>
 
 <p>   As we can see from the feature title, this feature set establishes that the phone infrastructure for all remaining tests can be found and is correctly configured. In the Background segment’s Given line, we are checking to ensure we can access both machines listed. The first server listed (blackbird.rubyists.com) is a freeswitch that is being used basically as nothing more than a soft phone. The second server listed (tigershark.rubyists.com) is the actual freeswitch being tested. The And line ensures that we can talk to the soft phone (blackbird) via freeswitch’s EventSocket.</p>
 
@@ -255,9 +188,9 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>  To distill that all down, in the Background we define several ivars for use elsewhere in the Feature, such as @server1, @server2, and use them to open a FSR::CommandSocket to ‘blackbird’, our ‘soft phone’, named @sock1 after which we promptly ensure it was created (not_nil). This establishes that we have a valid connection between the tests and its requirements.</p>
+<p>  To distill that all down, in the Background we define several ivars for use elsewhere in the Feature, such as <strong>@server1</strong>, <strong>@server2</strong>, and use them to open a <strong>FSR::CommandSocket</strong> to ‘blackbird’, our ‘soft phone’, named @sock1 after which we promptly ensure it was created (not_nil). This establishes that we have a valid connection between the tests and its requirements.</p>
 
-<p>  Immediately after this we open a second FSR::CommandSocket to ‘blackbird’ for conducting the remainder of this feature’s Scenarios. We also populate a @uuid variable for use elsewhere in identifying related traffic, and connect the endpoint to freeswitch’s Music On Hold extension (MoH) 9664.</p>
+<p>  Immediately after this we open a second <strong>FSR::CommandSocket</strong> to ‘blackbird’ for conducting the remainder of this feature’s Scenarios. We also populate a <strong>@uuid</strong> variable for use elsewhere in identifying related traffic, and connect the endpoint to freeswitch’s Music On Hold extension (MoH) 9664.</p>
 
 <p>  The remainder of the code which is inside the 30.times do has us wait for up to 30 seconds to ensure that our call was actually processed. Items such as network delay, host OS issues, etc all play a part in how response times so we cover our butts a bit here to ensure the call actually got created.</p>
 
@@ -278,19 +211,18 @@
 
 <p>  So, thats what the next week of blog articles is about :) What we&#8217;re doing is taking Cucumber feature sets, augmented with RSpec for matchers, and using EventMachine, the FreeSWITCHeR ruby library, and a couple FreeSWITCH softswitches to:</p>
 
-<p>  Open a Listener
-  Hook into on_event with:</p>
+<p>  Open a Listener Hook into on_event with:</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 </pre></td><td class='code'><pre><code class='ruby'><span class='line'>  <span class="n">add_event</span><span class="p">(</span><span class="ss">:ALL</span><span class="p">){</span> <span class="o">|</span><span class="n">event</span><span class="o">|</span> <span class="n">handle_event</span><span class="p">(</span><span class="n">event</span><span class="p">)</span> <span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p> In handle_event(event) we datamatch against channel_state and call_state based on the thrown events using a hash of WANTED_STATE. Basically, right now I&#8217;m trying to map the events thrown for both channel_state and call_state changes, and the channel state sequences that get thrown per event.</p>
+<p> In <strong>handle_event(event)</strong>, we datamatch against channel_state and call_state based on the thrown events using a hash of <strong>WANTED_STATE</strong>. Basically, right now I&#8217;m trying to map the events thrown for both channel_state and call_state changes, and the channel state sequences that get thrown per event.</p>
 
 <p>  E.g channel has an associated call, that call could be hanging up, dialing another extension, calling into voicemail, et al. The channel has state for length of its call&#8217;s action. The call has state for the specific action done. Routing and call progression states also affect channel state.</p>
 
-<p>  Channels have calls, both fire off events, events have names (CHANNEL_EXECUTE) and fire in specific order for a particular &#8216;action&#8217;, providing a mechanism for constant feedback on the current status of the channel and its associated call. The events fired are affected by the specific channel state e.g CS_HANGUP or CS_DESTROY and, internally, the call state e.g HANGUP or DESTROY.</p>
+<p>  Channels have calls, both fire off events, events have names (<strong>CHANNEL_EXECUTE</strong>) and fire in specific order for a particular &#8216;action&#8217;, providing a mechanism for constant feedback on the current status of the channel and its associated call. The events fired are affected by the specific channel state e.g <strong>CS_HANGUP</strong> or <strong>CS_DESTROY</strong> and, internally, the call state e.g <strong>HANGUP</strong> or <strong>DESTROY</strong>.</p>
 
 <p> Its the combination of these three status/state settings (event, channel, &#8216;call/action&#8217;) that reveal the inner workings of whats going on inside FreeSWITCH as it sees things, the channel, and the call. Grouping the channel&#8217;s event chain for a specific action on that channel, and then mapping the channel state changes that take place during that channel&#8217;s lifecycle, and the channel&#8217;s call lifecycle I believe provides value by exposing that internal coordination in such a way it can be readily and repeatably tested in a myriad of combinations.</p>
 ]]></content>

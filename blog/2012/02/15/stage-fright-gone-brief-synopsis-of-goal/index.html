@@ -94,19 +94,18 @@
 
 <p>  So, thats what the next week of blog articles is about :) What we&#8217;re doing is taking Cucumber feature sets, augmented with RSpec for matchers, and using EventMachine, the FreeSWITCHeR ruby library, and a couple FreeSWITCH softswitches to:</p>
 
-<p>  Open a Listener
-  Hook into on_event with:</p>
+<p>  Open a Listener Hook into on_event with:</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 </pre></td><td class='code'><pre><code class='ruby'><span class='line'>  <span class="n">add_event</span><span class="p">(</span><span class="ss">:ALL</span><span class="p">){</span> <span class="o">|</span><span class="n">event</span><span class="o">|</span> <span class="n">handle_event</span><span class="p">(</span><span class="n">event</span><span class="p">)</span> <span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p> In handle_event(event) we datamatch against channel_state and call_state based on the thrown events using a hash of WANTED_STATE. Basically, right now I&#8217;m trying to map the events thrown for both channel_state and call_state changes, and the channel state sequences that get thrown per event.</p>
+<p> In <strong>handle_event(event)</strong>, we datamatch against channel_state and call_state based on the thrown events using a hash of <strong>WANTED_STATE</strong>. Basically, right now I&#8217;m trying to map the events thrown for both channel_state and call_state changes, and the channel state sequences that get thrown per event.</p>
 
 <p>  E.g channel has an associated call, that call could be hanging up, dialing another extension, calling into voicemail, et al. The channel has state for length of its call&#8217;s action. The call has state for the specific action done. Routing and call progression states also affect channel state.</p>
 
-<p>  Channels have calls, both fire off events, events have names (CHANNEL_EXECUTE) and fire in specific order for a particular &#8216;action&#8217;, providing a mechanism for constant feedback on the current status of the channel and its associated call. The events fired are affected by the specific channel state e.g CS_HANGUP or CS_DESTROY and, internally, the call state e.g HANGUP or DESTROY.</p>
+<p>  Channels have calls, both fire off events, events have names (<strong>CHANNEL_EXECUTE</strong>) and fire in specific order for a particular &#8216;action&#8217;, providing a mechanism for constant feedback on the current status of the channel and its associated call. The events fired are affected by the specific channel state e.g <strong>CS_HANGUP</strong> or <strong>CS_DESTROY</strong> and, internally, the call state e.g <strong>HANGUP</strong> or <strong>DESTROY</strong>.</p>
 
 <p> Its the combination of these three status/state settings (event, channel, &#8216;call/action&#8217;) that reveal the inner workings of whats going on inside FreeSWITCH as it sees things, the channel, and the call. Grouping the channel&#8217;s event chain for a specific action on that channel, and then mapping the channel state changes that take place during that channel&#8217;s lifecycle, and the channel&#8217;s call lifecycle I believe provides value by exposing that internal coordination in such a way it can be readily and repeatably tested in a myriad of combinations.</p>
 </div>
@@ -166,10 +165,6 @@
     <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
-    
-      <li class="post">
-        <a href="/fs_specs/blog/2012/02/20/interacting-with-voicemail-002-channel-can-interact-with-voicemail-feature/">Interacting With Voicemail - 002_channel_can_interact_with_voicemail feature</a>
-      </li>
     
       <li class="post">
         <a href="/fs_specs/blog/2012/02/16/anatomy-of-an-fs-specs-feature-set-000-phone-infrastructure-feature/">Anatomy of an FS_SPECS Feature Set - 000_phone_infrastructure.feature</a>

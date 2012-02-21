@@ -90,18 +90,21 @@
   </header>
 
 
-<div class="entry-content"><p>FS_SPECS Stable Branch - master</p>
+<div class="entry-content"><h2>FS_SPECS Stable Branch - master</h2>
 
 <p>As I stated earlier, our ‘master’ branch on GitHub is the ‘Stable Release’ branch for fs_specs. As of today’s date, we currently have 4 Features that test different aspects of FreeSWITCH through FreeSWITCHeR. They are:</p>
 
-<p>000_phone_infrastructure.feature
-001_channel_can_dial_extensions.feature
-002_channel_can_interact_with_voicemail.feature
-003_can_retrieve_channel_information.feature</p>
+<ul>
+<li>000_phone_infrastructure.feature</li>
+<li>001_channel_can_dial_extensions.feature</li>
+<li>002_channel_can_interact_with_voicemail.feature</li>
+<li>003_can_retrieve_channel_information.feature</li>
+</ul>
 
-<p>Over the next few articles I’ll be diving into the anatomy of each feature, the attendant steps, and the FSL::Inbound *Listener classes for each.</p>
 
-<p>Core Feature - 000_phone_infrastructure.feature</p>
+<p>Over the next few articles I’ll be diving into the anatomy of each feature, the attendant steps, and the <strong>FSL::Inbound</strong> xxListener classes for each.</p>
+
+<h2>Core Feature - 000_phone_infrastructure.feature</h2>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -140,7 +143,7 @@
 
 <p>   This feature is the key to the entire set, both existing and those to come. The reason for this is the features job is solely to establish that you have a working configuration for running the rest of the features. If this particular feature fails nothing else will work.</p>
 
-<p>   To see what this feature is actually doing, lets open up the associated ‘steps.rb’ file and look for the matchers that comprise each step of each Scenario as they go along. Background in each feature file sets up stuff we need to make it all work and keeps it existing for each Scenario in the feature rather than tearing it all down in-between each one.</p>
+<p>   To see what this feature is actually doing, lets open up the associated <a href="https://github.com/rubyists/fs_specs/blob/master/features/step_definitions/steps.rb">‘steps.rb’</a> file and look for the matchers that comprise each step of each Scenario as they go along. Background in each feature file sets up stuff we need to make it all work and keeps it existing for each Scenario in the feature rather than tearing it all down in-between each one.</p>
 
 <p>   As we can see from the feature title, this feature set establishes that the phone infrastructure for all remaining tests can be found and is correctly configured. In the Background segment’s Given line, we are checking to ensure we can access both machines listed. The first server listed (blackbird.rubyists.com) is a freeswitch that is being used basically as nothing more than a soft phone. The second server listed (tigershark.rubyists.com) is the actual freeswitch being tested. The And line ensures that we can talk to the soft phone (blackbird) via freeswitch’s EventSocket.</p>
 
@@ -257,9 +260,9 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>  To distill that all down, in the Background we define several ivars for use elsewhere in the Feature, such as @server1, @server2, and use them to open a FSR::CommandSocket to ‘blackbird’, our ‘soft phone’, named @sock1 after which we promptly ensure it was created (not_nil). This establishes that we have a valid connection between the tests and its requirements.</p>
+<p>  To distill that all down, in the Background we define several ivars for use elsewhere in the Feature, such as <strong>@server1</strong>, <strong>@server2</strong>, and use them to open a <strong>FSR::CommandSocket</strong> to ‘blackbird’, our ‘soft phone’, named @sock1 after which we promptly ensure it was created (not_nil). This establishes that we have a valid connection between the tests and its requirements.</p>
 
-<p>  Immediately after this we open a second FSR::CommandSocket to ‘blackbird’ for conducting the remainder of this feature’s Scenarios. We also populate a @uuid variable for use elsewhere in identifying related traffic, and connect the endpoint to freeswitch’s Music On Hold extension (MoH) 9664.</p>
+<p>  Immediately after this we open a second <strong>FSR::CommandSocket</strong> to ‘blackbird’ for conducting the remainder of this feature’s Scenarios. We also populate a <strong>@uuid</strong> variable for use elsewhere in identifying related traffic, and connect the endpoint to freeswitch’s Music On Hold extension (MoH) 9664.</p>
 
 <p>  The remainder of the code which is inside the 30.times do has us wait for up to 30 seconds to ensure that our call was actually processed. Items such as network delay, host OS issues, etc all play a part in how response times so we cover our butts a bit here to ensure the call actually got created.</p>
 
@@ -312,8 +315,6 @@
         <a class="basic-alignment left" href="/fs_specs/blog/2012/02/15/stage-fright-gone-brief-synopsis-of-goal/" title="Previous Post: Stage Fright Gone! Brief Synopsis of Goal">&laquo; Stage Fright Gone! Brief Synopsis of Goal</a>
       
       
-        <a class="basic-alignment right" href="/fs_specs/blog/2012/02/20/interacting-with-voicemail-002-channel-can-interact-with-voicemail-feature/" title="Next Post: Interacting With Voicemail - 002_channel_can_interact_with_voicemail feature">Interacting With Voicemail - 002_channel_can_interact_with_voicemail feature &raquo;</a>
-      
     </p>
   </footer>
 </article>
@@ -325,10 +326,6 @@
     <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
-    
-      <li class="post">
-        <a href="/fs_specs/blog/2012/02/20/interacting-with-voicemail-002-channel-can-interact-with-voicemail-feature/">Interacting With Voicemail - 002_channel_can_interact_with_voicemail feature</a>
-      </li>
     
       <li class="post">
         <a href="/fs_specs/blog/2012/02/16/anatomy-of-an-fs-specs-feature-set-000-phone-infrastructure-feature/">Anatomy of an FS_SPECS Feature Set - 000_phone_infrastructure.feature</a>
