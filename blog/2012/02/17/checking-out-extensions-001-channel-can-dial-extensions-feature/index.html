@@ -94,7 +94,7 @@
 
 <p>As I said in the previous article, there is some overlap here. Note that I will be referring to features by their ordering number e.g 000. 000 also dials an extension, but in this feature we wanted to specifically isolate, and focus on, that distinct capability of dialling extensions.</p>
 
-<p>Here is the Feature itself. Remember, this is a testing framework targeting FreeSWITCH. So, we drive all of our actual code through the tests. We, in this instance, are using cucumber to drive our entire framework so we start in the Feature itself.</p>
+<p>Here is the Feature itself. Remember, this is a testing framework targeting FreeSWITCH. So, we drive all of our actual code through the tests. We, in this instance, are using Cucumber to drive our entire framework so we start in the Feature itself.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -114,7 +114,7 @@
 <span class='line-number'>16</span>
 <span class='line-number'>17</span>
 <span class='line-number'>18</span>
-</pre></td><td class='code'><pre><code class='cucumber'><span class='line'><span class="k">Feature:</span><span class="nf"> A channel can dial an extension</span>
+</pre></td><td class='code'><pre><code class='Cucumber'><span class='line'><span class="k">Feature:</span><span class="nf"> A channel can dial an extension</span>
 </span><span class='line'>
 </span><span class='line'><span class="nf">Once a UserAgent (X-Lite, PolyCom, another FS) can successfully connect to freeswitch, that UserAgent should be able to place a call to any known extension. The UserAgent should be connected to that extension. If that extension can not be reached, or the extension is not known, then the UserAgent should be notified of both the fact of the failure, and the type of the failure.</span>
 </span><span class='line'>
@@ -148,7 +148,7 @@
 <span class='line-number'>5</span>
 <span class='line-number'>6</span>
 <span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='cucumber'><span class='line'><span class="k">When </span><span class="nf">/^I dial extension “([^”]*)” on ([\w.]+)$/ do |known_extension, server|</span>
+</pre></td><td class='code'><pre><code class='Cucumber'><span class='line'><span class="k">When </span><span class="nf">/^I dial extension “([^”]*)” on ([\w.]+)$/ do |known_extension, server|</span>
 </span><span class='line'><span class="nf">  orig = </span><span class="nt">@sock2.originate(target:</span><span class="nf"> ‘sofia/external/%s</span><span class="nt">@%s’</span><span class="nf"> % [known_extension, </span><span class="nt">@server2],</span><span class="nf"> endpoint:</span>
 </span><span class='line'><span class="nf">                                           “&amp;transfer(‘</span><span class="s">3000</span><span class="nf"> XML default’)”)</span>
 </span><span class='line'><span class="nf">  orig.should_not be_nil</span>
@@ -166,7 +166,7 @@
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='cucumber'><span class='line'><span class="k">Then </span><span class="nf">/^I should be connected to that extension$/ do</span>
+</pre></td><td class='code'><pre><code class='Cucumber'><span class='line'><span class="k">Then </span><span class="nf">/^I should be connected to that extension$/ do</span>
 </span><span class='line'><span class="nf">  message, </span><span class="nt">@uuid</span><span class="nf"> = </span><span class="nt">@resp[&quot;body&quot;].split(&quot;</span><span class="nf"> &quot;</span><span class="s">)</span>
 </span><span class='line'><span class="s">  fail </span><span class="nf">&quot;No UUID found&quot;</span><span class="s"> unless message == &#39;+OK&#39;</span>
 </span><span class='line'><span class="s">end</span>
@@ -188,7 +188,7 @@
 <span class='line-number'>9</span>
 <span class='line-number'>10</span>
 <span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='cucumber'><span class='line'><span class="k">Then </span><span class="nf">/^I should be able to terminate the call$/ do</span>
+</pre></td><td class='code'><pre><code class='Cucumber'><span class='line'><span class="k">Then </span><span class="nf">/^I should be able to terminate the call$/ do</span>
 </span><span class='line'><span class="nf">  </span><span class="nt">@uuid.should_not</span><span class="nf"> be_nil</span>
 </span><span class='line'><span class="nf">  resp = </span><span class="nt">@sock2.kill(@uuid).run(:api)</span><span class="nf"></span>
 </span><span class='line'><span class="nf">  resp[“body”].should match(/^\+OK/)</span>
@@ -223,7 +223,7 @@
 <span class='line-number'>13</span>
 <span class='line-number'>14</span>
 <span class='line-number'>15</span>
-</pre></td><td class='code'><pre><code class='cucumber'><span class='line'><span class="k">When </span><span class="nf">/^I dial unknown extension “([^”]*)”$/ do | unknown_extension|</span>
+</pre></td><td class='code'><pre><code class='Cucumber'><span class='line'><span class="k">When </span><span class="nf">/^I dial unknown extension “([^”]*)”$/ do | unknown_extension|</span>
 </span><span class='line'><span class="nf">  orig = </span><span class="nt">@sock2.originate(target:</span><span class="nf"> ‘sofia/external/%s</span><span class="nt">@%s’</span><span class="nf"> % [unknown_extension, </span><span class="nt">@server2],</span><span class="nf"></span>
 </span><span class='line'><span class="nf">  endpoint: “&amp;transfer(‘</span><span class="s">3000</span><span class="nf"> XML default’)”)</span>
 </span><span class='line'><span class="nf">  </span><span class="nt">@resp</span><span class="nf"> = orig.run(:api)</span>
@@ -259,7 +259,7 @@
 <span class='line-number'>8</span>
 <span class='line-number'>9</span>
 <span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='cucumber'><span class='line'><span class="nf">Feature Step Lines</span>
+</pre></td><td class='code'><pre><code class='Cucumber'><span class='line'><span class="nf">Feature Step Lines</span>
 </span><span class='line'>
 </span><span class='line'><span class="nf">      Given /^I have </span><span class="s">2</span><span class="nf"> servers named ([\w.]+) and ([\w.]+)$/ do</span><span class="k"> |</span><span class="s">server1, server2</span><span class="k">|</span><span class="s"></span>
 </span><span class='line'><span class="s">      Given /^([\w.]+) is accessible via the Event Socket$/ do</span><span class="k"> |</span><span class="s">es_server</span><span class="k">|</span><span class="s"></span>
