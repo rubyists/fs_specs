@@ -9,7 +9,8 @@
   <meta name="author" content="Deryl R. Doucette">
 
   
-  <meta name="description" content="FS_SPECS Stable Branch - master As I stated earlier, our ‘master’ branch on GitHub is the ‘Stable Release’ branch for fs_specs. As of today’s date, &hellip;">
+  <meta name="description" content="
+">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -70,153 +71,6 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/fs_specs/blog/2012/02/20/anatomy-of-an-fs-specs-feature-set-000-phone-infrastructure-feature/">Anatomy of an FS_SPECS Feature Set - 000_phone_infrastructure.feature</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-02-20T22:29:00-05:00" pubdate data-updated="true">Feb 20<span>th</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>FS_SPECS Stable Branch - master</p>
-
-<p>As I stated earlier, our ‘master’ branch on GitHub is the ‘Stable Release’ branch for fs_specs. As of today’s date, we currently have 4 Features that test different aspects of FreeSWITCH through FreeSWITCHeR. They are:</p>
-
-<p>000_phone_infrastructure.feature
-001_channel_can_dial_extensions.feature
-002_channel_can_interact_with_voicemail.feature
-003_can_retrieve_channel_information.feature</p>
-
-<p>Over the next few articles I’ll be diving into the anatomy of each feature, the attendant steps, and the FSL::Inbound *Listener classes for each.</p>
-
-<p>Core Feature - 000_phone_infrastructure.feature</p>
-
-<p>Feature: Establish that phone infrastructure is working<br/>
-If we have 2 properly configured freeswitch servers,
-   we want to ensure we can make a connection between the 2 of them,
-   and properly terminate that connection.</p>
-
-<p>   Background:
-   Given I have 2 servers named blackbird.rubyists.com and tigershark.rubyists.com
-   And blackbird.rubyists.com is accessible via the Event Socket</p>
-
-<p>   Scenario: Show that True and False express correctly, and exactly, with should and should_not
-   Then true.should == true
-   And  false.should != true</p>
-
-<p>   Scenario:
-   When I make a phone call
-   Then I should be able to terminate the call</p>
-
-<p>   This feature is the key to the entire set, both existing and those to come. The reason for this is the features job is solely to establish that you have a working configuration for running the rest of the features. If this particular feature fails nothing else will work.</p>
-
-<p>   To see what this feature is actually doing, lets open up the associated ‘steps.rb’ file and look for the matchers that comprise each step of each Scenario as they go along. Background in each feature file sets up stuff we need to make it all work and keeps it existing for each Scenario in the feature rather than tearing it all down in-between each one.</p>
-
-<p>   As we can see from the feature title, this feature set establishes that the phone infrastructure for all remaining tests can be found and is correctly configured. In the Background segment’s Given line, we are checking to ensure we can access both machines listed. The first server listed (blackbird.rubyists.com) is a freeswitch that is being used basically as nothing more than a soft phone. The second server listed (tigershark.rubyists.com) is the actual freeswitch being tested. The And line ensures that we can talk to the soft phone (blackbird) via freeswitch’s EventSocket.</p>
-
-<p>   In the first Scenario, we establish the validity of both ‘true’ and ‘false’ values which establishes the credibility of all remaining tests. If ‘true’ and ‘false’ really aren’t what values they say they are, not a chance in the Universe you can be positive any positive or negative results are valid. Since this is our initialization feature, we put it as the first Scenario.</p>
-
-<p>   In the final Scenario, we concretely establish our baseline configuration by ensuring we can originate a call to freeswitch, and that we can, in turn, terminate that call. The steps which comprise this Feature are as follows:</p>
-
-<p>   Background:
-   Given /<sup>I</sup> have 2 servers named ([\w.]+) and ([\w.]+)$/ do |server1, server2|
-  @server1, @server2 = server1, server2
-@sock1 = FSR::CommandSocket.new(server: @server1, port: 8021)
-  @played_files = []
-  end</p>
-
-<p>  Given /<sup>([\w.]+)</sup> is accessible via the Event Socket$/ do |es_server|
-@sock2 = FSR::CommandSocket.new(server: @server1)
-  @sock2.should_not be_nil
-  end</p>
-
-<p>  Scenario:
-  Then /<sup>true.should</sup> == true$/ do
-  true.should == true
-  end</p>
-
-<p>  Then /<sup>false.should</sup> != true$/ do
-  false.should_not == true
-  end</p>
-
-<p>  Scenario:
-  When /<sup>I</sup> make a phone call$/ do
-orig = @sock2.originate(target: “sofia/external/3000@#{@server2}”, endpoint: ‘&amp;transfer(9664)’)
-  @uuid = orig.run(:api)[‘body’].split[1]</p>
-
-<h1>Due to asynchronous nature of the entire method chain</h1>
-
-<h1>which involves network stack, call plans, etc..</h1>
-
-<h1>We sleep long enough for the call creations have been handled <em>throughout</em> the stack.</h1>
-
-<h1>We limit our sleep times to &lt; 1s in order to wait the last amount of time,</h1>
-
-<h1>and include additional checks oxide the sleep to limit wait time further.</h1>
-
-<p>  30.times do
-  sleep 0.1
-  break if @sock2.calls.run.any?{|call| call.uuid == @uuid }
-  end
-  our_call = @sock2.calls.run.detect { |call| call.uuid == @uuid }
-  fail “No Call Exists!” unless our_call and our_call.uuid == @uuid
-  end</p>
-
-<p>  Then /<sup>I</sup> should be able to terminate the call$/ do
-  @uuid.should_not be_nil</p>
-
-<p>resp = @sock2.kill(@uuid).run(:api)</p>
-
-<p>resp[“body”].should match(/<sup>+OK/)</sup></p>
-
-<p>  30.times do
-  sleep 0.1
-  break unless @sock2.calls.run.detect { |c| c.uuid == @uuid }
-  end</p>
-
-<h1>Make sure there are no calls left still dangling</h1>
-
-<p>  @sock2.calls.run.detect { |c| c.uuid == @uuid }.should be_nil
-  end</p>
-
-<p>  To distill that all down, in the Background we define several ivars for use elsewhere in the Feature, such as @server1, @server2, and use them to open a FSR::CommandSocket to ‘blackbird’, our ‘soft phone’, named @sock1 after which we promptly ensure it was created (not_nil). This establishes that we have a valid connection between the tests and its requirements.</p>
-
-<p>  Immediately after this we open a second FSR::CommandSocket to ‘blackbird’ for conducting the remainder of this feature’s Scenarios. We also populate a @uuid variable for use elsewhere in identifying related traffic, and connect the endpoint to freeswitch’s Music On Hold extension (MoH) 9664.</p>
-
-<p>  The remainder of the code which is inside the 30.times do has us wait for up to 30 seconds to ensure that our call was actually processed. Items such as network delay, host OS issues, etc all play a part in how response times so we cover our butts a bit here to ensure the call actually got created.</p>
-
-<p>  And finally, we terminal the call in order to show we have functional control over everything. This completes our primary test feature. Now that we know we have network connectivity, that our local testing environment is properly configured, that our truthiness can be trusted, and that we can originate/terminate calls, we can move forward into testing components of FreeSWITCH directly.</p>
-
-<p>  That will be the focus of our next article covering 001_channel_can_dial_extensions.feature. The astute observer will notice a bit of overlap between 000 and 001 insofar as that we are testing the ability to connect to extensions, and we implement that same test twice, once in each feature. That is both on purpose, and due to the nature of establishing that you could actually do something with the established CommandSocket in the 000 feature.</p>
-
-<p>  Thanks for reading!</p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
       <h1 class="entry-title"><a href="/fs_specs/blog/2012/02/20/new-post/">New-post</a></h1>
     
     
@@ -241,6 +95,219 @@ orig = @sock2.originate(target: “sofia/external/3000@#{@server2}”, endpoint:
 
 
   <div class="entry-content">
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/fs_specs/blog/2012/02/16/anatomy-of-an-fs-specs-feature-set-000-phone-infrastructure-feature/">Anatomy of an FS_SPECS Feature Set - 000_phone_infrastructure.feature</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-02-16T14:44:00-05:00" pubdate data-updated="true">Feb 16<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>FS_SPECS Stable Branch - master</p>
+
+<p>As I stated earlier, our ‘master’ branch on GitHub is the ‘Stable Release’ branch for fs_specs. As of today’s date, we currently have 4 Features that test different aspects of FreeSWITCH through FreeSWITCHeR. They are:</p>
+
+<p>000_phone_infrastructure.feature
+001_channel_can_dial_extensions.feature
+002_channel_can_interact_with_voicemail.feature
+003_can_retrieve_channel_information.feature</p>
+
+<p>Over the next few articles I’ll be diving into the anatomy of each feature, the attendant steps, and the FSL::Inbound *Listener classes for each.</p>
+
+<p>Core Feature - 000_phone_infrastructure.feature</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='cucumber'><span class='line'><span class="k">Feature:</span><span class="nf"> Establish that phone infrastructure is working  </span>
+</span><span class='line'><span class="nf">If we have 2 properly configured freeswitch servers, </span>
+</span><span class='line'><span class="nf">   we want to ensure we can make a connection between the 2 of them,</span>
+</span><span class='line'><span class="nf">   and properly terminate that connection.</span>
+</span><span class='line'>
+</span><span class='line'><span class="nf">   </span><span class="k">Background:</span><span class="nf"> </span>
+</span><span class='line'><span class="k">   Given </span><span class="nf">I have </span><span class="s">2</span><span class="nf"> servers named blackbird.rubyists.com and tigershark.rubyists.com</span>
+</span><span class='line'><span class="nf">   </span><span class="k">And </span><span class="nf">blackbird.rubyists.com is accessible via the Event Socket</span>
+</span><span class='line'>
+</span><span class='line'><span class="nf">   </span><span class="k">Scenario:</span><span class="nf"> Show that True and False express correctly, and exactly, with should and should_not</span>
+</span><span class='line'><span class="k">   Then </span><span class="nf">true.should == true</span>
+</span><span class='line'><span class="nf">   </span><span class="k">And </span><span class="nf"> false.should != true</span>
+</span><span class='line'>
+</span><span class='line'><span class="nf">   </span><span class="k">Scenario:</span><span class="nf"> </span>
+</span><span class='line'><span class="k">   When </span><span class="nf">I make a phone call</span>
+</span><span class='line'><span class="nf">   </span><span class="k">Then </span><span class="nf">I should be able to terminate the call</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>   This feature is the key to the entire set, both existing and those to come. The reason for this is the features job is solely to establish that you have a working configuration for running the rest of the features. If this particular feature fails nothing else will work.</p>
+
+<p>   To see what this feature is actually doing, lets open up the associated ‘steps.rb’ file and look for the matchers that comprise each step of each Scenario as they go along. Background in each feature file sets up stuff we need to make it all work and keeps it existing for each Scenario in the feature rather than tearing it all down in-between each one.</p>
+
+<p>   As we can see from the feature title, this feature set establishes that the phone infrastructure for all remaining tests can be found and is correctly configured. In the Background segment’s Given line, we are checking to ensure we can access both machines listed. The first server listed (blackbird.rubyists.com) is a freeswitch that is being used basically as nothing more than a soft phone. The second server listed (tigershark.rubyists.com) is the actual freeswitch being tested. The And line ensures that we can talk to the soft phone (blackbird) via freeswitch’s EventSocket.</p>
+
+<p>   In the first Scenario, we establish the validity of both ‘true’ and ‘false’ values which establishes the credibility of all remaining tests. If ‘true’ and ‘false’ really aren’t what values they say they are, not a chance in the Universe you can be positive any positive or negative results are valid. Since this is our initialization feature, we put it as the first Scenario.</p>
+
+<p>   In the final Scenario, we concretely establish our baseline configuration by ensuring we can originate a call to freeswitch, and that we can, in turn, terminate that call. The steps which comprise this Feature are as follows:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+</pre></td><td class='code'><pre><code class='cucumber'><span class='line'><span class="nf">   </span><span class="k">Background:</span><span class="nf"> </span>
+</span><span class='line'><span class="k">   Given </span><span class="nf">/^I have </span><span class="s">2</span><span class="nf"> servers named ([\w.]+) and ([\w.]+)$/ do |server</span><span class="s">1</span><span class="nf">, server</span><span class="s">2</span><span class="nf">|</span>
+</span><span class='line'><span class="nf">  </span><span class="nt">@server1,</span><span class="nf"> </span><span class="nt">@server2</span><span class="nf"> = server</span><span class="s">1</span><span class="nf">, server</span><span class="s">2</span><span class="nf"></span>
+</span><span class='line'><span class="nt">@sock1</span><span class="nf"> = FSR::CommandSocket.new(server: </span><span class="nt">@server1,</span><span class="nf"> port: </span><span class="s">8021</span><span class="nf">)</span>
+</span><span class='line'><span class="nf">  </span><span class="nt">@played_files</span><span class="nf"> = []</span>
+</span><span class='line'><span class="nf">  end</span>
+</span><span class='line'>
+</span><span class='line'><span class="nf">  </span><span class="k">Given </span><span class="nf">/^([\w.]+) is accessible via the Event Socket$/ do |es_server|</span>
+</span><span class='line'><span class="nt">@sock2</span><span class="nf"> = FSR::CommandSocket.new(server: </span><span class="nt">@server1)</span><span class="nf"></span>
+</span><span class='line'><span class="nf">  </span><span class="nt">@sock2.should_not</span><span class="nf"> be_nil</span>
+</span><span class='line'><span class="nf">  end</span>
+</span><span class='line'>
+</span><span class='line'><span class="nf">  </span><span class="k">Scenario:</span><span class="nf"></span>
+</span><span class='line'><span class="k">  Then </span><span class="nf">/^true.should == true$/ do</span>
+</span><span class='line'><span class="nf">  true.should == true</span>
+</span><span class='line'><span class="nf">  end</span>
+</span><span class='line'>
+</span><span class='line'><span class="nf">  </span><span class="k">Then </span><span class="nf">/^false.should != true$/ do</span>
+</span><span class='line'><span class="nf">  false.should_not == true</span>
+</span><span class='line'><span class="nf">  end</span>
+</span><span class='line'>
+</span><span class='line'><span class="nf">  </span><span class="k">Scenario:</span><span class="nf"></span>
+</span><span class='line'><span class="k">  When </span><span class="nf">/^I make a phone call$/ do</span>
+</span><span class='line'><span class="nf">orig = </span><span class="nt">@sock2.originate(target:</span><span class="nf"> “sofia/external/</span><span class="s">3000</span><span class="nt">@#{@server2}”,</span><span class="nf"> endpoint: ‘&amp;transfer(</span><span class="s">9664</span><span class="nf">)’)</span>
+</span><span class='line'><span class="nf">  </span><span class="nt">@uuid</span><span class="nf"> = orig.run(:api)[‘body’].split[</span><span class="s">1</span><span class="nf">]</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># Due to asynchronous nature of the entire method chain</span><span class="nf"></span>
+</span><span class='line'><span class="c"># which involves network stack, call plans, etc..</span><span class="nf"></span>
+</span><span class='line'><span class="c"># We sleep long enough for the call creations have been handled _throughout_ the stack.</span><span class="nf"></span>
+</span><span class='line'><span class="c"># We limit our sleep times to &lt; 1s in order to wait the last amount of time,</span><span class="nf"></span>
+</span><span class='line'><span class="c"># and include additional checks oxide the sleep to limit wait time further.</span><span class="nf"></span>
+</span><span class='line'><span class="nf">  </span><span class="s">30.</span><span class="nf">times do</span>
+</span><span class='line'><span class="nf">  sleep </span><span class="s">0.1</span><span class="nf"></span>
+</span><span class='line'><span class="nf">  break if </span><span class="nt">@sock2.calls.run.any?{|call|</span><span class="nf"> call.uuid == </span><span class="nt">@uuid</span><span class="nf"> }</span>
+</span><span class='line'><span class="nf">  end</span>
+</span><span class='line'><span class="nf">  our_call = </span><span class="nt">@sock2.calls.run.detect</span><span class="nf"> {</span><span class="k"> |</span><span class="s">call</span><span class="k">|</span><span class="s"> call.uuid == @uuid }</span>
+</span><span class='line'><span class="s">  fail “No Call Exists!” unless our_call and our_call.uuid == @uuid</span>
+</span><span class='line'><span class="s">  end</span>
+</span><span class='line'>
+</span><span class='line'><span class="s">  Then /^I should be able to terminate the call$/ do</span>
+</span><span class='line'><span class="s">  @uuid.should_not be_nil</span>
+</span><span class='line'>
+</span><span class='line'><span class="s">resp = @sock2.kill(@uuid).run(:api)</span>
+</span><span class='line'>
+</span><span class='line'><span class="s">resp[“body”].should match(/^\+OK/)</span>
+</span><span class='line'>
+</span><span class='line'><span class="s">  30.times do</span>
+</span><span class='line'><span class="s">  sleep 0.1</span>
+</span><span class='line'><span class="s">  break unless @sock2.calls.run.detect {</span><span class="k"> |</span><span class="s">c</span><span class="k">|</span><span class="s"> c.uuid == @uuid }</span>
+</span><span class='line'><span class="s">  end</span>
+</span><span class='line'><span class="c"># Make sure there are no calls left still dangling</span><span class="s"></span>
+</span><span class='line'><span class="s">  @sock2.calls.run.detect {</span><span class="k"> |</span><span class="s">c</span><span class="k">|</span><span class="s"> c.uuid == @uuid }.should be_nil</span>
+</span><span class='line'><span class="s">  end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>  To distill that all down, in the Background we define several ivars for use elsewhere in the Feature, such as @server1, @server2, and use them to open a FSR::CommandSocket to ‘blackbird’, our ‘soft phone’, named @sock1 after which we promptly ensure it was created (not_nil). This establishes that we have a valid connection between the tests and its requirements.</p>
+
+<p>  Immediately after this we open a second FSR::CommandSocket to ‘blackbird’ for conducting the remainder of this feature’s Scenarios. We also populate a @uuid variable for use elsewhere in identifying related traffic, and connect the endpoint to freeswitch’s Music On Hold extension (MoH) 9664.</p>
+
+<p>  The remainder of the code which is inside the 30.times do has us wait for up to 30 seconds to ensure that our call was actually processed. Items such as network delay, host OS issues, etc all play a part in how response times so we cover our butts a bit here to ensure the call actually got created.</p>
+
+<p>  And finally, we terminal the call in order to show we have functional control over everything. This completes our primary test feature. Now that we know we have network connectivity, that our local testing environment is properly configured, that our truthiness can be trusted, and that we can originate/terminate calls, we can move forward into testing components of FreeSWITCH directly.</p>
+
+<p>  That will be the focus of our next article covering 001_channel_can_dial_extensions.feature. The astute observer will notice a bit of overlap between 000 and 001 insofar as that we are testing the ability to connect to extensions, and we implement that same test twice, once in each feature. That is both on purpose, and due to the nature of establishing that you could actually do something with the established CommandSocket in the 000 feature.</p>
+
+<p>  Thanks for reading!</p>
 </div>
   
   
@@ -361,11 +428,11 @@ orig = @sock2.originate(target: “sofia/external/3000@#{@server2}”, endpoint:
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/fs_specs/blog/2012/02/20/anatomy-of-an-fs-specs-feature-set-000-phone-infrastructure-feature/">Anatomy of an FS_SPECS Feature Set - 000_phone_infrastructure.feature</a>
+        <a href="/fs_specs/blog/2012/02/20/new-post/">new-post</a>
       </li>
     
       <li class="post">
-        <a href="/fs_specs/blog/2012/02/20/new-post/">new-post</a>
+        <a href="/fs_specs/blog/2012/02/16/anatomy-of-an-fs-specs-feature-set-000-phone-infrastructure-feature/">Anatomy of an FS_SPECS Feature Set - 000_phone_infrastructure.feature</a>
       </li>
     
       <li class="post">
