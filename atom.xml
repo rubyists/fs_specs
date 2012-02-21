@@ -4,7 +4,7 @@
   <title><![CDATA[FreeSWITCH And FreeSWITCHeR Ruby Library]]></title>
   <link href="http://rubyists.github.com/fs_specs/atom.xml" rel="self"/>
   <link href="http://rubyists.github.com/fs_specs/"/>
-  <updated>2012-02-20T23:18:33-05:00</updated>
+  <updated>2012-02-20T23:22:44-05:00</updated>
   <id>http://rubyists.github.com/fs_specs/</id>
   <author>
     <name><![CDATA[Deryl R. Doucette]]></name>
@@ -274,9 +274,9 @@
     <link href="http://rubyists.github.com/fs_specs/blog/2012/02/16/anatomy-of-an-fs-specs-feature-set-000-phone-infrastructure-feature/"/>
     <updated>2012-02-16T14:44:00-05:00</updated>
     <id>http://rubyists.github.com/fs_specs/blog/2012/02/16/anatomy-of-an-fs-specs-feature-set-000-phone-infrastructure-feature</id>
-    <content type="html"><![CDATA[<h2>FS_SPECS Stable Branch - master</h2>
+    <content type="html"><![CDATA[<h3>FS_SPECS Stable Branch - <a href="https://github.com/rubyists/fs_specs">master</a></h3>
 
-<p>As I stated earlier, our ‘master’ branch on GitHub is the ‘Stable Release’ branch for fs_specs. As of today’s date, we currently have 4 Features that test different aspects of FreeSWITCH through FreeSWITCHeR. They are:</p>
+<p>As I stated earlier, our ‘master’ branch on <a href="https://github.com">GitHub</a> is the ‘Stable Release’ branch for fs_specs. As of today’s date, we currently have 4 Features that test different aspects of FreeSWITCH through FreeSWITCHeR. They are:</p>
 
 <ul>
 <li>000_phone_infrastructure.feature</li>
@@ -288,7 +288,7 @@
 
 <p>Over the next few articles I’ll be diving into the anatomy of each feature, the attendant steps, and the <strong>FSL::Inbound</strong> xxListener classes for each.</p>
 
-<h2>Core Feature - 000_phone_infrastructure.feature</h2>
+<h3>Core Feature - <a href="https://github.com/rubyists/fs_specs/blob/master/features/000_phone_infrastructure.feature">000_phone_infrastructure.feature</a></h3>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
