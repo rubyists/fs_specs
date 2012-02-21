@@ -4,7 +4,7 @@
   <title><![CDATA[FreeSWITCH And FreeSWITCHeR Ruby Library]]></title>
   <link href="http://rubyists.github.com/fs_specs/atom.xml" rel="self"/>
   <link href="http://rubyists.github.com/fs_specs/"/>
-  <updated>2012-02-20T23:16:43-05:00</updated>
+  <updated>2012-02-20T23:18:33-05:00</updated>
   <id>http://rubyists.github.com/fs_specs/</id>
   <author>
     <name><![CDATA[Deryl R. Doucette]]></name>
@@ -187,11 +187,11 @@
 <span class='line-number'>10</span>
 </pre></td><td class='code'><pre><code class='Cucumber'><span class='line'><span class="nf">Feature Step Lines</span>
 </span><span class='line'>
-</span><span class='line'><span class="nf">      Given /^I have </span><span class="s">2</span><span class="nf"> servers named ([\w.]+) and ([\w.]+)$/ do</span><span class="k"> |</span><span class="s">server1, server2</span><span class="k">|</span><span class="s"></span>
-</span><span class='line'><span class="s">      Given /^([\w.]+) is accessible via the Event Socket$/ do</span><span class="k"> |</span><span class="s">es_server</span><span class="k">|</span><span class="s"></span>
-</span><span class='line'><span class="s">     When /^I dial extension &quot;([^&quot;]*)&quot; on ([\w.]+)$/ do</span><span class="k"> |</span><span class="s">known_extension, server</span><span class="k">|</span><span class="s"></span>
-</span><span class='line'><span class="s">     Then /^I should be connected to that extension$/ do</span>
-</span><span class='line'><span class="s">     Then /^I should be able to terminate the call$/ do</span>
+</span><span class='line'><span class="nf">    Given /^I have </span><span class="s">2</span><span class="nf"> servers named ([\w.]+) and ([\w.]+)$/ do</span><span class="k"> |</span><span class="s">server1, server2</span><span class="k">|</span><span class="s"></span>
+</span><span class='line'><span class="s">    Given /^([\w.]+) is accessible via the Event Socket$/ do</span><span class="k"> |</span><span class="s">es_server</span><span class="k">|</span><span class="s"></span>
+</span><span class='line'><span class="s">    When /^I dial extension &quot;([^&quot;]*)&quot; on ([\w.]+)$/ do</span><span class="k"> |</span><span class="s">known_extension, server</span><span class="k">|</span><span class="s"></span>
+</span><span class='line'><span class="s">    Then /^I should be connected to that extension$/ do</span>
+</span><span class='line'><span class="s">    Then /^I should be able to terminate the call$/ do</span>
 </span><span class='line'><span class="s">    When /^I dial unknown extension &quot;([^&quot;]*)&quot;$/ do</span><span class="k"> |</span><span class="s"> unknown_extension</span><span class="k">|</span><span class="s"></span>
 </span><span class='line'><span class="s">    Then /^I should be notified the call failed$/ do</span>
 </span><span class='line'><span class="s">    Then /^I should recieve call failure type &quot;([^&quot;]*)&quot;$/ do</span><span class="k"> |</span><span class="s">failure_type</span><span class="k">|</span><span class="s"></span>
@@ -227,7 +227,7 @@
 <span class='line-number'>25</span>
 <span class='line-number'>26</span>
 <span class='line-number'>27</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="vi">@server1</span><span class="p">,</span> <span class="vi">@server2</span> <span class="o">=</span> <span class="n">server1</span><span class="p">,</span> <span class="n">server2</span>
+</pre></td><td class='code'><pre><code class='Ruby'><span class='line'><span class="vi">@server1</span><span class="p">,</span> <span class="vi">@server2</span> <span class="o">=</span> <span class="n">server1</span><span class="p">,</span> <span class="n">server2</span>
 </span><span class='line'><span class="vi">@sock1</span> <span class="o">=</span> <span class="no">FSR</span><span class="o">::</span><span class="no">CommandSocket</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">server</span><span class="p">:</span> <span class="vi">@server1</span><span class="p">,</span> <span class="n">port</span><span class="p">:</span> <span class="mi">8021</span><span class="p">)</span>
 </span><span class='line'><span class="vi">@played_files</span> <span class="o">=</span> <span class="o">[]</span>
 </span><span class='line'><span class="vi">@sock2</span> <span class="o">=</span> <span class="no">FSR</span><span class="o">::</span><span class="no">CommandSocket</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">server</span><span class="p">:</span> <span class="vi">@server1</span><span class="p">)</span>
@@ -259,9 +259,7 @@
 
 <hr />
 
-<p>Total Step Lines: 8
-Total Code Lines: 25
-Code To Step Ratio: 3:1</p>
+<p>Total Step Lines: 8 | Total Code Lines: 25 | Code To Step Ratio: 3:1</p>
 
 <hr />
 
