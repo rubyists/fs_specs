@@ -4,7 +4,7 @@
   <title><![CDATA[FreeSWITCH And FreeSWITCHeR Ruby Library]]></title>
   <link href="http://rubyists.github.com/fs_specs/atom.xml" rel="self"/>
   <link href="http://rubyists.github.com/fs_specs/"/>
-  <updated>2012-02-20T22:52:03-05:00</updated>
+  <updated>2012-02-20T22:53:45-05:00</updated>
   <id>http://rubyists.github.com/fs_specs/</id>
   <author>
     <name><![CDATA[Deryl R. Doucette]]></name>
@@ -22,7 +22,7 @@
 
 <p>In this article, we’ll be discussing interacting with FreeSWITCH’s voicemail system. This Feature will require that we write our own custom Listener class that we attach to the EventSocket’s on_event() method using our own customized handle_event() method.</p>
 
-<p>Core Feature - <a href="https://github.com/rubyists/fs_specs/blob/master/features/002_channel_can_interact_with_voicemail.features">002_channel_can_interact_with_voicemail.feature</a></p>
+<p>Core Feature - <a href="https://github.com/rubyists/fs_specs/blob/master/features/002_channel_can_interact_with_voicemail.feature">002_channel_can_interact_with_voicemail.feature</a></p>
 
 <p>Here is the Feature itself.</p>
 
