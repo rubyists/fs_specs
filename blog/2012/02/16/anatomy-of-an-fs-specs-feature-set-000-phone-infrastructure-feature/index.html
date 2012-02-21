@@ -102,7 +102,7 @@
 </ul>
 
 
-<p>Over the next few articles I’ll be diving into the anatomy of each feature, the attendant steps, and the <strong>FSL::Inbound</strong> xxListener classes for each.</p>
+<p>Over the next few articles I’ll be diving into the anatomy of each feature, the attendant steps, and the <em>FSL::Inbound</em> xxListener classes for each.</p>
 
 <h3>Core Feature - <a href="https://github.com/rubyists/fs_specs/blob/master/features/000_phone_infrastructure.feature">000_phone_infrastructure.feature</a></h3>
 
@@ -260,9 +260,9 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>  To distill that all down, in the Background we define several ivars for use elsewhere in the Feature, such as <strong>@server1</strong>, <strong>@server2</strong>, and use them to open a <strong>FSR::CommandSocket</strong> to ‘blackbird’, our ‘soft phone’, named @sock1 after which we promptly ensure it was created (not_nil). This establishes that we have a valid connection between the tests and its requirements.</p>
+<p>  To distill that all down, in the Background we define several ivars for use elsewhere in the Feature, such as <em>@server1</em>, <em>@server2</em>, and use them to open a <em>FSR::CommandSocket</em> to ‘blackbird’, our ‘soft phone’, named @sock1 after which we promptly ensure it was created (not_nil). This establishes that we have a valid connection between the tests and its requirements.</p>
 
-<p>  Immediately after this we open a second <strong>FSR::CommandSocket</strong> to ‘blackbird’ for conducting the remainder of this feature’s Scenarios. We also populate a <strong>@uuid</strong> variable for use elsewhere in identifying related traffic, and connect the endpoint to freeswitch’s Music On Hold extension (MoH) 9664.</p>
+<p>  Immediately after this we open a second <em>FSR::CommandSocket</em> to ‘blackbird’ for conducting the remainder of this feature’s Scenarios. We also populate a <em>@uuid</em> variable for use elsewhere in identifying related traffic, and connect the endpoint to freeswitch’s Music On Hold extension (MoH) 9664.</p>
 
 <p>  The remainder of the code which is inside the 30.times do has us wait for up to 30 seconds to ensure that our call was actually processed. Items such as network delay, host OS issues, etc all play a part in how response times so we cover our butts a bit here to ensure the call actually got created.</p>
 

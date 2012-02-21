@@ -388,7 +388,7 @@
 </ul>
 
 
-<p>Over the next few articles I’ll be diving into the anatomy of each feature, the attendant steps, and the <strong>FSL::Inbound</strong> xxListener classes for each.</p>
+<p>Over the next few articles I’ll be diving into the anatomy of each feature, the attendant steps, and the <em>FSL::Inbound</em> xxListener classes for each.</p>
 
 <h3>Core Feature - <a href="https://github.com/rubyists/fs_specs/blob/master/features/000_phone_infrastructure.feature">000_phone_infrastructure.feature</a></h3>
 
@@ -546,9 +546,9 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>  To distill that all down, in the Background we define several ivars for use elsewhere in the Feature, such as <strong>@server1</strong>, <strong>@server2</strong>, and use them to open a <strong>FSR::CommandSocket</strong> to ‘blackbird’, our ‘soft phone’, named @sock1 after which we promptly ensure it was created (not_nil). This establishes that we have a valid connection between the tests and its requirements.</p>
+<p>  To distill that all down, in the Background we define several ivars for use elsewhere in the Feature, such as <em>@server1</em>, <em>@server2</em>, and use them to open a <em>FSR::CommandSocket</em> to ‘blackbird’, our ‘soft phone’, named @sock1 after which we promptly ensure it was created (not_nil). This establishes that we have a valid connection between the tests and its requirements.</p>
 
-<p>  Immediately after this we open a second <strong>FSR::CommandSocket</strong> to ‘blackbird’ for conducting the remainder of this feature’s Scenarios. We also populate a <strong>@uuid</strong> variable for use elsewhere in identifying related traffic, and connect the endpoint to freeswitch’s Music On Hold extension (MoH) 9664.</p>
+<p>  Immediately after this we open a second <em>FSR::CommandSocket</em> to ‘blackbird’ for conducting the remainder of this feature’s Scenarios. We also populate a <em>@uuid</em> variable for use elsewhere in identifying related traffic, and connect the endpoint to freeswitch’s Music On Hold extension (MoH) 9664.</p>
 
 <p>  The remainder of the code which is inside the 30.times do has us wait for up to 30 seconds to ensure that our call was actually processed. Items such as network delay, host OS issues, etc all play a part in how response times so we cover our butts a bit here to ensure the call actually got created.</p>
 
@@ -603,11 +603,11 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p> In <strong>handle_event(event)</strong>, we datamatch against channel_state and call_state based on the thrown events using a hash of <strong>WANTED_STATE</strong>. Basically, right now I&#8217;m trying to map the events thrown for both channel_state and call_state changes, and the channel state sequences that get thrown per event.</p>
+<p> In <em>handle_event(event)</em>, we datamatch against channel_state and call_state based on the thrown events using a hash of <em>WANTED_STATE</em>. Basically, right now I&#8217;m trying to map the events thrown for both channel_state and call_state changes, and the channel state sequences that get thrown per event.</p>
 
 <p>  E.g channel has an associated call, that call could be hanging up, dialing another extension, calling into voicemail, et al. The channel has state for length of its call&#8217;s action. The call has state for the specific action done. Routing and call progression states also affect channel state.</p>
 
-<p>  Channels have calls, both fire off events, events have names (<strong>CHANNEL_EXECUTE</strong>) and fire in specific order for a particular &#8216;action&#8217;, providing a mechanism for constant feedback on the current status of the channel and its associated call. The events fired are affected by the specific channel state e.g <strong>CS_HANGUP</strong> or <strong>CS_DESTROY</strong> and, internally, the call state e.g <strong>HANGUP</strong> or <strong>DESTROY</strong>.</p>
+<p>  Channels have calls, both fire off events, events have names (<em>CHANNEL_EXECUTE</em>) and fire in specific order for a particular &#8216;action&#8217;, providing a mechanism for constant feedback on the current status of the channel and its associated call. The events fired are affected by the specific channel state e.g <em>CS_HANGUP</em> or <em>CS_DESTROY</em> and, internally, the call state e.g <em>HANGUP</em> or <em>DESTROY</em>.</p>
 
 <p> Its the combination of these three status/state settings (event, channel, &#8216;call/action&#8217;) that reveal the inner workings of whats going on inside FreeSWITCH as it sees things, the channel, and the call. Grouping the channel&#8217;s event chain for a specific action on that channel, and then mapping the channel state changes that take place during that channel&#8217;s lifecycle, and the channel&#8217;s call lifecycle I believe provides value by exposing that internal coordination in such a way it can be readily and repeatably tested in a myriad of combinations.</p>
 </div>
