@@ -93,7 +93,7 @@
 
 <div class="entry-content"><p>  What I was attempting to explain in the conferences was the subject of testing events within the context of channel and call state changes, and tracking those states for purposes of refining the granularity of both steps and EventSocket listener classes. I wasn&#8217;t .. clear .. (understatement) while explaining.</p>
 
-<p>  So, thats what the next week of blog articles is about :) What we&#8217;re doing is taking Cucumber feature sets, augmented with RSpec for matchers, and using EventMachine, the FreeSWITCHeR ruby library, and a couple FreeSWITCH softswitches to:</p>
+<p>  So, thats what the next week of blog articles is about :) What we&#8217;re doing is taking Cucumber feature sets, augmented with RSpec for matchers, and using EventMachine, the FreeSWITCHeR ruby library, and a couple FreeSWITCH soft-switches to:</p>
 
 <p>  Open a Listener Hook into on_event with:</p>
 
@@ -102,9 +102,9 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p> In <em>handle_event(event)</em>, we datamatch against channel_state and call_state based on the thrown events using a hash of <em>WANTED_STATE</em>. Basically, right now I&#8217;m trying to map the events thrown for both channel_state and call_state changes, and the channel state sequences that get thrown per event.</p>
+<p> In <em>handle_event(event)</em>, we data match against channel_state and call_state based on the thrown events using a hash of <em>WANTED_STATE</em>. Basically, right now I&#8217;m trying to map the events thrown for both channel_state and call_state changes, and the channel state sequences that get thrown per event.</p>
 
-<p>  E.g channel has an associated call, that call could be hanging up, dialing another extension, calling into voicemail, et al. The channel has state for length of its call&#8217;s action. The call has state for the specific action done. Routing and call progression states also affect channel state.</p>
+<p>  E.g channel has an associated call, that call could be hanging up, dialling another extension, calling into voicemail, et al. The channel has state for length of its call&#8217;s action. The call has state for the specific action done. Routing and call progression states also affect channel state.</p>
 
 <p>  Channels have calls, both fire off events, events have names (<em>CHANNEL_EXECUTE</em>) and fire in specific order for a particular &#8216;action&#8217;, providing a mechanism for constant feedback on the current status of the channel and its associated call. The events fired are affected by the specific channel state e.g <em>CS_HANGUP</em> or <em>CS_DESTROY</em> and, internally, the call state e.g <em>HANGUP</em> or <em>DESTROY</em>.</p>
 
