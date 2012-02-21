@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>FreeSWITCH And FreeSWITCHeR Ruby Library</title>
+  <title>Checking Out Extensions - 001_channel_can_dial_extensions feature - FreeSWITCH And FreeSWITCHeR Ruby Library</title>
   <meta name="author" content="Deryl R. Doucette">
 
   
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://rubyists.github.com/fs_specs">
+  <link rel="canonical" href="http://rubyists.github.com/fs_specs/blog/2012/02/17/checking-out-extensions-001-channel-can-dial-extensions-feature">
   <link href="/fs_specs/favicon.png" rel="icon">
   <link href="/fs_specs/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/fs_specs/javascripts/modernizr-2.0.js"></script>
@@ -62,15 +62,12 @@
 </nav>
   <div id="main">
     <div id="content">
-      <div class="blog-index">
+      <div>
+<article class="hentry" role="article">
   
-  
-  
-    <article>
-      
   <header>
     
-      <h1 class="entry-title"><a href="/fs_specs/blog/2012/02/17/checking-out-extensions-001-channel-can-dial-extensions-feature/">Checking Out Extensions - 001_channel_can_dial_extensions Feature</a></h1>
+      <h1 class="entry-title">Checking Out Extensions - 001_channel_can_dial_extensions Feature</h1>
     
     
       <p class="meta">
@@ -93,7 +90,7 @@
   </header>
 
 
-  <div class="entry-content"><h3>Core Feature - 001_channel_can_dial_extensions.feature</h3>
+<div class="entry-content"><h3>Core Feature - 001_channel_can_dial_extensions.feature</h3>
 
 <p>As I said in the previous article, there is some overlap here. [note: I will be referring to features by their ordering number e.g 000]. 000 also dials an extension, but in this feature we wanted to specifically isolate, and focus on, that distinct capability of dialling extensions.</p>
 
@@ -346,238 +343,16 @@ Code To Step Ratio: 3:1</p>
 
 <p>  Our next article will add more to the pot because we’ll be adding in our first Listener class for handling events on the Listener we create and attach to the EventSocket. Anyone who wants a heads up can look over here.</p>
 </div>
-  
-  
 
 
-    </article>
-  
-  
-    <article>
+  <footer>
+    <p class="meta">
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/fs_specs/blog/2012/02/16/anatomy-of-an-fs-specs-feature-set-000-phone-infrastructure-feature/">Anatomy of an FS_SPECS Feature Set - 000_phone_infrastructure.feature</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
   
 
+<span class="byline author vcard">Posted by <span class="fn">Deryl R. Doucette</span></span>
 
-<time datetime="2012-02-16T14:44:00-05:00" pubdate data-updated="true">Feb 16<span>th</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h2>FS_SPECS Stable Branch - master</h2>
-
-<p>As I stated earlier, our ‘master’ branch on GitHub is the ‘Stable Release’ branch for fs_specs. As of today’s date, we currently have 4 Features that test different aspects of FreeSWITCH through FreeSWITCHeR. They are:</p>
-
-<ul>
-<li>000_phone_infrastructure.feature</li>
-<li>001_channel_can_dial_extensions.feature</li>
-<li>002_channel_can_interact_with_voicemail.feature</li>
-<li>003_can_retrieve_channel_information.feature</li>
-</ul>
-
-
-<p>Over the next few articles I’ll be diving into the anatomy of each feature, the attendant steps, and the <strong>FSL::Inbound</strong> xxListener classes for each.</p>
-
-<h2>Core Feature - 000_phone_infrastructure.feature</h2>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-</pre></td><td class='code'><pre><code class='cucumber'><span class='line'><span class="k">Feature:</span><span class="nf"> Establish that phone infrastructure is working  </span>
-</span><span class='line'><span class="nf">If we have 2 properly configured freeswitch servers, </span>
-</span><span class='line'><span class="nf">   we want to ensure we can make a connection between the 2 of them,</span>
-</span><span class='line'><span class="nf">   and properly terminate that connection.</span>
-</span><span class='line'>
-</span><span class='line'><span class="nf">   </span><span class="k">Background:</span><span class="nf"> </span>
-</span><span class='line'><span class="k">   Given </span><span class="nf">I have </span><span class="s">2</span><span class="nf"> servers named blackbird.rubyists.com and tigershark.rubyists.com</span>
-</span><span class='line'><span class="nf">   </span><span class="k">And </span><span class="nf">blackbird.rubyists.com is accessible via the Event Socket</span>
-</span><span class='line'>
-</span><span class='line'><span class="nf">   </span><span class="k">Scenario:</span><span class="nf"> Show that True and False express correctly, and exactly, with should and should_not</span>
-</span><span class='line'><span class="k">   Then </span><span class="nf">true.should == true</span>
-</span><span class='line'><span class="nf">   </span><span class="k">And </span><span class="nf"> false.should != true</span>
-</span><span class='line'>
-</span><span class='line'><span class="nf">   </span><span class="k">Scenario:</span><span class="nf"> </span>
-</span><span class='line'><span class="k">   When </span><span class="nf">I make a phone call</span>
-</span><span class='line'><span class="nf">   </span><span class="k">Then </span><span class="nf">I should be able to terminate the call</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>   This feature is the key to the entire set, both existing and those to come. The reason for this is the features job is solely to establish that you have a working configuration for running the rest of the features. If this particular feature fails nothing else will work.</p>
-
-<p>   To see what this feature is actually doing, lets open up the associated <a href="https://github.com/rubyists/fs_specs/blob/master/features/step_definitions/steps.rb">‘steps.rb’</a> file and look for the matchers that comprise each step of each Scenario as they go along. Background in each feature file sets up stuff we need to make it all work and keeps it existing for each Scenario in the feature rather than tearing it all down in-between each one.</p>
-
-<p>   As we can see from the feature title, this feature set establishes that the phone infrastructure for all remaining tests can be found and is correctly configured. In the Background segment’s Given line, we are checking to ensure we can access both machines listed. The first server listed (blackbird.rubyists.com) is a freeswitch that is being used basically as nothing more than a soft phone. The second server listed (tigershark.rubyists.com) is the actual freeswitch being tested. The And line ensures that we can talk to the soft phone (blackbird) via freeswitch’s EventSocket.</p>
-
-<p>   In the first Scenario, we establish the validity of both ‘true’ and ‘false’ values which establishes the credibility of all remaining tests. If ‘true’ and ‘false’ really aren’t what values they say they are, not a chance in the Universe you can be positive any positive or negative results are valid. Since this is our initialization feature, we put it as the first Scenario.</p>
-
-<p>   In the final Scenario, we concretely establish our baseline configuration by ensuring we can originate a call to freeswitch, and that we can, in turn, terminate that call. The steps which comprise this Feature are as follows:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-</pre></td><td class='code'><pre><code class='cucumber'><span class='line'><span class="nf">   </span><span class="k">Background:</span><span class="nf"> </span>
-</span><span class='line'><span class="k">   Given </span><span class="nf">/^I have </span><span class="s">2</span><span class="nf"> servers named ([\w.]+) and ([\w.]+)$/ do |server</span><span class="s">1</span><span class="nf">, server</span><span class="s">2</span><span class="nf">|</span>
-</span><span class='line'><span class="nf">  </span><span class="nt">@server1,</span><span class="nf"> </span><span class="nt">@server2</span><span class="nf"> = server</span><span class="s">1</span><span class="nf">, server</span><span class="s">2</span><span class="nf"></span>
-</span><span class='line'><span class="nt">@sock1</span><span class="nf"> = FSR::CommandSocket.new(server: </span><span class="nt">@server1,</span><span class="nf"> port: </span><span class="s">8021</span><span class="nf">)</span>
-</span><span class='line'><span class="nf">  </span><span class="nt">@played_files</span><span class="nf"> = []</span>
-</span><span class='line'><span class="nf">  end</span>
-</span><span class='line'>
-</span><span class='line'><span class="nf">  </span><span class="k">Given </span><span class="nf">/^([\w.]+) is accessible via the Event Socket$/ do |es_server|</span>
-</span><span class='line'><span class="nt">@sock2</span><span class="nf"> = FSR::CommandSocket.new(server: </span><span class="nt">@server1)</span><span class="nf"></span>
-</span><span class='line'><span class="nf">  </span><span class="nt">@sock2.should_not</span><span class="nf"> be_nil</span>
-</span><span class='line'><span class="nf">  end</span>
-</span><span class='line'>
-</span><span class='line'><span class="nf">  </span><span class="k">Scenario:</span><span class="nf"></span>
-</span><span class='line'><span class="k">  Then </span><span class="nf">/^true.should == true$/ do</span>
-</span><span class='line'><span class="nf">  true.should == true</span>
-</span><span class='line'><span class="nf">  end</span>
-</span><span class='line'>
-</span><span class='line'><span class="nf">  </span><span class="k">Then </span><span class="nf">/^false.should != true$/ do</span>
-</span><span class='line'><span class="nf">  false.should_not == true</span>
-</span><span class='line'><span class="nf">  end</span>
-</span><span class='line'>
-</span><span class='line'><span class="nf">  </span><span class="k">Scenario:</span><span class="nf"></span>
-</span><span class='line'><span class="k">  When </span><span class="nf">/^I make a phone call$/ do</span>
-</span><span class='line'><span class="nf">orig = </span><span class="nt">@sock2.originate(target:</span><span class="nf"> “sofia/external/</span><span class="s">3000</span><span class="nt">@#{@server2}”,</span><span class="nf"> endpoint: ‘&amp;transfer(</span><span class="s">9664</span><span class="nf">)’)</span>
-</span><span class='line'><span class="nf">  </span><span class="nt">@uuid</span><span class="nf"> = orig.run(:api)[‘body’].split[</span><span class="s">1</span><span class="nf">]</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># Due to asynchronous nature of the entire method chain</span><span class="nf"></span>
-</span><span class='line'><span class="c"># which involves network stack, call plans, etc..</span><span class="nf"></span>
-</span><span class='line'><span class="c"># We sleep long enough for the call creations have been handled _throughout_ the stack.</span><span class="nf"></span>
-</span><span class='line'><span class="c"># We limit our sleep times to &lt; 1s in order to wait the last amount of time,</span><span class="nf"></span>
-</span><span class='line'><span class="c"># and include additional checks oxide the sleep to limit wait time further.</span><span class="nf"></span>
-</span><span class='line'><span class="nf">  </span><span class="s">30.</span><span class="nf">times do</span>
-</span><span class='line'><span class="nf">  sleep </span><span class="s">0.1</span><span class="nf"></span>
-</span><span class='line'><span class="nf">  break if </span><span class="nt">@sock2.calls.run.any?{|call|</span><span class="nf"> call.uuid == </span><span class="nt">@uuid</span><span class="nf"> }</span>
-</span><span class='line'><span class="nf">  end</span>
-</span><span class='line'><span class="nf">  our_call = </span><span class="nt">@sock2.calls.run.detect</span><span class="nf"> {</span><span class="k"> |</span><span class="s">call</span><span class="k">|</span><span class="s"> call.uuid == @uuid }</span>
-</span><span class='line'><span class="s">  fail “No Call Exists!” unless our_call and our_call.uuid == @uuid</span>
-</span><span class='line'><span class="s">  end</span>
-</span><span class='line'>
-</span><span class='line'><span class="s">  Then /^I should be able to terminate the call$/ do</span>
-</span><span class='line'><span class="s">  @uuid.should_not be_nil</span>
-</span><span class='line'>
-</span><span class='line'><span class="s">resp = @sock2.kill(@uuid).run(:api)</span>
-</span><span class='line'>
-</span><span class='line'><span class="s">resp[“body”].should match(/^\+OK/)</span>
-</span><span class='line'>
-</span><span class='line'><span class="s">  30.times do</span>
-</span><span class='line'><span class="s">  sleep 0.1</span>
-</span><span class='line'><span class="s">  break unless @sock2.calls.run.detect {</span><span class="k"> |</span><span class="s">c</span><span class="k">|</span><span class="s"> c.uuid == @uuid }</span>
-</span><span class='line'><span class="s">  end</span>
-</span><span class='line'><span class="c"># Make sure there are no calls left still dangling</span><span class="s"></span>
-</span><span class='line'><span class="s">  @sock2.calls.run.detect {</span><span class="k"> |</span><span class="s">c</span><span class="k">|</span><span class="s"> c.uuid == @uuid }.should be_nil</span>
-</span><span class='line'><span class="s">  end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>  To distill that all down, in the Background we define several ivars for use elsewhere in the Feature, such as <strong>@server1</strong>, <strong>@server2</strong>, and use them to open a <strong>FSR::CommandSocket</strong> to ‘blackbird’, our ‘soft phone’, named @sock1 after which we promptly ensure it was created (not_nil). This establishes that we have a valid connection between the tests and its requirements.</p>
-
-<p>  Immediately after this we open a second <strong>FSR::CommandSocket</strong> to ‘blackbird’ for conducting the remainder of this feature’s Scenarios. We also populate a <strong>@uuid</strong> variable for use elsewhere in identifying related traffic, and connect the endpoint to freeswitch’s Music On Hold extension (MoH) 9664.</p>
-
-<p>  The remainder of the code which is inside the 30.times do has us wait for up to 30 seconds to ensure that our call was actually processed. Items such as network delay, host OS issues, etc all play a part in how response times so we cover our butts a bit here to ensure the call actually got created.</p>
-
-<p>  And finally, we terminal the call in order to show we have functional control over everything. This completes our primary test feature. Now that we know we have network connectivity, that our local testing environment is properly configured, that our truthiness can be trusted, and that we can originate/terminate calls, we can move forward into testing components of FreeSWITCH directly.</p>
-
-<p>  That will be the focus of our next article covering 001_channel_can_dial_extensions.feature. The astute observer will notice a bit of overlap between 000 and 001 insofar as that we are testing the ability to connect to extensions, and we implement that same test twice, once in each feature. That is both on purpose, and due to the nature of establishing that you could actually do something with the established CommandSocket in the 000 feature.</p>
-
-<p>  Thanks for reading!</p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/fs_specs/blog/2012/02/15/stage-fright-gone-brief-synopsis-of-goal/">Stage Fright Gone! Brief Synopsis of Goal</a></h1>
-    
-    
-      <p class="meta">
-        
 
 
 
@@ -589,94 +364,34 @@ Code To Step Ratio: 3:1</p>
   
 
 
-<time datetime="2012-02-15T20:53:00-05:00" pubdate data-updated="true">Feb 15<span>th</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>  What I was attempting to explain in the conferences was the subject of testing events within the context of channel and call state changes, and tracking those states for purposes of refining the granularity of both steps and EventSocket listener classes. I wasn&#8217;t .. clear .. (understatement) while explaining.</p>
-
-<p>  So, thats what the next week of blog articles is about :) What we&#8217;re doing is taking Cucumber feature sets, augmented with RSpec for matchers, and using EventMachine, the FreeSWITCHeR ruby library, and a couple FreeSWITCH softswitches to:</p>
-
-<p>  Open a Listener Hook into on_event with:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'>  <span class="n">add_event</span><span class="p">(</span><span class="ss">:ALL</span><span class="p">){</span> <span class="o">|</span><span class="n">event</span><span class="o">|</span> <span class="n">handle_event</span><span class="p">(</span><span class="n">event</span><span class="p">)</span> <span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p> In <strong>handle_event(event)</strong>, we datamatch against channel_state and call_state based on the thrown events using a hash of <strong>WANTED_STATE</strong>. Basically, right now I&#8217;m trying to map the events thrown for both channel_state and call_state changes, and the channel state sequences that get thrown per event.</p>
-
-<p>  E.g channel has an associated call, that call could be hanging up, dialing another extension, calling into voicemail, et al. The channel has state for length of its call&#8217;s action. The call has state for the specific action done. Routing and call progression states also affect channel state.</p>
-
-<p>  Channels have calls, both fire off events, events have names (<strong>CHANNEL_EXECUTE</strong>) and fire in specific order for a particular &#8216;action&#8217;, providing a mechanism for constant feedback on the current status of the channel and its associated call. The events fired are affected by the specific channel state e.g <strong>CS_HANGUP</strong> or <strong>CS_DESTROY</strong> and, internally, the call state e.g <strong>HANGUP</strong> or <strong>DESTROY</strong>.</p>
-
-<p> Its the combination of these three status/state settings (event, channel, &#8216;call/action&#8217;) that reveal the inner workings of whats going on inside FreeSWITCH as it sees things, the channel, and the call. Grouping the channel&#8217;s event chain for a specific action on that channel, and then mapping the channel state changes that take place during that channel&#8217;s lifecycle, and the channel&#8217;s call lifecycle I believe provides value by exposing that internal coordination in such a way it can be readily and repeatably tested in a myriad of combinations.</p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
+<time datetime="2012-02-17T13:53:00-05:00" pubdate data-updated="true">Feb 17<span>th</span>, 2012</time>
       
-  <header>
+
+
+    </p>
     
-      <h1 class="entry-title"><a href="/fs_specs/blog/2012/02/15/and-theyre-off-the-start-of-fs-specs/">And They&#8217;re Off! - the Start of FS_SPECS</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
+      <div class="sharing">
   
-
-
-<time datetime="2012-02-15T19:52:00-05:00" pubdate data-updated="true">Feb 15<span>th</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>My name is Deryl R. Doucette. I&#8217;m the originator of, but only one of a team on, fs_specs which means [F]ree[S]witch [SPEC]ification[S]. The group over at The Rubyists, LLC. has been in on it from the get go. It was through conversations with TJ that this project was born. TJ has contributed great amounts of time, energy, and code. Ken Rice (SwK on freenode) has helped direct the flow of my inquiries, and provided key conceptual information.</p>
-
-<p>So &#8220;What is &#8216;it&#8217;?&#8221;, you&#8217;re probably asking. FS_SPECs is a project to backfill testing into the FreeSWITCH Project utilizing the Ruby library FreeSWITCHeR as the interface to FreeSWITCH in an effort to enhance the stability, and usability, of both projects. The features and scenarios are written using Cucumber (which uses gherkin). We pull in RSpec for additional matchers. Everything else is Ruby. We are currently using Ruby 1.9.3p0, Cucumber 1.1.4, and RSpec 2.8.0. We use Bundler for gems management, which currently is 1.0.21. The Ruby environment is managed using RVM, and we utilize RVM&#8217;s per-project .rvmrc file capability.</p>
-
-<p>This is the first post for fs_specs. I&#8217;m not usually sure what to say in a first post because its one that defines your outlook for that specific project. I&#8217;ve several outlooks, hopes, and thoughts on direction for this project. The first of which is that it be useful in what it does.</p>
-
-<p>I&#8217;ve had the honor of speaking twice now during FreeSWITCH&#8217;s live weekly conference. I&#8217;ve come to realize that I do not, in any way shape or form, have the gift of &#8216;makin dah speech sounds&#8217;.</p>
-
-<p>So, I figure I&#8217;ll fall back to my comfort zone which is writing. I like to write. I can express myself a bit better with the written word. Hopefully, along the way I&#8217;ll be able to express here what I was unable to in the conferences. Much of what I was hoping to point out with regards to testing events within the context of channel and call state changes never made it into the conversation. My brain went for a walk and decided not to take me with it. I was drawing complete blanks. :/ Not fun on life audio.</p>
-
-<p>So, herein is where I&#8217;ll explain from top to bottom what I&#8217;m doing with fs_specs, urls for getting to the code, detailed explanations of the current Cucumber Features and Scenarios, and the exposed event&#8217;s content. On the code front, plaese be aware that I use the &#8216;master&#8217; branch as the &#8216;stable&#8217; branch. All development is done directly on, or in offshoots of, the &#8216;development&#8217; branch. Pulling master, which is the default, will always pull what is considered &#8216;Stable Release&#8217;.</p>
-
-<p>There might be a bit of meandering as I gather my thoughts and order my information. Trust me, if you saw the editing that goes on <em>before</em> I hit the save button, you would quickly agree the saved is a much cleaner piece than originally written. <grin></p>
-
-<p>Over th next few postings, I plan on taking apart the currently defined Features and their Scenarios on the master branch and explaining them here, along with the end-goal which might necessitate reworking some of the steps. I hope to use the explanations not only to educate on who, what, when, where, and why, but also because it might also serve to streamline my own thought processes thereby creating greater focus. One can hope!</p>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://rubyists.github.com/fs_specs/blog/2012/02/17/checking-out-extensions-001-channel-can-dial-extensions-feature/" data-via="" data-counturl="http://rubyists.github.com/fs_specs/blog/2012/02/17/checking-out-extensions-001-channel-can-dial-extensions-feature/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
 </div>
-  
-  
 
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/fs_specs/blog/2012/02/16/anatomy-of-an-fs-specs-feature-set-000-phone-infrastructure-feature/" title="Previous Post: Anatomy of an FS_SPECS Feature Set - 000_phone_infrastructure.feature">&laquo; Anatomy of an FS_SPECS Feature Set - 000_phone_infrastructure.feature</a>
+      
+      
+    </p>
+  </footer>
+</article>
 
-    </article>
-  
-  <div class="pagination">
-    
-    <a href="/fs_specs/blog/archives">Blog Archives</a>
-    
-  </div>
 </div>
+
 <aside class="sidebar">
   
     <section>
@@ -696,7 +411,7 @@ Code To Step Ratio: 3:1</p>
       </li>
     
       <li class="post">
-        <a href="/fs_specs/blog/2012/02/15/and-theyre-off-the-start-of-fs-specs/">And They&#8217;re Off! - The start of FS_SPECS</a>
+        <a href="/fs_specs/blog/2012/02/15/and-theyre-off-the-start-of-fs-specs/">And They're Off! - The start of FS_SPECS</a>
       </li>
     
   </ul>
@@ -705,7 +420,7 @@ Code To Step Ratio: 3:1</p>
 <section>
   <h1>GitHub Repos</h1>
   <ul id="gh_repos">
-    <li class="loading">Status updating&#8230;</li>
+    <li class="loading">Status updating...</li>
   </ul>
   
   <a href="https://github.com/rubyists">@rubyists</a> on GitHub
@@ -747,6 +462,7 @@ Code To Step Ratio: 3:1</p>
 
   
 </aside>
+
 
     </div>
   </div>
