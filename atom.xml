@@ -4,7 +4,7 @@
   <title><![CDATA[FreeSWITCH And FreeSWITCHeR Ruby Library]]></title>
   <link href="http://rubyists.github.com/fs_specs/atom.xml" rel="self"/>
   <link href="http://rubyists.github.com/fs_specs/"/>
-  <updated>2012-02-21T12:18:39-05:00</updated>
+  <updated>2012-02-21T12:20:48-05:00</updated>
   <id>http://rubyists.github.com/fs_specs/</id>
   <author>
     <name><![CDATA[Deryl R. Doucette]]></name>
@@ -175,7 +175,7 @@
 
 <p>  I realize, at this point, people might be asking themselves if its worth writing test features and step definitions for the little bit of code that is actually driven out by that process. Here are the step lines, minus their closing ‘end’, and the lines of code we generated as a result.</p>
 
-<p>  Feature Step Lines</p>
+<p>  <em><strong>Feature Step Lines</strong></em></p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -196,7 +196,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>  Code Lines Driven Out</p>
+<p>  <em><strong>Code Lines Driven Out</strong></em></p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -255,7 +255,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>  <em><em>Total Step Lines: 8 | Total Code Lines: 25 | Code To Step Ratio: 3:1</em></em></p>
+<p>  <em><strong>Total Step Lines: 8 | Total Code Lines: 25 | Code To Step Ratio: 3:1</strong></em></p>
 
 <p>  Not bad, we are averaging 3 lines of code being described by 1 step line. Or, if you prefer, we are averaging 3 lines of code to pass 1 step. To get back on the beaten path, we have completed the contents of 001 and proven out our Feature. So, far it looks like things are progressing right along.</p>
 
