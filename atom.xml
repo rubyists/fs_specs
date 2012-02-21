@@ -4,7 +4,7 @@
   <title><![CDATA[FreeSWITCH And FreeSWITCHeR Ruby Library]]></title>
   <link href="http://rubyists.github.com/fs_specs/atom.xml" rel="self"/>
   <link href="http://rubyists.github.com/fs_specs/"/>
-  <updated>2012-02-20T23:15:59-05:00</updated>
+  <updated>2012-02-20T23:16:43-05:00</updated>
   <id>http://rubyists.github.com/fs_specs/</id>
   <author>
     <name><![CDATA[Deryl R. Doucette]]></name>
@@ -41,7 +41,6 @@
 <span class='line-number'>15</span>
 <span class='line-number'>16</span>
 <span class='line-number'>17</span>
-<span class='line-number'>18</span>
 </pre></td><td class='code'><pre><code class='Cucumber'><span class='line'><span class="k">Feature:</span><span class="nf"> A channel can dial an extension</span>
 </span><span class='line'>
 </span><span class='line'><span class="nf">Once a UserAgent (X-Lite, PolyCom, another FS) can successfully connect to freeswitch, that UserAgent should be able to place a call to any known extension. The UserAgent should be connected to that extension. If that extension can not be reached, or the extension is not known, then the UserAgent should be notified of both the fact of the failure, and the type of the failure.</span>
@@ -55,8 +54,7 @@
 </span><span class='line'><span class="nf">    Then I should be connected to that extension</span>
 </span><span class='line'><span class="nf">    And I should be able to terminate the call</span>
 </span><span class='line'>
-</span><span class='line'>
-</span><span class='line'><span class="nf">Scenario:</span>
+</span><span class='line'><span class="nf">  Scenario:</span>
 </span><span class='line'><span class="nf">    When I dial unknown extension “1020”</span>
 </span><span class='line'><span class="nf">    Then I should be notified the call failed</span>
 </span><span class='line'><span class="nf">    And I should receive call failure type “NO_USER_RESPONSE”</span>
