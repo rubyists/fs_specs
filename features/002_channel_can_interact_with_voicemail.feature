@@ -8,10 +8,10 @@ Feature: Channel can interact with voicemail
     And blackbird.rubyists.com is accessible via the Event Socket
 
   Scenario: Successfully log into voicemail using extension
-    And I check voicemail for user 1000 with good password 1000
+    When I check voicemail for user 1000 with good password 1000
     Then I should be logged into voicemail
 
   Scenario: Fail to log into voicemail using extension
-    And I check voicemail for user 1000 with bad password 1001
+    When I check voicemail for user 1000 with bad password 1001
     Then I should be prompted to try again
 
