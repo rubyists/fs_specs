@@ -25,11 +25,17 @@
         <lastmod>2012-02-21T12:21:47-05:00</lastmod>
     </url>
     <url>
+        <loc>
+            http://rubyists.github.com/fs_specs/blog/2012/02/22/interacting-with-voicemail-002-channel-can-interact-with-voicemail-feature/
+        </loc>
+        <lastmod>2012-02-22T13:13:31-05:00</lastmod>
+    </url>
+    <url>
         <loc>http://rubyists.github.com/fs_specs/blog/archives/</loc>
-        <lastmod>2012-02-21T12:24:49-05:00</lastmod>
+        <lastmod>2012-02-22T13:13:31-05:00</lastmod>
     </url>
     <url>
         <loc>http://rubyists.github.com/fs_specs/</loc>
-        <lastmod>2012-02-21T12:24:49-05:00</lastmod>
+        <lastmod>2012-02-22T13:13:31-05:00</lastmod>
     </url>
 </urlset>
