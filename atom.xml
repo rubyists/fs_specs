@@ -4,7 +4,7 @@
   <title><![CDATA[FreeSWITCH And FreeSWITCHeR Ruby Library]]></title>
   <link href="http://rubyists.github.com/fs_specs/atom.xml" rel="self"/>
   <link href="http://rubyists.github.com/fs_specs/"/>
-  <updated>2012-02-22T13:42:06-05:00</updated>
+  <updated>2012-02-22T13:44:55-05:00</updated>
   <id>http://rubyists.github.com/fs_specs/</id>
   <author>
     <name><![CDATA[Deryl R. Doucette]]></name>
@@ -26,7 +26,7 @@
 
 <p>Here is the Feature itself.</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>002_channel_can_interact_with_voicemail.feature</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -157,7 +157,7 @@
 
 <p>For those that missed where this was defined, here is the line of code.</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>FSR::CommandSocket.new</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 </pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="vi">@sock1</span> <span class="o">=</span> <span class="no">FSR</span><span class="o">::</span><span class="no">CommandSocket</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">server</span><span class="p">:</span> <span class="vi">@server1</span><span class="p">,</span> <span class="n">port</span><span class="p">:</span> <span class="mi">8021</span><span class="p">)</span>
 </span></code></pre></td></tr></table></div></figure>
 
