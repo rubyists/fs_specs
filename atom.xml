@@ -4,7 +4,7 @@
   <title><![CDATA[FreeSWITCH And FreeSWITCHeR Ruby Library]]></title>
   <link href="http://rubyists.github.com/fs_specs/atom.xml" rel="self"/>
   <link href="http://rubyists.github.com/fs_specs/"/>
-  <updated>2012-02-22T13:44:55-05:00</updated>
+  <updated>2012-02-22T13:45:44-05:00</updated>
   <id>http://rubyists.github.com/fs_specs/</id>
   <author>
     <name><![CDATA[Deryl R. Doucette]]></name>
@@ -69,12 +69,12 @@
 
 <p>It tests that we can:</p>
 
-<pre><code>    * connect to the server
-    * that it recognizes and sends us well formed data
-    * that it recognizes well formed data we send it (e.g pressed keys)
-    * that we recognize and identify the usage and response pattern freeswitch expects
-    * that the expected pattern for interaction is seen in the data
-    * that freeswitch responds correctly to our response. 
+<pre><code>* connect to the server
+* that it recognizes and sends us well formed data
+* that it recognizes well formed data we send it (e.g pressed keys)
+* that we recognize and identify the usage and response pattern freeswitch expects
+* that the expected pattern for interaction is seen in the data
+* that freeswitch responds correctly to our response. 
 </code></pre>
 
 <p>  The same is expected in the following Scenario, but for a negative test case. This ensures that we cover both states of recognition. Either we’re authenticated, or we’re not. If we are, use the system. If not, re-prompt and eventually drop.</p>
