@@ -1,6 +1,7 @@
 language: ruby
 rvm:
   - 1.9.3
+  - jruby-19mode # JRuby in 1.9 mode
 script: 'bundle exec cucumber features && bundle exec rspec spec --format doc'
 notifications:
   irc:
