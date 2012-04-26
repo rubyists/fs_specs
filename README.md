@@ -58,10 +58,10 @@ Feel free to submit pull requests. Also, if you're using this, then you shouldn'
 
 
 #### Continous Integrated Testing - Travis CI
-  We curently hook into [Travis-CI](http://travis-ci.org): http://travis-ci.org/rubyists/fs_specs which will show you the status of all tests as of the last commit
+  We curently hook into [Travis-CI](http://travis-ci.org): http://travis-ci.org/deryldoucette/fs_specs which will show you the status of all tests as of the last commit
   that was *not* marked '[cs skip]'. You can watch how the tree progresses from there.
 
-  _Current Build Status_: [![Build Status](https://secure.travis-ci.org/rubyists/fs_specs.png)](http://travis-ci.org/rubyists/fs_specs)
+  _Current Build Status_: [![Build Status](https://secure.travis-ci.org/deryldoucette/fs_specs.png)](http://travis-ci.org/deryldoucette/fs_specs)
 
 Enjoy!
 
@@ -80,7 +80,7 @@ will fit right in, and install the ruby version we use, create and use the gemse
 
 Once done, cd to wherever you want to keep the testing tree. eg 'cd $HOME/projects/local'
 
-Then execute: ``git clone git://github.com/rubyists/fs_specs.git``
+Then execute: ``git clone git://github.com/deryldoucette/fs_specs.git``
 
 Now cd fs_specs
 If you have rvm installed, this next step will kick it off. it will notice our .rvmrc file
