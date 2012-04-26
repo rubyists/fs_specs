@@ -1,0 +1,458 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Interacting With Voicemail - FreeSWITCH And FreeSWITCHeR Ruby Library</title>
+  <meta name="author" content="Deryl R. Doucette">
+
+  
+  <meta name="description" content="What Are We Doing Today? In this article, we’ll be discussing interacting with FreeSWITCH’s voicemail system using our &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://rubyists.github.com/fs_specs/blog/2012/02/22/interacting-with-voicemail-002-channel-can-interact-with-voicemail-feature">
+  <link href="/fs_specs/favicon.png" rel="icon">
+  <link href="/fs_specs/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/fs_specs/javascripts/modernizr-2.0.js"></script>
+  <script src="/fs_specs/javascripts/ender.js"></script>
+  <script src="/fs_specs/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/fs_specs/atom.xml" rel="alternate" title="FreeSWITCH And FreeSWITCHeR Ruby Library" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href='http://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h2><a href="/fs_specs/">FreeSWITCH And FreeSWITCHeR Ruby Library</a></h2>
+  
+  <h4>A Project for testing FreeSWITCH</h4>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/fs_specs/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:rubyists.github.com/fs_specs" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/fs_specs/">Blog</a></li>
+  <li><a href="/fs_specs/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h2 class="entry-title">Interacting With Voicemail</h2>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-02-22T13:40:00-05:00" pubdate data-updated="true">Feb 22<span>nd</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><h3>What Are We Doing Today?</h3>
+
+<p>In this article, we’ll be discussing interacting with FreeSWITCH’s voicemail system using our <a href="https://github.com/rubyists/fs_specs/blob/master/features/002_channel_can_interact_with_voicemail.feature">002_channel_can_interact_with_voicemail</a> feature. This Feature will require that we write our own custom Listener class that we attach to the EventSocket’s <em>on_event()</em> method using our own customized <em>handle_event()</em> method.</p>
+
+<h3>Feature -  <a href="https://github.com/rubyists/fs_specs/blob/master/features/002_channel_can_interact_with_voicemail.feature">002_channel_can_interact_with_voicemail.feature</a></h3>
+
+<p>Here is the Feature itself.</p>
+
+<figure class='code'><figcaption><span>002_channel_can_interact_with_voicemail.feature</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='cucumber'><span class='line'><span class="nf">        Feature: Channel can interact with voicemail</span>
+</span><span class='line'><span class="nf">     In order to utilize voicemail</span>
+</span><span class='line'><span class="nf">     As a channel</span>
+</span><span class='line'><span class="nf">     </span><span class="k">I </span><span class="nf">want to be able to log into, and use, the voicemail system</span>
+</span><span class='line'>
+</span><span class='line'><span class="nf">     </span><span class="k">Background:</span><span class="nf"></span>
+</span><span class='line'><span class="k">      Given </span><span class="nf">I have </span><span class="s">2</span><span class="nf"> servers named blackbird.rubyists.com and tigershark.rubyists.com</span>
+</span><span class='line'><span class="nf">     </span><span class="k">And </span><span class="nf">blackbird.rubyists.com is accessible via the Event Socket</span>
+</span><span class='line'>
+</span><span class='line'><span class="nf">     </span><span class="k">Scenario:</span><span class="nf"> Successfully log into voicemail using extension</span>
+</span><span class='line'><span class="k">      And </span><span class="nf">I check voicemail for user </span><span class="s">1000</span><span class="nf"> with good password </span><span class="s">1000</span><span class="nf"></span>
+</span><span class='line'><span class="nf">     </span><span class="k">Then </span><span class="nf">I should be logged into voicemail</span>
+</span><span class='line'>
+</span><span class='line'><span class="nf">     </span><span class="k">Scenario:</span><span class="nf"> Fail to log into voicemail using extension</span>
+</span><span class='line'><span class="k">      And </span><span class="nf">I check voicemail for user </span><span class="s">1000</span><span class="nf"> with bad password </span><span class="s">1001</span><span class="nf"></span>
+</span><span class='line'><span class="nf">     </span><span class="k">Then </span><span class="nf">I should be prompted to try again</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>What Exactly Does It Do? - <a href="https://github.com/rubyists/fs_specs/blob/master/features/step_definitions/steps.rb">steps.rb</a></h3>
+
+<p>OK, here we go with the whirlwind ride of whats taking place within these Feature steps. The definitions of each of them are in the linked steps.rb file.</p>
+
+<p>  As usual, we briefly describe in the Feature line, and expand upon immediately following, what the feature is for. We, again, hit the Background step which set up the connection for the remaining scenarios to use. That steps right into our first Scenario, “Successfully log into voicemail using extension”. In this Scenario, we check that we can log into voicemail for a specific extension, using the known password for that extension’s mailbox. This Scenario tests several sets of ideas.</p>
+
+<p>It tests that we can:</p>
+
+<pre><code>* connect to the server
+* that it recognizes and sends us well formed data
+* that it recognizes well formed data we send it (e.g pressed keys)
+* that we recognize and identify the usage and response pattern freeswitch expects
+* that the expected pattern for interaction is seen in the data
+* that freeswitch responds correctly to our response. 
+</code></pre>
+
+<p>  The same is expected in the following Scenario, but for a negative test case. This ensures that we cover both states of recognition. Either we’re authenticated, or we’re not. If we are, use the system. If not, re-prompt and eventually drop.</p>
+
+<p>Before we get into the specifics of the extension, let me explain what we’re going to be doing. We need a way to validate that we’re actually connecting to the voicemail system, and that we can react based upon the state changes we see as we move through the system. In this instance, freeswitch uses wav files to communicate. It plays specific wavs, in specific patterns and sub-patterns, that describe the various options available under the voicemail menu. We need some way to capture and use that information. Enter our custom class, the VmListener!</p>
+
+<h3>The Code - What did we actually build? - <a href="https://github.com/rubyists/fs_specs/blob/master/features/step_definitions/vm_listener.rb">VmListener</a></h3>
+
+<p>  If you look at the linked file, you&#8217;ll see that we define a class named VmListener which we attach to the freeswitch EventSocket.</p>
+
+<figure class='code'><figcaption><span>VmListener Class</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'> <span class="k">class</span> <span class="nc">VmListener</span> <span class="o">&lt;</span> <span class="no">FSL</span><span class="o">::</span><span class="no">Inbound</span>
+</span><span class='line'>  <span class="o">.</span><span class="n">.</span><span class="o">.</span>
+</span><span class='line'>  <span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>  You can find, over here, the definition for <a href="https://github.com/rubyists/freeswitcher/blob/master/lib/fsr/listener/inbound.rb">FSL::Inbound</a>. What is VmListener doing? In this case, if you review, you&#8217;ll see that we define the list of wav files that FreeSWITCH should play to us when we connect to the voicemail system.</p>
+
+<figure class='code'><figcaption><span>Voicemail Wav File List</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'> <span class="no">PLAYBACK_FILES</span> <span class="o">=</span> <span class="o">[]</span>
+</span><span class='line'>  <span class="no">SOUNDS</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>    <span class="n">vm_enter_id</span><span class="p">:</span> <span class="s2">&quot;/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-enter_id.wav&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="n">vm_enter_pass</span><span class="p">:</span> <span class="s2">&quot;/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-enter_pass.wav&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="n">pound</span><span class="p">:</span> <span class="s2">&quot;file_string://ascii/35.wav&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="n">vm_abort</span><span class="p">:</span> <span class="s2">&quot;/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-abort.wav&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="n">vm_goodbye</span><span class="p">:</span> <span class="s2">&quot;/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-goodbye.wav&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="n">vm_press</span><span class="p">:</span> <span class="s2">&quot;/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-press.wav&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="n">vm_no_messages</span><span class="p">:</span> <span class="s2">&quot;/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-no_messages.wav&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="n">vm_fail</span><span class="p">:</span> <span class="s2">&quot;/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-fail_auth.wav&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="n">vm_has_messages</span><span class="p">:</span> <span class="s2">&quot;/var/lib/freeswitch/sounds/en/us/callie/voicemail/vm-you_have.wav&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>  This took me a bit of trial and error to find out as these are not listed anywhere that I found. (Anyone got a link I missed?) By playing with the connection and watching <em>fs_cli</em> output when the Listener connected, we got the list. Now, we redefine several methods in the class to do what we need done. In the first instance, we have the <em>initialize</em> method which sets up a slew of variables for us to make use of throughout the class. Next, we have <em>before_session</em>. All interaction with freeswitch is done via something called <em>Events</em>. Before freeswitch starts the actual session, we want to continue our setup for our needs. Here, we subscribe to the <em>PLAYBACK_STOP</em> event, which is thrown whenever a wav file completes its playtime. This allows us to <em>only</em> handle the specific event we need. Once a wav file finishes playing we know we can interact with the system. (Why else would it play us a file unless it wanted something from us, right?) For this particular use case, we want to make it so our custom handler, <em>handle_event</em>, is called.</p>
+
+<p>  Next, we want to only deal with events that are specifically for us, so we tie in via the <em>post_init</em> method.</p>
+
+<figure class='code'><figcaption><span>post_init</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'> <span class="k">def</span> <span class="nf">post_init</span>
+</span><span class='line'>    <span class="vi">@spec_id</span> <span class="o">=</span> <span class="nb">rand</span><span class="p">(</span><span class="mi">100000000</span><span class="p">)</span><span class="o">.</span><span class="n">to_s</span>
+</span><span class='line'>    <span class="n">orig</span> <span class="o">=</span> <span class="vi">@sock1</span><span class="o">.</span><span class="n">originate</span><span class="p">(</span><span class="n">target_options</span><span class="p">:</span> <span class="p">{</span><span class="n">origination_caller_id_number</span><span class="p">:</span> <span class="vi">@spec_id</span><span class="p">},</span> <span class="n">target</span><span class="p">:</span> <span class="s2">&quot;sofia/external/4000@</span><span class="si">#{</span><span class="vi">@server2</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">:</span> <span class="s1">&#39;&amp;park&#39;</span><span class="p">)</span>
+</span><span class='line'>    <span class="vi">@uuid</span> <span class="o">=</span> <span class="n">orig</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="ss">:api</span><span class="p">)</span><span class="o">[</span><span class="s1">&#39;body&#39;</span><span class="o">].</span><span class="n">split</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span>
+</span><span class='line'>    <span class="nb">warn</span> <span class="s2">&quot;UUID is </span><span class="si">#{</span><span class="vi">@uuid</span><span class="si">}</span><span class="s2">&quot;</span>
+</span><span class='line'>    <span class="nb">warn</span> <span class="s2">&quot;spec_id is </span><span class="si">#{</span><span class="vi">@spec_id</span><span class="si">}</span><span class="s2">&quot;</span>
+</span><span class='line'>  <span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>  What this does is sets a spec_id for us. We use <em>rand()</em> to generate a ID for us, and then in the <em>@sock1.originate</em> we use it to set the <em>origination_caller_id_number</em> to match so we know anything with that caller ID was generated by our test(s), making it easier to isolate and track.</p>
+
+<p>Now for a little bit of an explanation:</p>
+
+<figure class='code'><figcaption><span>Socket Connection Code</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">orig</span> <span class="o">=</span> <span class="vi">@sock1</span><span class="o">.</span><span class="n">originate</span><span class="p">(</span><span class="n">target_options</span><span class="p">:</span> <span class="p">{</span><span class="n">origination_caller_id_number</span><span class="p">:</span> <span class="vi">@spec_id</span><span class="p">},</span> <span class="n">target</span><span class="p">:</span> <span class="s2">&quot;sofia/external/4000@</span><span class="si">#{</span><span class="vi">@server2</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">:</span> <span class="s1">&#39;&amp;park&#39;</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This line of code calls the originate method on @sock1 which was created in the features/step_definitions/steps.rb file, specifically, on Line 11. Remember that @sock1 is an object created from the <a href="https://github.com/rubyists/freeswitcher/blob/master/lib/fsr/cmd/originate.rb">FSR::CommandSocket</a> class. That, in itself, is an overridden class of type Originate which is itself classed from Command. (As seen on Line 4 of the same file linked above.) This @sock1 object is what actually opens the connection to blackbird. If you remember, blackbird is our &#8216;Softphone&#8217; for these tests. It sets the caller ID to the spec_id, and then connects this leg to extension 4000 which is voicemail on the freeswitch server.</p>
+
+<p>For those that missed where this was defined, here is the line of code.</p>
+
+<figure class='code'><figcaption><span>FSR::CommandSocket.new</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="vi">@sock1</span> <span class="o">=</span> <span class="no">FSR</span><span class="o">::</span><span class="no">CommandSocket</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">server</span><span class="p">:</span> <span class="vi">@server1</span><span class="p">,</span> <span class="n">port</span><span class="p">:</span> <span class="mi">8021</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Next, we define a couple methods for our own use such as <em>enter_extension</em> and <em>enter_password</em>. These will push the DTMF tones for the keys involved in typing out the extension and password to the freeswitch server. Now we come to the meat of the class! (Aren&#8217;t you so glad?)</p>
+
+<figure class='code'><figcaption><span>handle_event(event)</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">handle_event</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">return</span> <span class="k">unless</span> <span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">content</span><span class="o">[</span><span class="ss">:caller_caller_id_number</span><span class="o">]</span> <span class="o">==</span> <span class="vi">@spec_id</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">path</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">content</span><span class="o">[</span><span class="ss">:playback_file_path</span><span class="o">]</span>
+</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="n">path</span> <span class="o">==</span> <span class="no">SOUNDS</span><span class="o">[</span><span class="ss">:pound</span><span class="o">]</span> <span class="ow">and</span> <span class="no">PLAYBACK_FILES</span><span class="o">.</span><span class="n">last</span> <span class="o">==</span> <span class="no">SOUNDS</span><span class="o">[</span><span class="ss">:vm_enter_id</span><span class="o">]</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">enter_extension</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="n">path</span> <span class="o">==</span> <span class="no">SOUNDS</span><span class="o">[</span><span class="ss">:pound</span><span class="o">]</span> <span class="ow">and</span> <span class="no">PLAYBACK_FILES</span><span class="o">.</span><span class="n">last</span> <span class="o">==</span> <span class="no">SOUNDS</span><span class="o">[</span><span class="ss">:vm_enter_pass</span><span class="o">]</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">enter_password</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>  <span class="c1"># We call it logged in (or unsuccessful) when we hear any of these wavs</span>
+</span><span class='line'>  <span class="k">if</span><span class="p">(</span><span class="n">path</span> <span class="o">==</span> <span class="no">SOUNDS</span><span class="o">[</span><span class="ss">:vm_no_messages</span><span class="o">]</span> <span class="o">||</span> <span class="n">path</span> <span class="o">==</span> <span class="no">SOUNDS</span><span class="o">[</span><span class="ss">:vm_has_messages</span><span class="o">]</span> <span class="o">||</span> <span class="n">path</span> <span class="o">==</span> <span class="no">SOUNDS</span><span class="o">[</span><span class="ss">:vm_fail</span><span class="o">]</span><span class="p">)</span>
+</span><span class='line'>    <span class="c1"># And hang up the call</span>
+</span><span class='line'>    <span class="vi">@sock1</span><span class="o">.</span><span class="n">kill</span><span class="p">(</span><span class="vi">@uuid</span><span class="p">)</span><span class="o">.</span><span class="n">run</span>
+</span><span class='line'>    <span class="c1"># Then stop the reactor</span>
+</span><span class='line'>    <span class="no">EM</span><span class="o">.</span><span class="n">stop</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>  <span class="no">PLAYBACK_FILES</span> <span class="o">&lt;&lt;</span> <span class="n">path</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>  Here, we first check to make sure that the caller ID matches our spec_id so we <em>only</em> deal with what our tests generated, and nothing more. Next, we use a temporary variable named path and set it to the full filepath as returned by freeswitch for the wav file its playing to us. We&#8217;ll do this over and over for each wav that comes in once PLAYBACK_STOP event has been fired for it. We know the combination of wav files we&#8217;re looking for from playing with <em>fs_cli</em> and watching the debug output. Here, we compare the files returned until we see that the last file played was <em>:vm_enter_id</em> and the current one is &#8216;#&#8217;. When we get that combination, in that particular order, we fire off our <em>enter_extension</em> method which calls <em>@sock1.send_uuid_dtmf</em> giving it both the UUID of the call (for identification), and the dtmf tones to send.</p>
+
+<p>  In this instance, we&#8217;re sending the tones for the numbers 1000 which is our extension. This walks us right into our next check, which is for freeswitch prompting us for our password. We won&#8217;t get this if freeswitch never got our original dtmf tones. The fact that we even got the <em>:vm_enter_pass</em> wav file after the previous order tells us we successfully spoke with freeswitch. We continue to listen to more of the wav files offered up by freeswitch as they are our indicators of where we are in the call. If, after successfully logging in, we see the <em>:vm_no_messages</em>, <em>:vm_has_messages</em>, or <em>:vm_fail</em> we immediately hang up the call and stop the reactor. We then add the path we saw to the PLAYBACK_FILES array for future use.</p>
+
+<p>Finally, we run the same Scenario again, but in the negative (by supplying an incorrect password) in order to ensure that we cover what happens if someone goofs their pass or extension.</p>
+
+<h3>The Round Up - And In Closing…</h3>
+
+<p>  I want to say a little something here about the Listener class. We purposefully create a new class for each Listener we want/need from VmListener named for whatever aspect we are trying to test. For instance, in our next feature we want to start culling lots of information from the Event freeswitch returns to us and put it in some sort of logical order what we&#8217;re looking for trying to identify, as closely as possible, the patterns exposed by FreeSWITCH for different events.
+These patterns are non-negotiable. They are always exposed in specific order and for specific causes by freeswitch. By keying in on these patterns, and specifically testing for them, we are able to directly and correctly test freeswitch&#8217;s operations as well as that of FreeSWITCHeR.</p>
+
+<h3>Up Next - A Look Ahead..</h3>
+
+<p>Our next article will cover the exposed Event object from FreeSWITCH. For those that would like, please look ahead at <a href="https://github.com/rubyists/fs_specs/blob/master/features/003_can_retrieve_channel_information.feature">features/003_can_retrieve_channel_information.feature</a>. This feature is the last of our current &#8216;Core Features&#8217;, and was designed to expose the event object to you as much as possible so you can make decisions on what to test for, and so you can see what information you have available to you for that decision process.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Deryl R. Doucette</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-02-22T13:40:00-05:00" pubdate data-updated="true">Feb 22<span>nd</span>, 2012</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://rubyists.github.com/fs_specs/blog/2012/02/22/interacting-with-voicemail-002-channel-can-interact-with-voicemail-feature/" data-via="" data-counturl="http://rubyists.github.com/fs_specs/blog/2012/02/22/interacting-with-voicemail-002-channel-can-interact-with-voicemail-feature/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/fs_specs/blog/2012/02/17/checking-out-extensions-001-channel-can-dial-extensions-feature/" title="Previous Post: Checking Out Extensions">&laquo; Checking Out Extensions</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/fs_specs/blog/2012/02/22/interacting-with-voicemail-002-channel-can-interact-with-voicemail-feature/">Interacting With Voicemail</a>
+      </li>
+    
+      <li class="post">
+        <a href="/fs_specs/blog/2012/02/17/checking-out-extensions-001-channel-can-dial-extensions-feature/">Checking Out Extensions</a>
+      </li>
+    
+      <li class="post">
+        <a href="/fs_specs/blog/2012/02/16/anatomy-of-an-fs-specs-feature-set-000-phone-infrastructure-feature/">Anatomy of an FS_SPECS Feature Set</a>
+      </li>
+    
+      <li class="post">
+        <a href="/fs_specs/blog/2012/02/15/stage-fright-gone-brief-synopsis-of-goal/">Stage Fright Gone! Brief Synopsis of Goal</a>
+      </li>
+    
+      <li class="post">
+        <a href="/fs_specs/blog/2012/02/15/and-theyre-off-the-start-of-fs-specs/">And They're Off! The start of FS_SPECS</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/rubyists">@rubyists</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'rubyists',
+            count: 7,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/fs_specs/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/114407361520857511779?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2012 - Deryl R. Doucette -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
