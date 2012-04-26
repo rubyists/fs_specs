@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://rubyists.github.com/fs_specs">
+  <link rel="canonical" href="http://deryldoucette.github.com/fs_specs">
   <link href="/fs_specs/favicon.png" rel="icon">
   <link href="/fs_specs/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/fs_specs/javascripts/modernizr-2.0.js"></script>
@@ -50,7 +50,7 @@
   
 <form action="http://google.com/search" method="get">
   <fieldset role="search">
-    <input type="hidden" name="q" value="site:rubyists.github.com/fs_specs" />
+    <input type="hidden" name="q" value="site:deryldoucette.github.com/fs_specs" />
     <input class="search" type="text" name="q" results="0" placeholder="Search"/>
   </fieldset>
 </form>
@@ -96,9 +96,9 @@
 
   <div class="entry-content"><h3>What Are We Doing Today?</h3>
 
-<p>In this article, we’ll be discussing interacting with FreeSWITCH’s voicemail system using our <a href="https://github.com/rubyists/fs_specs/blob/master/features/002_channel_can_interact_with_voicemail.feature">002_channel_can_interact_with_voicemail</a> feature. This Feature will require that we write our own custom Listener class that we attach to the EventSocket’s <em>on_event()</em> method using our own customized <em>handle_event()</em> method.</p>
+<p>In this article, we’ll be discussing interacting with FreeSWITCH’s voicemail system using our <a href="https://github.com/deryldoucette/fs_specs/blob/master/features/002_channel_can_interact_with_voicemail.feature">002_channel_can_interact_with_voicemail</a> feature. This Feature will require that we write our own custom Listener class that we attach to the EventSocket’s <em>on_event()</em> method using our own customized <em>handle_event()</em> method.</p>
 
-<h3>Feature -  <a href="https://github.com/rubyists/fs_specs/blob/master/features/002_channel_can_interact_with_voicemail.feature">002_channel_can_interact_with_voicemail.feature</a></h3>
+<h3>Feature -  <a href="https://github.com/deryldoucette/fs_specs/blob/master/features/002_channel_can_interact_with_voicemail.feature">002_channel_can_interact_with_voicemail.feature</a></h3>
 
 <p>Here is the Feature itself.</p>
 
@@ -137,7 +137,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<h3>What Exactly Does It Do? - <a href="https://github.com/rubyists/fs_specs/blob/master/features/step_definitions/steps.rb">steps.rb</a></h3>
+<h3>What Exactly Does It Do? - <a href="https://github.com/deryldoucette/fs_specs/blob/master/features/step_definitions/steps.rb">steps.rb</a></h3>
 
 <p>OK, here we go with the whirlwind ride of whats taking place within these Feature steps. The definitions of each of them are in the linked steps.rb file.</p>
 
@@ -157,7 +157,7 @@
 
 <p>Before we get into the specifics of the extension, let me explain what we’re going to be doing. We need a way to validate that we’re actually connecting to the voicemail system, and that we can react based upon the state changes we see as we move through the system. In this instance, freeswitch uses wav files to communicate. It plays specific wavs, in specific patterns and sub-patterns, that describe the various options available under the voicemail menu. We need some way to capture and use that information. Enter our custom class, the VmListener!</p>
 
-<h3>The Code - What did we actually build? - <a href="https://github.com/rubyists/fs_specs/blob/master/features/step_definitions/vm_listener.rb">VmListener</a></h3>
+<h3>The Code - What did we actually build? - <a href="https://github.com/deryldoucette/fs_specs/blob/master/features/step_definitions/vm_listener.rb">VmListener</a></h3>
 
 <p>  If you look at the linked file, you&#8217;ll see that we define a class named VmListener which we attach to the freeswitch EventSocket.</p>
 
@@ -170,7 +170,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>  You can find, over here, the definition for <a href="https://github.com/rubyists/freeswitcher/blob/master/lib/fsr/listener/inbound.rb">FSL::Inbound</a>. What is VmListener doing? In this case, if you review, you&#8217;ll see that we define the list of wav files that FreeSWITCH should play to us when we connect to the voicemail system.</p>
+<p>  You can find, over here, the definition for <a href="https://github.com/deryldoucette/freeswitcher/blob/master/lib/fsr/listener/inbound.rb">FSL::Inbound</a>. What is VmListener doing? In this case, if you review, you&#8217;ll see that we define the list of wav files that FreeSWITCH should play to us when we connect to the voicemail system.</p>
 
 <figure class='code'><figcaption><span>Voicemail Wav File List</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -229,7 +229,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>This line of code calls the originate method on @sock1 which was created in the features/step_definitions/steps.rb file, specifically, on Line 11. Remember that @sock1 is an object created from the <a href="https://github.com/rubyists/freeswitcher/blob/master/lib/fsr/cmd/originate.rb">FSR::CommandSocket</a> class. That, in itself, is an overridden class of type Originate which is itself classed from Command. (As seen on Line 4 of the same file linked above.) This @sock1 object is what actually opens the connection to blackbird. If you remember, blackbird is our &#8216;Softphone&#8217; for these tests. It sets the caller ID to the spec_id, and then connects this leg to extension 4000 which is voicemail on the freeswitch server.</p>
+<p>This line of code calls the originate method on @sock1 which was created in the features/step_definitions/steps.rb file, specifically, on Line 11. Remember that @sock1 is an object created from the <a href="https://github.com/deryldoucette/freeswitcher/blob/master/lib/fsr/cmd/originate.rb">FSR::CommandSocket</a> class. That, in itself, is an overridden class of type Originate which is itself classed from Command. (As seen on Line 4 of the same file linked above.) This @sock1 object is what actually opens the connection to blackbird. If you remember, blackbird is our &#8216;Softphone&#8217; for these tests. It sets the caller ID to the spec_id, and then connects this leg to extension 4000 which is voicemail on the freeswitch server.</p>
 
 <p>For those that missed where this was defined, here is the line of code.</p>
 
@@ -292,7 +292,7 @@ These patterns are non-negotiable. They are always exposed in specific order and
 
 <h3>Up Next - A Look Ahead..</h3>
 
-<p>Our next article will cover the exposed Event object from FreeSWITCH. For those that would like, please look ahead at <a href="https://github.com/rubyists/fs_specs/blob/master/features/003_can_retrieve_channel_information.feature">features/003_can_retrieve_channel_information.feature</a>. This feature is the last of our current &#8216;Core Features&#8217;, and was designed to expose the event object to you as much as possible so you can make decisions on what to test for, and so you can see what information you have available to you for that decision process.</p>
+<p>Our next article will cover the exposed Event object from FreeSWITCH. For those that would like, please look ahead at <a href="https://github.com/deryldoucette/fs_specs/blob/master/features/003_can_retrieve_channel_information.feature">features/003_can_retrieve_channel_information.feature</a>. This feature is the last of our current &#8216;Core Features&#8217;, and was designed to expose the event object to you as much as possible so you can make decisions on what to test for, and so you can see what information you have available to you for that decision process.</p>
 </div>
   
   
@@ -328,7 +328,7 @@ These patterns are non-negotiable. They are always exposed in specific order and
   </header>
 
 
-  <div class="entry-content"><h3>Feature - <a href="https://github.com/rubyists/fs_specs/blob/master/features/001_channel_can_dial_extensions.feature">001_channel_can_dial_extensions.feature</a></h3>
+  <div class="entry-content"><h3>Feature - <a href="https://github.com/deryldoucette/fs_specs/blob/master/features/001_channel_can_dial_extensions.feature">001_channel_can_dial_extensions.feature</a></h3>
 
 <p>  As I said in the previous article, there is some overlap here. Note that I will be referring to features by their ordering number e.g 000. 000 also dials an extension, but in this feature we wanted to specifically isolate, and focus on, that distinct capability of dialling extensions.</p>
 
@@ -603,7 +603,7 @@ These patterns are non-negotiable. They are always exposed in specific order and
   </header>
 
 
-  <div class="entry-content"><h3>FS_SPECS Stable Branch - <a href="https://github.com/rubyists/fs_specs">master</a></h3>
+  <div class="entry-content"><h3>FS_SPECS Stable Branch - <a href="https://github.com/deryldoucette/fs_specs">master</a></h3>
 
 <p>As I stated earlier, our ‘master’ branch on <a href="https://github.com">GitHub</a> is the ‘Stable Release’ branch for fs_specs. As of today’s date, we currently have 4 Features that test different aspects of FreeSWITCH through FreeSWITCHeR. They are:</p>
 
@@ -617,7 +617,7 @@ These patterns are non-negotiable. They are always exposed in specific order and
 
 <p>Over the next few articles I’ll be diving into the anatomy of each feature, the attendant steps, and the <em>FSL::Inbound</em> xxListener classes for each.</p>
 
-<h3>Feature - <a href="https://github.com/rubyists/fs_specs/blob/master/features/000_phone_infrastructure.feature">000_phone_infrastructure.feature</a></h3>
+<h3>Feature - <a href="https://github.com/deryldoucette/fs_specs/blob/master/features/000_phone_infrastructure.feature">000_phone_infrastructure.feature</a></h3>
 
 <figure class='code'><figcaption><span>features/000_phone_infrastructure.feature</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -656,7 +656,7 @@ These patterns are non-negotiable. They are always exposed in specific order and
 
 <p>   This feature is the key to the entire set, both existing and those to come. The reason for this is the features job is solely to establish that you have a working configuration for running the rest of the features. If this particular feature fails nothing else will work.</p>
 
-<p>   To see what this feature is actually doing, lets open up the associated <a href="https://github.com/rubyists/fs_specs/blob/master/features/step_definitions/steps.rb">‘steps.rb’</a> file and look for the matchers that comprise each step of each Scenario as they go along. Background in each feature file sets up stuff we need to make it all work and keeps it existing for each Scenario in the feature rather than tearing it all down in-between each one.</p>
+<p>   To see what this feature is actually doing, lets open up the associated <a href="https://github.com/deryldoucette/fs_specs/blob/master/features/step_definitions/steps.rb">‘steps.rb’</a> file and look for the matchers that comprise each step of each Scenario as they go along. Background in each feature file sets up stuff we need to make it all work and keeps it existing for each Scenario in the feature rather than tearing it all down in-between each one.</p>
 
 <p>   As we can see from the feature title, this feature set establishes that the phone infrastructure for all remaining tests can be found and is correctly configured. In the Background segment’s Given line, we are checking to ensure we can access both machines listed. The first server listed (blackbird.rubyists.com) is a freeswitch that is being used basically as nothing more than a soft phone. The second server listed (tigershark.rubyists.com) is the actual freeswitch being tested. The And line ensures that we can talk to the soft phone (blackbird) via freeswitch’s EventSocket.</p>
 
@@ -781,7 +781,7 @@ These patterns are non-negotiable. They are always exposed in specific order and
 
 <p>  And finally, we terminal the call in order to show we have functional control over everything. This completes our primary test feature. Now that we know we have network connectivity, that our local testing environment is properly configured, that our truthiness can be trusted, and that we can originate/terminate calls, we can move forward into testing components of FreeSWITCH directly.</p>
 
-<p>  That will be the focus of our next article covering <a href="https://github.com/rubyists/fs_specs/blob/master/features/001_channel_can_dial_extensions.feature">001_channel_can_dial_extensions.feature</a>. The astute observer will notice a bit of overlap between 000 and 001 insofar as that we are testing the ability to connect to extensions, and we implement that same test twice, once in each feature. That is both on purpose, and due to the nature of establishing that you could actually do something with the established CommandSocket in the 000 feature.</p>
+<p>  That will be the focus of our next article covering <a href="https://github.com/deryldoucette/fs_specs/blob/master/features/001_channel_can_dial_extensions.feature">001_channel_can_dial_extensions.feature</a>. The astute observer will notice a bit of overlap between 000 and 001 insofar as that we are testing the ability to connect to extensions, and we implement that same test twice, once in each feature. That is both on purpose, and due to the nature of establishing that you could actually do something with the established CommandSocket in the 000 feature.</p>
 
 <p>  Thanks for reading!</p>
 </div>
@@ -874,7 +874,7 @@ These patterns are non-negotiable. They are always exposed in specific order and
 
   <div class="entry-content"><p>My name is Deryl R. Doucette. I&#8217;m the originator of, but only one of a team on, fs_specs which means [F]ree[S]witch [SPEC]ification[S]. The group over at The <a href="http://rubyists.com">Rubyists, LLC.</a> has been in on it from the get go. It was through conversations with TJ that this project was born. TJ has contributed great amounts of time, energy, and code. Ken Rice (SwK on freenode) has helped direct the flow of my inquiries, and provided key conceptual information.</p>
 
-<p>So &#8220;What is &#8216;it&#8217;?&#8221;, you&#8217;re probably asking. FS_SPECs is a project to backfill testing into the <a href="http://freeswitch.org">FreeSWITCH Project</a> utilizing the Ruby library <a href="https://github.com/rubyists/freeswitcher">FreeSWITCHeR</a> as the interface to FreeSWITCH in an effort to enhance the stability, and usability, of both projects. The features and scenarios are written using <a href="http://cukes.info">Cucumber</a> (which uses gherkin). We pull in <a href="https://www.relishapp.com/rspec">RSpec</a> for additional matchers. Everything else is <a href="http://ruby-lang.org">Ruby</a>. We are currently using Ruby 1.9.3p0, Cucumber 1.1.4, and RSpec 2.8.0. We use <a href="http://gembundler.com">Bundler</a> for gems management, which currently is 1.0.21. The Ruby environment is managed using <a href="http://rvm.beginrescueend.com">RVM</a>, which I&#8217;m also a team member of, and we utilize RVM&#8217;s per-project .rvmrc file capability.</p>
+<p>So &#8220;What is &#8216;it&#8217;?&#8221;, you&#8217;re probably asking. FS_SPECs is a project to backfill testing into the <a href="http://freeswitch.org">FreeSWITCH Project</a> utilizing the Ruby library <a href="https://github.com/deryldoucette/freeswitcher">FreeSWITCHeR</a> as the interface to FreeSWITCH in an effort to enhance the stability, and usability, of both projects. The features and scenarios are written using <a href="http://cukes.info">Cucumber</a> (which uses gherkin). We pull in <a href="https://www.relishapp.com/rspec">RSpec</a> for additional matchers. Everything else is <a href="http://ruby-lang.org">Ruby</a>. We are currently using Ruby 1.9.3p0, Cucumber 1.1.4, and RSpec 2.8.0. We use <a href="http://gembundler.com">Bundler</a> for gems management, which currently is 1.0.21. The Ruby environment is managed using <a href="http://rvm.beginrescueend.com">RVM</a>, which I&#8217;m also a team member of, and we utilize RVM&#8217;s per-project .rvmrc file capability.</p>
 
 <p>This is the first post for <a href="http://github.fs-specs.org">fs_specs</a>. I&#8217;m not usually sure what to say in a first post because its one that defines your outlook for that specific project. I&#8217;ve several outlooks, hopes, and thoughts on direction for this project. The first of which is that it be useful in what it does.</p>
 
@@ -935,7 +935,7 @@ These patterns are non-negotiable. They are always exposed in specific order and
     <li class="loading">Status updating&#8230;</li>
   </ul>
   
-  <a href="https://github.com/rubyists">@rubyists</a> on GitHub
+  <a href="https://github.com/deryldoucette">@deryldoucette</a> on GitHub
   
   <script type="text/javascript">
     $.domReady(function(){
@@ -948,7 +948,7 @@ These patterns are non-negotiable. They are always exposed in specific order and
         }
 
         github.showRepos({
-            user: 'rubyists',
+            user: 'deryldoucette',
             count: 7,
             skip_forks: true,
             target: '#gh_repos'

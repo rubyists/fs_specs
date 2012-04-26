@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://rubyists.github.com/fs_specs/blog/2012/02/22/interacting-with-voicemail-002-channel-can-interact-with-voicemail-feature">
+  <link rel="canonical" href="http://deryldoucette.github.com/fs_specs/blog/2012/02/22/interacting-with-voicemail-002-channel-can-interact-with-voicemail-feature">
   <link href="/fs_specs/favicon.png" rel="icon">
   <link href="/fs_specs/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/fs_specs/javascripts/modernizr-2.0.js"></script>
@@ -50,7 +50,7 @@
   
 <form action="http://google.com/search" method="get">
   <fieldset role="search">
-    <input type="hidden" name="q" value="site:rubyists.github.com/fs_specs" />
+    <input type="hidden" name="q" value="site:deryldoucette.github.com/fs_specs" />
     <input class="search" type="text" name="q" results="0" placeholder="Search"/>
   </fieldset>
 </form>
@@ -93,9 +93,9 @@
 
 <div class="entry-content"><h3>What Are We Doing Today?</h3>
 
-<p>In this article, we’ll be discussing interacting with FreeSWITCH’s voicemail system using our <a href="https://github.com/rubyists/fs_specs/blob/master/features/002_channel_can_interact_with_voicemail.feature">002_channel_can_interact_with_voicemail</a> feature. This Feature will require that we write our own custom Listener class that we attach to the EventSocket’s <em>on_event()</em> method using our own customized <em>handle_event()</em> method.</p>
+<p>In this article, we’ll be discussing interacting with FreeSWITCH’s voicemail system using our <a href="https://github.com/deryldoucette/fs_specs/blob/master/features/002_channel_can_interact_with_voicemail.feature">002_channel_can_interact_with_voicemail</a> feature. This Feature will require that we write our own custom Listener class that we attach to the EventSocket’s <em>on_event()</em> method using our own customized <em>handle_event()</em> method.</p>
 
-<h3>Feature -  <a href="https://github.com/rubyists/fs_specs/blob/master/features/002_channel_can_interact_with_voicemail.feature">002_channel_can_interact_with_voicemail.feature</a></h3>
+<h3>Feature -  <a href="https://github.com/deryldoucette/fs_specs/blob/master/features/002_channel_can_interact_with_voicemail.feature">002_channel_can_interact_with_voicemail.feature</a></h3>
 
 <p>Here is the Feature itself.</p>
 
@@ -134,7 +134,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<h3>What Exactly Does It Do? - <a href="https://github.com/rubyists/fs_specs/blob/master/features/step_definitions/steps.rb">steps.rb</a></h3>
+<h3>What Exactly Does It Do? - <a href="https://github.com/deryldoucette/fs_specs/blob/master/features/step_definitions/steps.rb">steps.rb</a></h3>
 
 <p>OK, here we go with the whirlwind ride of whats taking place within these Feature steps. The definitions of each of them are in the linked steps.rb file.</p>
 
@@ -154,7 +154,7 @@
 
 <p>Before we get into the specifics of the extension, let me explain what we’re going to be doing. We need a way to validate that we’re actually connecting to the voicemail system, and that we can react based upon the state changes we see as we move through the system. In this instance, freeswitch uses wav files to communicate. It plays specific wavs, in specific patterns and sub-patterns, that describe the various options available under the voicemail menu. We need some way to capture and use that information. Enter our custom class, the VmListener!</p>
 
-<h3>The Code - What did we actually build? - <a href="https://github.com/rubyists/fs_specs/blob/master/features/step_definitions/vm_listener.rb">VmListener</a></h3>
+<h3>The Code - What did we actually build? - <a href="https://github.com/deryldoucette/fs_specs/blob/master/features/step_definitions/vm_listener.rb">VmListener</a></h3>
 
 <p>  If you look at the linked file, you&#8217;ll see that we define a class named VmListener which we attach to the freeswitch EventSocket.</p>
 
@@ -167,7 +167,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>  You can find, over here, the definition for <a href="https://github.com/rubyists/freeswitcher/blob/master/lib/fsr/listener/inbound.rb">FSL::Inbound</a>. What is VmListener doing? In this case, if you review, you&#8217;ll see that we define the list of wav files that FreeSWITCH should play to us when we connect to the voicemail system.</p>
+<p>  You can find, over here, the definition for <a href="https://github.com/deryldoucette/freeswitcher/blob/master/lib/fsr/listener/inbound.rb">FSL::Inbound</a>. What is VmListener doing? In this case, if you review, you&#8217;ll see that we define the list of wav files that FreeSWITCH should play to us when we connect to the voicemail system.</p>
 
 <figure class='code'><figcaption><span>Voicemail Wav File List</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -226,7 +226,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>This line of code calls the originate method on @sock1 which was created in the features/step_definitions/steps.rb file, specifically, on Line 11. Remember that @sock1 is an object created from the <a href="https://github.com/rubyists/freeswitcher/blob/master/lib/fsr/cmd/originate.rb">FSR::CommandSocket</a> class. That, in itself, is an overridden class of type Originate which is itself classed from Command. (As seen on Line 4 of the same file linked above.) This @sock1 object is what actually opens the connection to blackbird. If you remember, blackbird is our &#8216;Softphone&#8217; for these tests. It sets the caller ID to the spec_id, and then connects this leg to extension 4000 which is voicemail on the freeswitch server.</p>
+<p>This line of code calls the originate method on @sock1 which was created in the features/step_definitions/steps.rb file, specifically, on Line 11. Remember that @sock1 is an object created from the <a href="https://github.com/deryldoucette/freeswitcher/blob/master/lib/fsr/cmd/originate.rb">FSR::CommandSocket</a> class. That, in itself, is an overridden class of type Originate which is itself classed from Command. (As seen on Line 4 of the same file linked above.) This @sock1 object is what actually opens the connection to blackbird. If you remember, blackbird is our &#8216;Softphone&#8217; for these tests. It sets the caller ID to the spec_id, and then connects this leg to extension 4000 which is voicemail on the freeswitch server.</p>
 
 <p>For those that missed where this was defined, here is the line of code.</p>
 
@@ -289,7 +289,7 @@ These patterns are non-negotiable. They are always exposed in specific order and
 
 <h3>Up Next - A Look Ahead..</h3>
 
-<p>Our next article will cover the exposed Event object from FreeSWITCH. For those that would like, please look ahead at <a href="https://github.com/rubyists/fs_specs/blob/master/features/003_can_retrieve_channel_information.feature">features/003_can_retrieve_channel_information.feature</a>. This feature is the last of our current &#8216;Core Features&#8217;, and was designed to expose the event object to you as much as possible so you can make decisions on what to test for, and so you can see what information you have available to you for that decision process.</p>
+<p>Our next article will cover the exposed Event object from FreeSWITCH. For those that would like, please look ahead at <a href="https://github.com/deryldoucette/fs_specs/blob/master/features/003_can_retrieve_channel_information.feature">features/003_can_retrieve_channel_information.feature</a>. This feature is the last of our current &#8216;Core Features&#8217;, and was designed to expose the event object to you as much as possible so you can make decisions on what to test for, and so you can see what information you have available to you for that decision process.</p>
 </div>
 
 
@@ -320,7 +320,7 @@ These patterns are non-negotiable. They are always exposed in specific order and
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://rubyists.github.com/fs_specs/blog/2012/02/22/interacting-with-voicemail-002-channel-can-interact-with-voicemail-feature/" data-via="" data-counturl="http://rubyists.github.com/fs_specs/blog/2012/02/22/interacting-with-voicemail-002-channel-can-interact-with-voicemail-feature/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://deryldoucette.github.com/fs_specs/blog/2012/02/22/interacting-with-voicemail-002-channel-can-interact-with-voicemail-feature/" data-via="" data-counturl="http://deryldoucette.github.com/fs_specs/blog/2012/02/22/interacting-with-voicemail-002-channel-can-interact-with-voicemail-feature/" >Tweet</a>
   
   
   <div class="g-plusone" data-size="medium"></div>
@@ -375,7 +375,7 @@ These patterns are non-negotiable. They are always exposed in specific order and
     <li class="loading">Status updating...</li>
   </ul>
   
-  <a href="https://github.com/rubyists">@rubyists</a> on GitHub
+  <a href="https://github.com/deryldoucette">@deryldoucette</a> on GitHub
   
   <script type="text/javascript">
     $.domReady(function(){
@@ -388,7 +388,7 @@ These patterns are non-negotiable. They are always exposed in specific order and
         }
 
         github.showRepos({
-            user: 'rubyists',
+            user: 'deryldoucette',
             count: 7,
             skip_forks: true,
             target: '#gh_repos'

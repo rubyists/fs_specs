@@ -2,40 +2,40 @@
 <urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>
     <url>
         <loc>
-            http://rubyists.github.com/fs_specs/blog/2012/02/15/and-theyre-off-the-start-of-fs-specs/
+            http://deryldoucette.github.com/fs_specs/blog/2012/02/15/and-theyre-off-the-start-of-fs-specs/
         </loc>
         <lastmod>2012-02-21T12:09:48-05:00</lastmod>
     </url>
     <url>
         <loc>
-            http://rubyists.github.com/fs_specs/blog/2012/02/15/stage-fright-gone-brief-synopsis-of-goal/
+            http://deryldoucette.github.com/fs_specs/blog/2012/02/15/stage-fright-gone-brief-synopsis-of-goal/
         </loc>
         <lastmod>2012-02-21T12:10:30-05:00</lastmod>
     </url>
     <url>
         <loc>
-            http://rubyists.github.com/fs_specs/blog/2012/02/16/anatomy-of-an-fs-specs-feature-set-000-phone-infrastructure-feature/
+            http://deryldoucette.github.com/fs_specs/blog/2012/02/16/anatomy-of-an-fs-specs-feature-set-000-phone-infrastructure-feature/
         </loc>
         <lastmod>2012-02-21T12:24:49-05:00</lastmod>
     </url>
     <url>
         <loc>
-            http://rubyists.github.com/fs_specs/blog/2012/02/17/checking-out-extensions-001-channel-can-dial-extensions-feature/
+            http://deryldoucette.github.com/fs_specs/blog/2012/02/17/checking-out-extensions-001-channel-can-dial-extensions-feature/
         </loc>
         <lastmod>2012-02-21T12:21:47-05:00</lastmod>
     </url>
     <url>
         <loc>
-            http://rubyists.github.com/fs_specs/blog/2012/02/22/interacting-with-voicemail-002-channel-can-interact-with-voicemail-feature/
+            http://deryldoucette.github.com/fs_specs/blog/2012/02/22/interacting-with-voicemail-002-channel-can-interact-with-voicemail-feature/
         </loc>
         <lastmod>2012-02-27T11:16:24-05:00</lastmod>
     </url>
     <url>
-        <loc>http://rubyists.github.com/fs_specs/blog/archives/</loc>
+        <loc>http://deryldoucette.github.com/fs_specs/blog/archives/</loc>
         <lastmod>2012-02-27T11:16:24-05:00</lastmod>
     </url>
     <url>
-        <loc>http://rubyists.github.com/fs_specs/</loc>
+        <loc>http://deryldoucette.github.com/fs_specs/</loc>
         <lastmod>2012-02-27T11:16:24-05:00</lastmod>
     </url>
 </urlset>

@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://rubyists.github.com/fs_specs/blog/2012/02/16/anatomy-of-an-fs-specs-feature-set-000-phone-infrastructure-feature">
+  <link rel="canonical" href="http://deryldoucette.github.com/fs_specs/blog/2012/02/16/anatomy-of-an-fs-specs-feature-set-000-phone-infrastructure-feature">
   <link href="/fs_specs/favicon.png" rel="icon">
   <link href="/fs_specs/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/fs_specs/javascripts/modernizr-2.0.js"></script>
@@ -50,7 +50,7 @@
   
 <form action="http://google.com/search" method="get">
   <fieldset role="search">
-    <input type="hidden" name="q" value="site:rubyists.github.com/fs_specs" />
+    <input type="hidden" name="q" value="site:deryldoucette.github.com/fs_specs" />
     <input class="search" type="text" name="q" results="0" placeholder="Search"/>
   </fieldset>
 </form>
@@ -91,7 +91,7 @@
   </header>
 
 
-<div class="entry-content"><h3>FS_SPECS Stable Branch - <a href="https://github.com/rubyists/fs_specs">master</a></h3>
+<div class="entry-content"><h3>FS_SPECS Stable Branch - <a href="https://github.com/deryldoucette/fs_specs">master</a></h3>
 
 <p>As I stated earlier, our ‘master’ branch on <a href="https://github.com">GitHub</a> is the ‘Stable Release’ branch for fs_specs. As of today’s date, we currently have 4 Features that test different aspects of FreeSWITCH through FreeSWITCHeR. They are:</p>
 
@@ -105,7 +105,7 @@
 
 <p>Over the next few articles I’ll be diving into the anatomy of each feature, the attendant steps, and the <em>FSL::Inbound</em> xxListener classes for each.</p>
 
-<h3>Feature - <a href="https://github.com/rubyists/fs_specs/blob/master/features/000_phone_infrastructure.feature">000_phone_infrastructure.feature</a></h3>
+<h3>Feature - <a href="https://github.com/deryldoucette/fs_specs/blob/master/features/000_phone_infrastructure.feature">000_phone_infrastructure.feature</a></h3>
 
 <figure class='code'><figcaption><span>features/000_phone_infrastructure.feature</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -144,7 +144,7 @@
 
 <p>   This feature is the key to the entire set, both existing and those to come. The reason for this is the features job is solely to establish that you have a working configuration for running the rest of the features. If this particular feature fails nothing else will work.</p>
 
-<p>   To see what this feature is actually doing, lets open up the associated <a href="https://github.com/rubyists/fs_specs/blob/master/features/step_definitions/steps.rb">‘steps.rb’</a> file and look for the matchers that comprise each step of each Scenario as they go along. Background in each feature file sets up stuff we need to make it all work and keeps it existing for each Scenario in the feature rather than tearing it all down in-between each one.</p>
+<p>   To see what this feature is actually doing, lets open up the associated <a href="https://github.com/deryldoucette/fs_specs/blob/master/features/step_definitions/steps.rb">‘steps.rb’</a> file and look for the matchers that comprise each step of each Scenario as they go along. Background in each feature file sets up stuff we need to make it all work and keeps it existing for each Scenario in the feature rather than tearing it all down in-between each one.</p>
 
 <p>   As we can see from the feature title, this feature set establishes that the phone infrastructure for all remaining tests can be found and is correctly configured. In the Background segment’s Given line, we are checking to ensure we can access both machines listed. The first server listed (blackbird.rubyists.com) is a freeswitch that is being used basically as nothing more than a soft phone. The second server listed (tigershark.rubyists.com) is the actual freeswitch being tested. The And line ensures that we can talk to the soft phone (blackbird) via freeswitch’s EventSocket.</p>
 
@@ -269,7 +269,7 @@
 
 <p>  And finally, we terminal the call in order to show we have functional control over everything. This completes our primary test feature. Now that we know we have network connectivity, that our local testing environment is properly configured, that our truthiness can be trusted, and that we can originate/terminate calls, we can move forward into testing components of FreeSWITCH directly.</p>
 
-<p>  That will be the focus of our next article covering <a href="https://github.com/rubyists/fs_specs/blob/master/features/001_channel_can_dial_extensions.feature">001_channel_can_dial_extensions.feature</a>. The astute observer will notice a bit of overlap between 000 and 001 insofar as that we are testing the ability to connect to extensions, and we implement that same test twice, once in each feature. That is both on purpose, and due to the nature of establishing that you could actually do something with the established CommandSocket in the 000 feature.</p>
+<p>  That will be the focus of our next article covering <a href="https://github.com/deryldoucette/fs_specs/blob/master/features/001_channel_can_dial_extensions.feature">001_channel_can_dial_extensions.feature</a>. The astute observer will notice a bit of overlap between 000 and 001 insofar as that we are testing the ability to connect to extensions, and we implement that same test twice, once in each feature. That is both on purpose, and due to the nature of establishing that you could actually do something with the established CommandSocket in the 000 feature.</p>
 
 <p>  Thanks for reading!</p>
 </div>
@@ -302,7 +302,7 @@
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://rubyists.github.com/fs_specs/blog/2012/02/16/anatomy-of-an-fs-specs-feature-set-000-phone-infrastructure-feature/" data-via="" data-counturl="http://rubyists.github.com/fs_specs/blog/2012/02/16/anatomy-of-an-fs-specs-feature-set-000-phone-infrastructure-feature/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://deryldoucette.github.com/fs_specs/blog/2012/02/16/anatomy-of-an-fs-specs-feature-set-000-phone-infrastructure-feature/" data-via="" data-counturl="http://deryldoucette.github.com/fs_specs/blog/2012/02/16/anatomy-of-an-fs-specs-feature-set-000-phone-infrastructure-feature/" >Tweet</a>
   
   
   <div class="g-plusone" data-size="medium"></div>
@@ -359,7 +359,7 @@
     <li class="loading">Status updating...</li>
   </ul>
   
-  <a href="https://github.com/rubyists">@rubyists</a> on GitHub
+  <a href="https://github.com/deryldoucette">@deryldoucette</a> on GitHub
   
   <script type="text/javascript">
     $.domReady(function(){
@@ -372,7 +372,7 @@
         }
 
         github.showRepos({
-            user: 'rubyists',
+            user: 'deryldoucette',
             count: 7,
             skip_forks: true,
             target: '#gh_repos'
