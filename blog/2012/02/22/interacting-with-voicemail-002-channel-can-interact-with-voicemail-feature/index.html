@@ -226,7 +226,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>This line of code calls the originate method on @sock1 which was created in the features/step_definitions/steps.rb file, specifically, on Line 11. Remember that @sock1 is an object created from the <a href="https://github.com/deryldoucette/freeswitcher/blob/master/lib/fsr/cmd/originate.rb">FSR::CommandSocket</a> class. That, in itself, is an overridden class of type Originate which is itself classed from Command. (As seen on Line 4 of the same file linked above.) This @sock1 object is what actually opens the connection to blackbird. If you remember, blackbird is our &#8216;Softphone&#8217; for these tests. It sets the caller ID to the spec_id, and then connects this leg to extension 4000 which is voicemail on the freeswitch server.</p>
+<p>This line of code calls the originate method on @sock1 which was created in the features/step_definitions/steps.rb file, specifically, on Line 11. Remember that @sock1 is an object created from the <a href="https://github.com/rubyists/freeswitcher/blob/master/lib/fsr/cmd/originate.rb">FSR::CommandSocket</a> class. That, in itself, is an overridden class of type Originate which is itself classed from Command. (As seen on Line 4 of the same file linked above.) This @sock1 object is what actually opens the connection to blackbird. If you remember, blackbird is our &#8216;Softphone&#8217; for these tests. It sets the caller ID to the spec_id, and then connects this leg to extension 4000 which is voicemail on the freeswitch server.</p>
 
 <p>For those that missed where this was defined, here is the line of code.</p>
 
